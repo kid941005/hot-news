@@ -1,0 +1,48 @@
+{
+  "5c77d7fd8f51ed0c": {
+    "username": "kid",
+    "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "config": {
+      "keywords": [
+        "小米",
+        "黄金",
+        "比亚迪",
+        "华为"
+      ],
+      "blocked_keywords": [],
+      "push_enabled": false,
+      "push_channel": "feishu",
+      "push_webhook": "",
+      "platforms": [
+        "baidu",
+        "weibo",
+        "douyin"
+      ]
+    },
+    "created_at": "2026-03-06 18:27:29"
+  },
+  "1a024b60a0e0600c": {
+    "username": "kid1412",
+    "password": "7997c33a5c70285c08692c46839a925646d238861fd59f26aec6b630dd0e8eca",
+    "config": {
+      "keywords": [
+        "科技",
+        "教育"
+      ],
+      "blocked_keywords": [],
+      "platforms": [
+        "weibo",
+        "baidu",
+        "douyin",
+        "zhihu",
+        "toutiao",
+        "bilibili",
+        "36kr"
+      ],
+      "push_enabled": false,
+      "push_channel": "feishu",
+      "push_webhook": ""
+    },
+    "created_at": "2026-03-06 19:00"
+  }
+}
