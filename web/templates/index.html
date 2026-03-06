@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="热点资讯聚合平台">
+    <meta name="theme-color" content="#e74c3c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>🔥 Hot News - 热点聚合</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { font-size: 20px; }
+        .header .date { font-size: 12px; opacity: 0.9; }
+        
+        .user-bar button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            color: #e74c3c;
+            border-bottom-color: #e74c3c;
+        }
+        
+        .container { padding: 15px; }
+        
+        .platform-filter {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .platform-tag {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .platform-tag.active {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+        
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .news-platform {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+        
+        .news-title {
+            font-size: 15px;
+            font-weight: bold;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        
+        .news-title a {
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .news-meta {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .news-hot {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .config-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        
+        .input-group { margin-bottom: 15px; }
+        
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 80px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        .btn-primary { background: #e74c3c; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #666; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input { opacity: 0; width: 0; height: 0; }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider { background-color: #e74c3c; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <h1>🔥 Hot News</h1>
+                <div class="date" id="currentDate"></div>
+            </div>
+            <div class="user-bar" id="userBar">
+                <button onclick="showLoginModal()">登录/注册</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="news" onclick="switchTab('news')">热点</div>
+        <div class="tab" data-tab="filter" onclick="switchTab('filter')">筛选</div>
+        <div class="tab" data-tab="push" onclick="switchTab('push')">推送</div>
+        <div class="tab" data-tab="config" onclick="switchTab('config')">设置</div>
+    </div>
+    
+    <div class="container">
+        <!-- News Tab -->
+        <div class="tab-content active" id="tab-news">
+            <div class="platform-filter" id="platformFilter">
+                <div class="loading">加载中...</div>
+            </div>
+            <div id="newsList">
+                <div class="loading">加载热点中...</div>
+            </div>
+        </div>
+        
+        <!-- Filter Tab -->
+        <div class="tab-content" id="tab-filter">
+            <div class="config-section">
+                <div class="config-title">关键词筛选</div>
+                <div class="input-group">
+                    <label>包含关键词（多个用逗号分隔）</label>
+                    <textarea id="keywordsInput" placeholder="如: 基金,理财,A股"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>屏蔽关键词</label>
+                    <textarea id="blockedInput" placeholder="如: 明星,娱乐"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="saveFilter()">保存筛选</button>
+            </div>
+        </div>
+        
+        <!-- Push Tab -->
+        <div class="tab-content" id="tab-push">
+            <div class="config-section">
+                <div class="config-title">消息推送</div>
+                <div class="input-group">
+                    <label>推送开关</label>
+                    <label class="switch">
+                        <input type="checkbox" id="pushSwitch" onchange="togglePush()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>推送渠道</label>
+                    <select id="pushChannel" style="width:100%;padding:10px;font-size:14px;">
+                        <option value="feishu">飞书</option>
+                        <option value="webhook">自定义Webhook</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Webhook地址</label>
+                    <input type="text" id="webhookInput" placeholder="输入飞书/钉钉Webhook地址">
+                </div>
+                <button class="btn btn-primary" onclick="savePushConfig()">保存配置</button>
+                <button class="btn btn-secondary" onclick="testPush()">测试推送</button>
+            </div>
+        </div>
+        
+        <!-- Config Tab -->
+        <div class="tab-content" id="tab-config">
+            <div class="config-section">
+                <div class="config-title">平台选择</div>
+                <div class="platform-filter" id="platformConfig">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+            <div class="config-section">
+                <button class="btn btn-primary" onclick="savePlatforms()">保存平台设置</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="config-title" id="loginTitle">登录</div>
+            <div class="input-group">
+                <label>用户名</label>
+                <input type="text" id="username" placeholder="输入用户名">
+            </div>
+            <div class="input-group">
+                <label>密码</label>
+                <input type="password" id="password" placeholder="输入密码">
+            </div>
+            <button class="btn btn-primary" onclick="doLogin()">登录</button>
+            <button class="btn btn-secondary" onclick="doRegister()">注册</button>
+            <button class="btn btn-secondary" onclick="hideLoginModal()">取消</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let selectedPlatforms = [];
+        let isLoginMode = true;
+        
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        
+        // Check login status
+        checkLoginStatus();
+        
+        async function checkLoginStatus() {
+            try {
+                const response = await fetch('/api/check-login');
+                const data = await response.json();
+                if (data.logged_in) {
+                    currentUser = data.username;
+                    updateUserBar(data.username);
+                    loadConfig();
+                }
+            } catch (e) {
+                console.log('Not logged in');
+            }
+            loadNews();
+            loadPlatforms();
+        }
+        
+        function updateUserBar(username) {
+            document.getElementById('userBar').innerHTML = `
+                <span>${username}</span>
+                <button onclick="doLogout()">退出</button>
+            `;
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+        
+        // Load news
+        async function loadNews() {
+            try {
+                const response = await fetch('/api/news');
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderNews(data.news);
+                }
+            } catch (e) {
+                document.getElementById('newsList').innerHTML = '<div class="loading">加载失败</div>';
+            }
+        }
+        
+        function renderNews(news) {
+            if (!news || news.length === 0) {
+                document.getElementById('newsList').innerHTML = '<div class="loading">暂无热点</div>';
+                return;
+            }
+            
+            const html = news.map(item => `
+                <div class="news-card">
+                    <div class="news-platform">${item.platform}</div>
+                    <div class="news-title">
+                        <a href="${item.url}" target="_blank">${item.title}</a>
+                    </div>
+                    <div class="news-meta">
+                        <span>${item.time}</span>
+                        <span class="news-hot">${item.hot || ''}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('newsList').innerHTML = html;
+        }
+        
+        // Load platforms
+        async function loadPlatforms() {
+            try {
+                const response = await fetch('/api/platforms');
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderPlatformFilter(data.platforms);
+                    renderPlatformConfig(data.platforms);
+                }
+            } catch (e) {
+                console.error('Failed to load platforms:', e);
+            }
+        }
+        
+        function renderPlatformFilter(platforms) {
+            const html = platforms.map(p => `
+                <div class="platform-tag ${selectedPlatforms.includes(p.id) ? 'active' : ''}" 
+                     onclick="togglePlatform('${p.id}')">
+                    ${p.icon} ${p.name}
+                </div>
+            `).join('');
+            document.getElementById('platformFilter').innerHTML = html;
+        }
+        
+        function renderPlatformConfig(platforms) {
+            const html = platforms.map(p => `
+                <div class="platform-tag ${selectedPlatforms.includes(p.id) ? 'active' : ''}" 
+                     onclick="togglePlatformConfig('${p.id}')">
+                    ${p.icon} ${p.name}
+                </div>
+            `).join('');
+            document.getElementById('platformConfig').innerHTML = html;
+        }
+        
+        function togglePlatform(platformId) {
+            const index = selectedPlatforms.indexOf(platformId);
+            if (index > -1) {
+                selectedPlatforms.splice(index, 1);
+            } else {
+                selectedPlatforms.push(platformId);
+            }
+            renderPlatformFilter([{id: 'weibo', icon: '🔵', name: '微博'}, 
+                {id: 'baidu', icon: '🔴', name: '百度'},
+                {id: 'zhihu', icon: '🔵', name: '知乎'},
+                {id: 'toutiao', icon: '🔵', name: '头条'},
+                {id: 'douyin', icon: '🎵', name: '抖音'},
+                {id: 'bilibili', icon: '🔵', name: 'B站'},
+                {id: '36kr', icon: '📊', name: '36Kr'}
+            ]);
+            loadNews();
+        }
+        
+        function togglePlatformConfig(platformId) {
+            const index = selectedPlatforms.indexOf(platformId);
+            if (index > -1) {
+                selectedPlatforms.splice(index, 1);
+            } else {
+                selectedPlatforms.push(platformId);
+            }
+            renderPlatformConfig([{id: 'weibo', icon: '🔵', name: '微博'}, 
+                {id: 'baidu', icon: '🔴', name: '百度'},
+                {id: 'zhihu', icon: '🔵', name: '知乎'},
+                {id: 'toutiao', icon: '🔵', name: '头条'},
+                {id: 'douyin', icon: '🎵', name: '抖音'},
+                {id: 'bilibili', icon: '🔵', name: 'B站'},
+                {id: '36kr', icon: '📊', name: '36Kr'}
+            ]);
+        }
+        
+        // Load user config
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const config = data.config;
+                    selectedPlatforms = config.platforms || [];
+                    document.getElementById('keywordsInput').value = (config.keywords || []).join(',');
+                    document.getElementById('blockedInput').value = (config.blocked_keywords || []).join(',');
+                    document.getElementById('pushSwitch').checked = config.push_enabled;
+                    document.getElementById('pushChannel').value = config.push_channel;
+                    document.getElementById('webhookInput').value = config.push_webhook;
+                }
+            } catch (e) {
+                console.error('Failed to load config:', e);
+            }
+        }
+        
+        // Save functions
+        async function saveFilter() {
+            const keywords = document.getElementById('keywordsInput').value.split(',').map(k => k.trim()).filter(k => k);
+            const blocked = document.getElementById('blockedInput').value.split(',').map(k => k.trim()).filter(k => k);
+            
+            await fetch('/api/config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({keywords, blocked_keywords: blocked})
+            });
+            
+            alert('筛选已保存');
+            loadNews();
+        }
+        
+        async function savePushConfig() {
+            const push_enabled = document.getElementById('pushSwitch').checked;
+            const push_channel = document.getElementById('pushChannel').value;
+            const push_webhook = document.getElementById('webhookInput').value;
+            
+            await fetch('/api/config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    push_enabled,
+                    push_channel,
+                    push_webhook
+                })
+            });
+            
+            alert('推送配置已保存');
+        }
+        
+        async function savePlatforms() {
+            await fetch('/api/config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({platforms: selectedPlatforms})
+            });
+            
+            alert('平台设置已保存');
+            loadNews();
+        }
+        
+        async function testPush() {
+            const response = await fetch('/api/push', {method: 'POST'});
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('推送成功！请检查你的接收渠道');
+            } else {
+                alert('推送失败: ' + data.error);
+            }
+        }
+        
+        function togglePush() {
+            // Auto-save when toggle
+            savePushConfig();
+        }
+        
+        // Login/Register
+        function showLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+        
+        function hideLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+        
+        async function doLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                currentUser = data.username;
+                updateUserBar(data.username);
+                hideLoginModal();
+                loadConfig();
+            } else {
+                alert(data.error);
+            }
+        }
+        
+        async function doRegister() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                currentUser = data.username;
+                updateUserBar(data.username);
+                hideLoginModal();
+            } else {
+                alert(data.error);
+            }
+        }
+        
+        async function doLogout() {
+            await fetch('/api/logout', {method: 'POST'});
+            currentUser = null;
+            document.getElementById('userBar').innerHTML = '<button onclick="showLoginModal()">登录/注册</button>';
+        }
+        
+        // Auto refresh
+        setInterval(loadNews, 60000);
+    </script>
+</body>
+</html>
