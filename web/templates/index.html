@@ -2,195 +2,289 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="热点资讯聚合平台">
-    <meta name="theme-color" content="#e74c3c">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="关键词资讯流">
+    <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>🔥 Hot News - 热点聚合</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>关键词资讯</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-            padding-bottom: 80px;
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary: #667eea;
+            --text: #1a1a2e;
+            --text-light: #666;
+            --gray: #f5f5f7;
+            --border: #e8e8e8;
+            --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
         
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+            background: var(--gray);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 14px;
+            overscroll-behavior-y: contain;
+        }
+        
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            background: var(--primary-gradient);
+            padding: 16px 20px;
             color: white;
-            padding: 15px;
             position: sticky;
             top: 0;
             z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
         
-        .header-content {
+        .header-main {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 16px;
         }
         
-        .header h1 { font-size: 20px; }
-        .header .date { font-size: 12px; opacity: 0.9; }
-        
-        .user-bar button {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
         }
         
-        .tabs {
+        .header-user {
             display: flex;
-            background: white;
-            border-bottom: 1px solid #eee;
-            overflow-x: auto;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 13px;
-            color: #666;
-            border-bottom: 2px solid transparent;
-            white-space: nowrap;
-        }
-        
-        .tab.active {
-            color: #e74c3c;
-            border-bottom-color: #e74c3c;
-        }
-        
-        .container { padding: 15px; }
-        
-        .platform-filter {
-            display: flex;
+            align-items: center;
             gap: 8px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
         }
         
-        .platform-tag {
-            padding: 6px 12px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 12px;
+        .user-btn {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 16px;
+            color: white;
+            font-size: 13px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .platform-tag.active {
-            background: #e74c3c;
-            color: white;
-            border-color: #e74c3c;
+        .user-btn:active {
+            transform: scale(0.95);
         }
         
-        .news-card {
+        /* Keywords section */
+        .keywords-section {
             background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 70px;
+            z-index: 99;
         }
         
-        .news-platform {
-            display: inline-block;
-            padding: 2px 8px;
-            background: #e74c3c;
-            color: white;
-            border-radius: 4px;
-            font-size: 11px;
-            margin-bottom: 8px;
-        }
-        
-        .news-title {
-            font-size: 15px;
-            font-weight: bold;
-            line-height: 1.5;
-            margin-bottom: 8px;
-        }
-        
-        .news-title a {
-            color: #333;
-            text-decoration: none;
-        }
-        
-        .news-meta {
-            font-size: 12px;
-            color: #999;
+        .keywords-header {
             display: flex;
             justify-content: space-between;
-        }
-        
-        .news-hot {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-        
-        .config-section {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .config-title {
-            font-size: 16px;
-            font-weight: bold;
+            align-items: center;
             margin-bottom: 12px;
         }
         
-        .input-group { margin-bottom: 15px; }
-        
-        .input-group label {
-            display: block;
+        .keywords-title {
             font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
+            font-weight: 600;
         }
         
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        
-        .input-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            min-height: 80px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
+        .keywords-edit {
+            font-size: 13px;
+            color: var(--primary);
             cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
         }
         
-        .btn-primary { background: #e74c3c; color: white; }
-        .btn-secondary { background: #f0f0f0; color: #666; }
+        .keywords-edit:active {
+            background: rgba(102, 126, 234, 0.1);
+        }
         
+        .keywords-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .keyword-tag {
+            padding: 6px 14px;
+            background: var(--gray);
+            border-radius: 16px;
+            font-size: 13px;
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            animation: fadeIn 0.3s ease backwards;
+        }
+        
+        .keyword-tag.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+        
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            background: white;
+            padding: 12px 20px;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .stat-item {
+            text-align: center;
+            animation: slideUp 0.3s ease backwards;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        /* Feed */
+        .feed {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+        
+        .feed-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            animation: slideUp 0.4s ease backwards;
+        }
+        
+        .feed-item:active {
+            transform: scale(0.98);
+        }
+        
+        .feed-item:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .feed-source {
+            font-size: 12px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feed-source .platform {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .feed-match {
+            font-size: 12px;
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 10px;
+            border-radius: 10px;
+        }
+        
+        .feed-title {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+        }
+        
+        .feed-title:hover {
+            color: var(--primary);
+        }
+        
+        .feed-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        /* Loading & Empty */
+        .loading, .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Stagger animations */
+        .feed-item:nth-child(1) { animation-delay: 0s; }
+        .feed-item:nth-child(2) { animation-delay: 0.05s; }
+        .feed-item:nth-child(3) { animation-delay: 0.1s; }
+        .feed-item:nth-child(4) { animation-delay: 0.15s; }
+        .feed-item:nth-child(5) { animation-delay: 0.2s; }
+        .feed-item:nth-child(6) { animation-delay: 0.25s; }
+        
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -199,452 +293,439 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
             z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 20px;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+            animation: fadeIn 0.2s ease;
         }
         
         .modal-content {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
         }
         
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
         
-        .switch input { opacity: 0; width: 0; height: 0; }
+        .form-group {
+            margin-bottom: 16px;
+        }
         
-        .slider {
-            position: absolute;
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
+            transition: all 0.2s;
+            -webkit-appearance: none;
         }
         
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+        .btn:active {
+            transform: scale(0.98);
         }
         
-        input:checked + .slider { background-color: #e74c3c; }
-        input:checked + .slider:before { transform: translateX(26px); }
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
         
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--text);
+        }
+        
+        /* Pull to refresh */
+        .pull-refresh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 13px;
+            transform: translateY(-100%);
+            transition: transform 0.3s;
+            z-index: 101;
+        }
+        
+        .pull-refresh.active {
+            transform: translateY(0);
+        }
+        
+        /* Safe area for mobile */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .bottom-nav {
+                padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* Responsive */
+        @media (min-width: 768px) {
+            .feed {
+                padding: 24px;
+            }
+            
+            .feed-item {
+                padding: 20px;
+            }
+            
+            .header, .keywords-section, .stats-bar {
+                padding-left: calc(50% - 300px);
+                padding-right: calc(50% - 300px);
+            }
+            
+            .feed-item:hover {
+                transform: translateY(-2px);
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .header-title {
+                font-size: 16px;
+            }
+            
+            .feed-title {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Pull to refresh -->
+    <div class="pull-refresh" id="pullRefresh">
+        <span>下拉刷新...</span>
+    </div>
+    
+    <!-- Header -->
     <div class="header">
-        <div class="header-content">
-            <div>
-                <h1>🔥 Hot News</h1>
-                <div class="date" id="currentDate"></div>
+        <div class="header-main">
+            <div class="header-title">关键词资讯</div>
+            <div class="header-user">
+                <button class="user-btn" id="userBtn" onclick="showLogin()">登录</button>
             </div>
-            <div class="user-bar" id="userBar">
-                <button onclick="showLoginModal()">登录/注册</button>
+        </div>
+        
+        <!-- Keywords -->
+        <div class="keywords-section">
+            <div class="keywords-header">
+                <span class="keywords-title">我的关键词</span>
+                <span class="keywords-edit" onclick="showKeywordsEdit()">编辑</span>
+            </div>
+            <div class="keywords-list" id="keywordsList">
+                <span class="keyword-tag">暂无关键词</span>
             </div>
         </div>
     </div>
     
-    <div class="tabs">
-        <div class="tab active" data-tab="news" onclick="switchTab('news')">热点</div>
-        <div class="tab" data-tab="filter" onclick="switchTab('filter')">筛选</div>
-        <div class="tab" data-tab="push" onclick="switchTab('push')">推送</div>
-        <div class="tab" data-tab="config" onclick="switchTab('config')">设置</div>
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-value" id="totalCount">0</div>
+            <div class="stat-label">匹配资讯</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="todayCount">0</div>
+            <div class="stat-label">今日新增</div>
+        </div>
     </div>
     
-    <div class="container">
-        <!-- News Tab -->
-        <div class="tab-content active" id="tab-news">
-            <div class="platform-filter" id="platformFilter">
-                <div class="loading">加载中...</div>
-            </div>
-            <div id="newsList">
-                <div class="loading">加载热点中...</div>
-            </div>
-        </div>
-        
-        <!-- Filter Tab -->
-        <div class="tab-content" id="tab-filter">
-            <div class="config-section">
-                <div class="config-title">关键词筛选</div>
-                <div class="input-group">
-                    <label>包含关键词（多个用逗号分隔）</label>
-                    <textarea id="keywordsInput" placeholder="如: 基金,理财,A股"></textarea>
-                </div>
-                <div class="input-group">
-                    <label>屏蔽关键词</label>
-                    <textarea id="blockedInput" placeholder="如: 明星,娱乐"></textarea>
-                </div>
-                <button class="btn btn-primary" onclick="saveFilter()">保存筛选</button>
-            </div>
-        </div>
-        
-        <!-- Push Tab -->
-        <div class="tab-content" id="tab-push">
-            <div class="config-section">
-                <div class="config-title">消息推送</div>
-                <div class="input-group">
-                    <label>推送开关</label>
-                    <label class="switch">
-                        <input type="checkbox" id="pushSwitch" onchange="togglePush()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="input-group">
-                    <label>推送渠道</label>
-                    <select id="pushChannel" style="width:100%;padding:10px;font-size:14px;">
-                        <option value="feishu">飞书</option>
-                        <option value="webhook">自定义Webhook</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Webhook地址</label>
-                    <input type="text" id="webhookInput" placeholder="输入飞书/钉钉Webhook地址">
-                </div>
-                <button class="btn btn-primary" onclick="savePushConfig()">保存配置</button>
-                <button class="btn btn-secondary" onclick="testPush()">测试推送</button>
-            </div>
-        </div>
-        
-        <!-- Config Tab -->
-        <div class="tab-content" id="tab-config">
-            <div class="config-section">
-                <div class="config-title">平台选择</div>
-                <div class="platform-filter" id="platformConfig">
-                    <div class="loading">加载中...</div>
-                </div>
-            </div>
-            <div class="config-section">
-                <button class="btn btn-primary" onclick="savePlatforms()">保存平台设置</button>
-            </div>
-        </div>
+    <!-- Feed -->
+    <div class="feed" id="feedList">
+        <div class="loading">加载中...</div>
     </div>
     
     <!-- Login Modal -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
-            <div class="config-title" id="loginTitle">登录</div>
-            <div class="input-group">
-                <label>用户名</label>
-                <input type="text" id="username" placeholder="输入用户名">
+            <div class="modal-title" id="loginTitle">登录</div>
+            <div class="form-group">
+                <input type="text" class="form-input" id="username" placeholder="用户名">
             </div>
-            <div class="input-group">
-                <label>密码</label>
-                <input type="password" id="password" placeholder="输入密码">
+            <div class="form-group">
+                <input type="password" class="form-input" id="password" placeholder="密码">
             </div>
             <button class="btn btn-primary" onclick="doLogin()">登录</button>
             <button class="btn btn-secondary" onclick="doRegister()">注册</button>
-            <button class="btn btn-secondary" onclick="hideLoginModal()">取消</button>
+            <button class="btn btn-secondary" onclick="hideLogin()" style="margin-top:10px;margin-bottom:0">取消</button>
         </div>
     </div>
-
+    
+    <!-- Keywords Edit Modal -->
+    <div class="modal" id="keywordsModal">
+        <div class="modal-content">
+            <div class="modal-title">编辑关键词</div>
+            <div class="form-group">
+                <label class="form-label">关注关键词（逗号分隔）</label>
+                <textarea class="form-textarea" id="keywordsInput" rows="4" placeholder="如: AI,科技,基金,芯片"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">屏蔽关键词</label>
+                <textarea class="form-textarea" id="blockedInput" rows="2" placeholder="不想看到的内容"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="saveKeywords()">保存</button>
+            <button class="btn btn-secondary" onclick="hideKeywordsModal()">取消</button>
+        </div>
+    </div>
+    
     <script>
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+        
         let currentUser = null;
-        let selectedPlatforms = [];
-        let isLoginMode = true;
+        let userKeywords = [];
+        let blockedKeywords = [];
+        let allNews = [];
+        let pullStartY = 0;
         
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
+        // Init
+        init();
         
-        // Check login status
-        checkLoginStatus();
-        
-        async function checkLoginStatus() {
-            try {
-                const response = await fetch('/api/check-login');
-                const data = await response.json();
-                if (data.logged_in) {
-                    currentUser = data.username;
-                    updateUserBar(data.username);
-                    loadConfig();
-                }
-            } catch (e) {
-                console.log('Not logged in');
-            }
-            loadNews();
-            loadPlatforms();
+        async function init() {
+            await checkLogin();
+            await loadNews();
+            initPullRefresh();
         }
         
-        function updateUserBar(username) {
-            document.getElementById('userBar').innerHTML = `
-                <span>${username}</span>
-                <button onclick="doLogout()">退出</button>
-            `;
-        }
-        
-        // Tab switching
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+        function initPullRefresh() {
+            document.addEventListener('touchstart', e => {
+                pullStartY = e.touches[0].clientY;
+            }, { passive: true });
             
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
+            document.addEventListener('touchmove', e => {
+                const y = e.touches[0].clientY;
+                const diff = y - pullStartY;
+                if (diff > 0 && window.scrollY === 0) {
+                    document.getElementById('pullRefresh').classList.add('active');
+                }
+            }, { passive: true });
+            
+            document.addEventListener('touchend', async () => {
+                document.getElementById('pullRefresh').classList.remove('active');
+                // Refresh on pull
+                if (window.scrollY === 0) {
+                    await loadNews(true);
+                }
+            }, { passive: true });
         }
         
-        // Load news
-        async function loadNews() {
+        async function checkLogin() {
             try {
-                const response = await fetch('/api/news');
-                const data = await response.json();
-                
-                if (data.success) {
-                    renderNews(data.news);
+                const r = await fetch('/api/check-login');
+                const d = await r.json();
+                if (d.logged_in) {
+                    currentUser = d.username;
+                    document.getElementById('userBtn').textContent = d.username;
+                    loadUserConfig();
                 }
-            } catch (e) {
-                document.getElementById('newsList').innerHTML = '<div class="loading">加载失败</div>';
+            } catch(e) {}
+        }
+        
+        async function loadUserConfig() {
+            try {
+                const r = await fetch('/api/config');
+                const d = await r.json();
+                if (d.success && d.config) {
+                    userKeywords = d.config.keywords || [];
+                    blockedKeywords = d.config.blocked_keywords || [];
+                    renderKeywords();
+                    filterAndRender();
+                }
+            } catch(e) {}
+        }
+        
+        function renderKeywords() {
+            const container = document.getElementById('keywordsList');
+            if (!userKeywords.length) {
+                container.innerHTML = '<span class="keyword-tag">暂无关键词</span>';
+                return;
+            }
+            container.innerHTML = userKeywords.map((kw, i) => 
+                `<span class="keyword-tag" style="animation-delay: ${i * 0.05}s">${kw}</span>`
+            ).join('');
+        }
+        
+        async function loadNews(force = false) {
+            try {
+                const url = force ? '/api/news?force=1' : '/api/news';
+                const r = await fetch(url);
+                const d = await r.json();
+                if (d.success) {
+                    allNews = d.news || [];
+                    filterAndRender();
+                }
+            } catch(e) {
+                document.getElementById('feedList').innerHTML = '<div class="empty">加载失败</div>';
             }
         }
         
-        function renderNews(news) {
-            if (!news || news.length === 0) {
-                document.getElementById('newsList').innerHTML = '<div class="loading">暂无热点</div>';
+        function filterAndRender() {
+            const container = document.getElementById('feedList');
+            
+            let filtered = allNews;
+            
+            if (userKeywords.length > 0) {
+                filtered = allNews.filter(item => {
+                    const title = item.title;
+                    const matches = userKeywords.some(kw => title.includes(kw));
+                    const blocked = blockedKeywords.some(bk => title.includes(bk));
+                    return matches && !blocked;
+                });
+            } else if (blockedKeywords.length > 0) {
+                filtered = allNews.filter(item => {
+                    const title = item.title;
+                    return !blockedKeywords.some(bk => title.includes(bk));
+                });
+            }
+            
+            document.getElementById('totalCount').textContent = filtered.length;
+            document.getElementById('todayCount').textContent = filtered.length;
+            
+            if (!filtered.length) {
+                container.innerHTML = '<div class="empty">' + 
+                    (userKeywords.length ? '暂无匹配资讯' : '请添加关注的关键词') + 
+                    '</div>';
                 return;
             }
             
-            const html = news.map(item => `
-                <div class="news-card">
-                    <div class="news-platform">${item.platform}</div>
-                    <div class="news-title">
-                        <a href="${item.url}" target="_blank">${item.title}</a>
-                    </div>
-                    <div class="news-meta">
-                        <span>${item.time}</span>
-                        <span class="news-hot">${item.hot || ''}</span>
-                    </div>
-                </div>
-            `).join('');
+            filtered.sort((a, b) => (b.hot || 0) - (a.hot || 0));
             
-            document.getElementById('newsList').innerHTML = html;
-        }
-        
-        // Load platforms
-        async function loadPlatforms() {
-            try {
-                const response = await fetch('/api/platforms');
-                const data = await response.json();
+            container.innerHTML = filtered.map((item, i) => {
+                const matched = userKeywords.filter(kw => item.title.includes(kw));
                 
-                if (data.success) {
-                    renderPlatformFilter(data.platforms);
-                    renderPlatformConfig(data.platforms);
-                }
-            } catch (e) {
-                console.error('Failed to load platforms:', e);
-            }
+                return `
+                    <div class="feed-item" style="animation-delay: ${i * 0.05}s" onclick="window.open('${item.url}', '_blank')">
+                        <div class="feed-header">
+                            <span class="feed-source"><span class="platform">${item.platform}</span> ${item.time}</span>
+                            ${matched.length ? `<span class="feed-match">${matched[0]}</span>` : ''}
+                        </div>
+                        <div class="feed-title">${item.title}</div>
+                        <div class="feed-footer">
+                            <span>热度: ${item.hot || '-'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
-        function renderPlatformFilter(platforms) {
-            const html = platforms.map(p => `
-                <div class="platform-tag ${selectedPlatforms.includes(p.id) ? 'active' : ''}" 
-                     onclick="togglePlatform('${p.id}')">
-                    ${p.icon} ${p.name}
-                </div>
-            `).join('');
-            document.getElementById('platformFilter').innerHTML = html;
-        }
-        
-        function renderPlatformConfig(platforms) {
-            const html = platforms.map(p => `
-                <div class="platform-tag ${selectedPlatforms.includes(p.id) ? 'active' : ''}" 
-                     onclick="togglePlatformConfig('${p.id}')">
-                    ${p.icon} ${p.name}
-                </div>
-            `).join('');
-            document.getElementById('platformConfig').innerHTML = html;
-        }
-        
-        function togglePlatform(platformId) {
-            const index = selectedPlatforms.indexOf(platformId);
-            if (index > -1) {
-                selectedPlatforms.splice(index, 1);
-            } else {
-                selectedPlatforms.push(platformId);
-            }
-            renderPlatformFilter([{id: 'weibo', icon: '🔵', name: '微博'}, 
-                {id: 'baidu', icon: '🔴', name: '百度'},
-                {id: 'zhihu', icon: '🔵', name: '知乎'},
-                {id: 'toutiao', icon: '🔵', name: '头条'},
-                {id: 'douyin', icon: '🎵', name: '抖音'},
-                {id: 'bilibili', icon: '🔵', name: 'B站'},
-                {id: '36kr', icon: '📊', name: '36Kr'}
-            ]);
-            loadNews();
-        }
-        
-        function togglePlatformConfig(platformId) {
-            const index = selectedPlatforms.indexOf(platformId);
-            if (index > -1) {
-                selectedPlatforms.splice(index, 1);
-            } else {
-                selectedPlatforms.push(platformId);
-            }
-            renderPlatformConfig([{id: 'weibo', icon: '🔵', name: '微博'}, 
-                {id: 'baidu', icon: '🔴', name: '百度'},
-                {id: 'zhihu', icon: '🔵', name: '知乎'},
-                {id: 'toutiao', icon: '🔵', name: '头条'},
-                {id: 'douyin', icon: '🎵', name: '抖音'},
-                {id: 'bilibili', icon: '🔵', name: 'B站'},
-                {id: '36kr', icon: '📊', name: '36Kr'}
-            ]);
-        }
-        
-        // Load user config
-        async function loadConfig() {
-            try {
-                const response = await fetch('/api/config');
-                const data = await response.json();
-                
-                if (data.success) {
-                    const config = data.config;
-                    selectedPlatforms = config.platforms || [];
-                    document.getElementById('keywordsInput').value = (config.keywords || []).join(',');
-                    document.getElementById('blockedInput').value = (config.blocked_keywords || []).join(',');
-                    document.getElementById('pushSwitch').checked = config.push_enabled;
-                    document.getElementById('pushChannel').value = config.push_channel;
-                    document.getElementById('webhookInput').value = config.push_webhook;
-                }
-            } catch (e) {
-                console.error('Failed to load config:', e);
-            }
-        }
-        
-        // Save functions
-        async function saveFilter() {
-            const keywords = document.getElementById('keywordsInput').value.split(',').map(k => k.trim()).filter(k => k);
-            const blocked = document.getElementById('blockedInput').value.split(',').map(k => k.trim()).filter(k => k);
-            
-            await fetch('/api/config', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({keywords, blocked_keywords: blocked})
-            });
-            
-            alert('筛选已保存');
-            loadNews();
-        }
-        
-        async function savePushConfig() {
-            const push_enabled = document.getElementById('pushSwitch').checked;
-            const push_channel = document.getElementById('pushChannel').value;
-            const push_webhook = document.getElementById('webhookInput').value;
-            
-            await fetch('/api/config', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    push_enabled,
-                    push_channel,
-                    push_webhook
-                })
-            });
-            
-            alert('推送配置已保存');
-        }
-        
-        async function savePlatforms() {
-            await fetch('/api/config', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({platforms: selectedPlatforms})
-            });
-            
-            alert('平台设置已保存');
-            loadNews();
-        }
-        
-        async function testPush() {
-            const response = await fetch('/api/push', {method: 'POST'});
-            const data = await response.json();
-            
-            if (data.success) {
-                alert('推送成功！请检查你的接收渠道');
-            } else {
-                alert('推送失败: ' + data.error);
-            }
-        }
-        
-        function togglePush() {
-            // Auto-save when toggle
-            savePushConfig();
-        }
-        
-        // Login/Register
-        function showLoginModal() {
+        // Login functions
+        function showLogin() {
             document.getElementById('loginModal').style.display = 'flex';
         }
         
-        function hideLoginModal() {
+        function hideLogin() {
             document.getElementById('loginModal').style.display = 'none';
         }
         
         async function doLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            const response = await fetch('/api/login', {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            const r = await fetch('/api/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username, password})
+                body: JSON.stringify({username: u, password: p})
             });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                currentUser = data.username;
-                updateUserBar(data.username);
-                hideLoginModal();
-                loadConfig();
+            const d = await r.json();
+            if (d.success) {
+                currentUser = d.username;
+                document.getElementById('userBtn').textContent = d.username;
+                hideLogin();
+                loadUserConfig();
             } else {
-                alert(data.error);
+                alert(d.error || '登录失败');
             }
         }
         
         async function doRegister() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            const response = await fetch('/api/register', {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            const r = await fetch('/api/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username, password})
+                body: JSON.stringify({username: u, password: p})
             });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                currentUser = data.username;
-                updateUserBar(data.username);
-                hideLoginModal();
+            const d = await r.json();
+            if (d.success) {
+                currentUser = d.username;
+                document.getElementById('userBtn').textContent = d.username;
+                hideLogin();
+                loadUserConfig();
             } else {
-                alert(data.error);
+                alert(d.error || '注册失败');
             }
         }
         
-        async function doLogout() {
-            await fetch('/api/logout', {method: 'POST'});
-            currentUser = null;
-            document.getElementById('userBar').innerHTML = '<button onclick="showLoginModal()">登录/注册</button>';
+        function showKeywordsEdit() {
+            document.getElementById('keywordsInput').value = userKeywords.join(', ');
+            document.getElementById('blockedInput').value = blockedKeywords.join(', ');
+            document.getElementById('keywordsModal').style.display = 'flex';
         }
         
-        // Auto refresh
-        setInterval(loadNews, 60000);
+        function hideKeywordsModal() {
+            document.getElementById('keywordsModal').style.display = 'none';
+        }
+        
+        async function saveKeywords() {
+            userKeywords = document.getElementById('keywordsInput').value
+                .split(',').map(s => s.trim()).filter(s => s);
+            blockedKeywords = document.getElementById('blockedInput').value
+                .split(',').map(s => s.trim()).filter(s => s);
+            
+            try {
+                await fetch('/api/config', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        keywords: userKeywords,
+                        blocked_keywords: blockedKeywords
+                    })
+                });
+            } catch(e) {}
+            
+            hideKeywordsModal();
+            renderKeywords();
+            filterAndRender();
+        }
     </script>
 </body>
 </html>

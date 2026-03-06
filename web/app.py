@@ -6,7 +6,6 @@ Hot News Web - 热点资讯Web界面
 import os
 import sys
 import json
-import secrets
 import hashlib
 from datetime import datetime
 from functools import wraps
@@ -14,12 +13,20 @@ from functools import wraps
 # Add scripts to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, render_template, jsonify, request, session, send_from_directory
 from flask_cors import CORS
 import hot_news
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 CORS(app, supports_credentials=True)
+
+# Disable caching
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 # Secret key
 app.secret_key = "hot-news-secret-2026"
@@ -27,61 +34,69 @@ app.secret_key = "hot-news-secret-2026"
 # Data paths
 DATA_DIR = os.path.expanduser("~/.openclaw/workspace/hot-news")
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
-CONFIG_FILE = os.path.join(DATA_DIR, "config.json")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# ============== User System ==============
+# ============== 用户系统 ==============
 
 def load_users():
+    """加载用户数据"""
     if os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     return {}
 
 def save_users(users):
+    """保存用户数据"""
     with open(USERS_FILE, 'w', encoding='utf-8') as f:
         json.dump(users, f, ensure_ascii=False, indent=2)
 
-def load_config():
-    default = {
-        "keywords": [],
-        "blocked_keywords": [],
-        "push_enabled": False,
-        "push_channel": "feishu",
-        "push_webhook": "",
-        "platforms": ["weibo", "baidu", "zhihu", "toutiao", "douyin", "bilibili"]
-    }
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return {**default, **json.load(f)}
-    return default
-
-def save_config(config):
-    with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(config, f, ensure_ascii=False, indent=2)
-
 def get_user_config(user_id):
+    """获取用户配置"""
     users = load_users()
     if user_id in users:
-        return users[user_id].get('config', load_config())
-    return load_config()
+        return users[user_id].get('config', {
+            'keywords': [],
+            'blocked_keywords': [],
+            'platforms': ['weibo', 'baidu', 'douyin'],
+            'push_enabled': False,
+            'push_channel': 'feishu',
+            'push_webhook': ''
+        })
+    return {
+        'keywords': [],
+        'blocked_keywords': [],
+        'platforms': ['weibo', 'baidu', 'douyin'],
+        'push_enabled': False,
+        'push_channel': 'feishu',
+        'push_webhook': ''
+    }
 
 def save_user_config(user_id, config):
+    """保存用户配置"""
     users = load_users()
     if user_id in users:
         users[user_id]['config'] = config
         save_users(users)
 
 def login_required(f):
+    """登录装饰器"""
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated(*args, **kwargs):
         if not session.get('user_id'):
             return jsonify({"success": False, "error": "请先登录", "need_login": True})
         return f(*args, **kwargs)
-    return decorated_function
+    return decorated
 
-# ============== Routes ==============
+# ============== 路由 ==============
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json')
+
+@app.route('/sw.js')
+def sw():
+    return send_from_directory('static', 'sw.js')
 
 @app.route('/')
 def index():
@@ -90,19 +105,24 @@ def index():
 @app.route('/api/news')
 def get_news():
     """获取热点新闻"""
-    config = load_config()
+    # 获取配置（优先用户配置，否则默认）
+    user_id = session.get('user_id')
+    config = get_user_config(user_id) if user_id else {
+        'platforms': ['weibo', 'baidu', 'douyin'],
+        'keywords': [],
+        'blocked_keywords': []
+    }
+    
     platforms = config.get('platforms', [])
     keywords = config.get('keywords', [])
     blocked = config.get('blocked_keywords', [])
     
-    # 获取所有平台热点
-    all_news = hot_news.fetch_all_hot(platforms if platforms else None)
+    # 获取热点
+    all_news = hot_news.fetch_all(platforms if platforms else None)
     
     # 关键词过滤
-    if keywords:
+    if keywords or blocked:
         all_news = hot_news.filter_by_keywords(all_news, keywords, blocked)
-    elif blocked:
-        all_news = hot_news.filter_by_keywords(all_news, None, blocked)
     
     return jsonify({
         "success": True,
@@ -114,53 +134,29 @@ def get_news():
 @app.route('/api/config', methods=['GET', 'POST'])
 @login_required
 def manage_config():
+    """获取/保存配置"""
     user_id = session.get('user_id')
     
     if request.method == 'GET':
-        config = get_user_config(user_id)
-        return jsonify({"success": True, "config": config})
+        return jsonify({"success": True, "config": get_user_config(user_id)})
     
     # POST - 更新配置
-    data = request.json
+    data = request.json or {}
     config = get_user_config(user_id)
     
-    if 'keywords' in data:
-        config['keywords'] = data['keywords']
-    if 'blocked_keywords' in data:
-        config['blocked_keywords'] = data['blocked_keywords']
-    if 'platforms' in data:
-        config['platforms'] = data['platforms']
-    if 'push_enabled' in data:
-        config['push_enabled'] = data['push_enabled']
-    if 'push_channel' in data:
-        config['push_channel'] = data['push_channel']
-    if 'push_webhook' in data:
-        config['push_webhook'] = data['push_webhook']
+    # 更新配置项
+    for key in ['keywords', 'blocked_keywords', 'platforms', 'push_enabled', 'push_channel', 'push_webhook']:
+        if key in data:
+            config[key] = data[key]
     
     save_user_config(user_id, config)
     
     return jsonify({"success": True, "message": "配置已保存"})
 
-@app.route('/api/platforms')
-def get_platforms():
-    """获取可用平台列表"""
-    return jsonify({
-        "success": True,
-        "platforms": [
-            {"id": "weibo", "name": "微博", "icon": "🔵"},
-            {"id": "baidu", "name": "百度", "icon": "🔴"},
-            {"id": "zhihu", "name": "知乎", "icon": "🔵"},
-            {"id": "toutiao", "name": "头条", "icon": "🔵"},
-            {"id": "douyin", "name": "抖音", "icon": "🎵"},
-            {"id": "bilibili", "name": "B站", "icon": "🔵"},
-            {"id": "36kr", "name": "36Kr", "icon": "📊"},
-            {"id": "jinri", "name": "今日头条", "icon": "📰"}
-        ]
-    })
-
 @app.route('/api/register', methods=['POST'])
 def register():
-    data = request.json
+    """注册用户"""
+    data = request.json or {}
     username = data.get('username', '').strip()
     password = data.get('password', '')
     
@@ -169,37 +165,47 @@ def register():
     
     users = load_users()
     
-    for uid, user in users.items():
+    # 检查用户名是否已存在
+    for user in users.values():
         if user.get('username') == username:
             return jsonify({"success": False, "error": "用户名已存在"})
     
+    # 创建新用户
     user_id = hashlib.sha256(username.encode()).hexdigest()[:16]
     users[user_id] = {
         'username': username,
         'password': hashlib.sha256(password.encode()).hexdigest(),
-        'config': load_config(),
-        'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        'config': {
+            'keywords': [],
+            'blocked_keywords': [],
+            'platforms': ['weibo', 'baidu', 'douyin'],
+            'push_enabled': False,
+            'push_channel': 'feishu',
+            'push_webhook': ''
+        },
+        'created_at': datetime.now().strftime("%Y-%m-%d %H:%M")
     }
     save_users(users)
     
     session['user_id'] = user_id
     session['username'] = username
     
-    return jsonify({"success": True, "message": "注册成功", "username": username})
+    return jsonify({"success": True, "username": username})
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.json
+    """用户登录"""
+    data = request.json or {}
     username = data.get('username', '').strip()
     password = data.get('password', '')
     
     users = load_users()
+    password_hash = hashlib.sha256(password.encode()).hexdigest()
     
     user_id = None
     for uid, user in users.items():
-        if user.get('username') == username:
-            if user.get('password') == hashlib.sha256(password.encode()).hexdigest():
-                user_id = uid
+        if user.get('username') == username and user.get('password') == password_hash:
+            user_id = uid
             break
     
     if not user_id:
@@ -208,15 +214,17 @@ def login():
     session['user_id'] = user_id
     session['username'] = username
     
-    return jsonify({"success": True, "message": "登录成功", "username": username})
+    return jsonify({"success": True, "username": username})
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
+    """退出登录"""
     session.clear()
-    return jsonify({"success": True, "message": "已退出登录"})
+    return jsonify({"success": True})
 
 @app.route('/api/check-login', methods=['GET'])
 def check_login():
+    """检查登录状态"""
     user_id = session.get('user_id')
     if user_id:
         return jsonify({"success": True, "logged_in": True, "username": session.get('username', '')})
@@ -225,18 +233,14 @@ def check_login():
 @app.route('/api/push', methods=['POST'])
 @login_required
 def push_news():
-    """手动推送热点"""
+    """推送热点到配置渠道"""
     config = get_user_config(session.get('user_id'))
     
     if not config.get('push_enabled'):
         return jsonify({"success": False, "error": "推送未启用"})
     
-    platforms = config.get('platforms', [])
-    keywords = config.get('keywords', [])
-    blocked = config.get('blocked_keywords', [])
-    
-    news = hot_news.fetch_all_hot(platforms if platforms else None)
-    news = hot_news.filter_by_keywords(news, keywords, blocked)
+    news = hot_news.fetch_all_hot(config.get('platforms', []))
+    news = hot_news.filter_by_keywords(news, config.get('keywords'), config.get('blocked_keywords'))
     news = news[:10]
     
     # 生成内容
@@ -246,12 +250,8 @@ def push_news():
     
     # 推送
     webhook = config.get('push_webhook', '')
-    channel = config.get('push_channel', 'feishu')
-    
-    if channel == 'feishu':
+    if config.get('push_channel') == 'feishu' and webhook:
         hot_news.push_to_feishu(webhook, content)
-    else:
-        hot_news.push_to_webhook(webhook, content)
     
     return jsonify({"success": True, "message": "推送成功"})
 

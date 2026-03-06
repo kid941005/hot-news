@@ -1,377 +1,363 @@
 #!/usr/bin/env python3
 """
-Hot News Aggregator - 热点资讯聚合工具
-支持多平台热点聚合 + 关键词过滤 + 推送通知
+热点资讯后端 - 核心功能：关键词过滤 + 缓存
 """
 
 import os
 import sys
 import json
-import time
-import hashlib
 import urllib.request
 import ssl
+import re
 from datetime import datetime
-from urllib.parse import urlencode
+from urllib.parse import quote
 
-# SSL context
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-# Data storage
-DATA_DIR = os.path.expanduser("~/.openclaw/workspace/hot-news")
-USERS_FILE = os.path.join(DATA_DIR, "users.json")
-CONFIG_FILE = os.path.join(DATA_DIR, "config.json")
-CACHE_FILE = os.path.join(DATA_DIR, "cache.json")
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Referer': 'https://weibo.com'
+}
 
-os.makedirs(DATA_DIR, exist_ok=True)
+# 缓存配置
+CACHE_DIR = os.path.expanduser("~/.openclaw/workspace/hot-news")
+CACHE_FILE = os.path.join(CACHE_DIR, "cache.json")
+CACHE_EXPIRE = 3600  # 缓存1小时
 
-def load_users():
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {}
+os.makedirs(CACHE_DIR, exist_ok=True)
 
-def save_users(users):
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(users, f, ensure_ascii=False, indent=2)
+def fetch(url, timeout=10):
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, context=ctx, timeout=timeout) as resp:
+        return json.loads(resp.read().decode('utf-8'))
 
-def load_config():
-    default = {
-        "keywords": [],  # 用户关键词
-        "blocked_keywords": [],  # 屏蔽关键词
-        "push_enabled": False,
-        "push_channel": "feishu",  # feishu, dingtalk, webhook
-        "push_webhook": ""
-    }
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return {**default, **json.load(f)}
-    return default
+# ============== 缓存管理 ==============
 
-def save_config(config):
-    with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(config, f, ensure_ascii=False, indent=2)
-
-# ============== 热点数据源 ==============
-
-def fetch_weibo_hot():
-    """获取微博热搜"""
+def load_cache():
+    """加载缓存"""
     try:
-        url = "https://weibo.com/ajax/side/hotSearch"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            results = []
-            for item in data.get('data', {}).get('realtime', [])[:20]:
-                results.append({
-                    'platform': '微博',
-                    'title': item.get('word', ''),
-                    'hot': item.get('num', 0),
-                    'url': f"https://s.weibo.com/weibo?q={item.get('word', '')}",
-                    'time': datetime.now().strftime("%H:%M")
-                })
-            return results
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('news', [])
+    except:
+        pass
+    return None
+
+def save_cache(news):
+    """保存缓存 - 合并新旧数据"""
+    try:
+        # 加载已有缓存
+        existing = []
+        if os.path.exists(CACHE_FILE):
+            try:
+                with open(CACHE_FILE, 'r', encoding='utf-8') as f:
+                    existing = json.load(f).get('news', [])
+            except:
+                pass
+        
+        # 合并去重
+        existing_dict = {n.get('title', ''): n for n in existing}
+        for n in news:
+            title = n.get('title', '')
+            if title and title not in existing_dict:
+                existing_dict[title] = n
+        
+        merged = list(existing_dict.values())
+        
+        with open(CACHE_FILE, 'w', encoding='utf-8') as f:
+            json.dump({
+                'timestamp': datetime.now().timestamp(),
+                'news': merged
+            }, f, ensure_ascii=False)
     except Exception as e:
-        print(f"微博热搜获取失败: {e}")
+        print(f"缓存保存失败: {e}")
+
+# ============== 数据源 ==============
+
+def fetch_weibo():
+    """微博热搜"""
+    try:
+        data = fetch("https://weibo.com/ajax/side/hotSearch")
+        return [{
+            'platform': '微博',
+            'title': i.get('word', ''),
+            'hot': i.get('num', 0),
+            'url': f"https://s.weibo.com/weibo?q={quote(i.get('word', ''))}",
+            'time': datetime.now().strftime("%H:%M")
+        } for i in data.get('data', {}).get('realtime', [])[:30]]
+    except Exception as e:
+        print(f"微博失败: {e}")
         return []
 
-def fetch_baidu_hot():
-    """获取百度热搜"""
+def fetch_baidu():
+    """百度热搜"""
     try:
-        url = "https://top.baidu.com/board?tab=realtime"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            html = response.read().decode('utf-8')
-            import re
-            results = []
-            # 简单解析
-            pattern = r'"topic-name":"([^"]+)".*?"hot-score":(\d+)'
-            matches = re.findall(pattern, html)[:20]
-            for title, hot in matches:
-                results.append({
+        req = urllib.request.Request("https://top.baidu.com/board?tab=realtime", headers=HEADERS)
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+            html = resp.read().decode('utf-8')
+            matches = re.findall(r'"content_(\d+)":\s*\{[^}]*"title":"([^"]+)"[^}]*"hotScore":(\d+)', html)
+            if matches:
+                return [{
                     'platform': '百度',
-                    'title': title,
-                    'hot': int(hot),
-                    'url': f"https://www.baidu.com/s?wd={title}",
+                    'title': t,
+                    'hot': int(h) if h.isdigit() else 0,
+                    'url': f"https://www.baidu.com/s?wd={quote(t)}",
                     'time': datetime.now().strftime("%H:%M")
-                })
-            return results
+                } for _, t, h in matches[:30]]
+            words = re.findall(r'"word":"([^"]+)"', html)[:30]
+            return [{'platform': '百度', 'title': w, 'hot': '', 'url': f"https://www.baidu.com/s?wd={quote(w)}", 'time': datetime.now().strftime("%H:%M")} for w in words]
     except Exception as e:
-        print(f"百度热搜获取失败: {e}")
+        print(f"百度失败: {e}")
         return []
 
-def fetch_zhihu_hot():
-    """获取知乎热榜"""
+def fetch_zhihu():
+    """知乎热榜"""
     try:
-        url = "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=20"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            results = []
-            for item in data.get('data', [])[:20]:
-                results.append({
-                    'platform': '知乎',
-                    'title': item.get('target', {}).get('title_area', {}).get('text', ''),
-                    'hot': item.get('detail_text', ''),
-                    'url': "https://www.zhihu.com" + item.get('target', {}).get('link', {}).get('url', ''),
-                    'time': datetime.now().strftime("%H:%M")
-                })
-            return results
+        data = fetch("https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=30")
+        return [{
+            'platform': '知乎',
+            'title': i.get('target', {}).get('title_area', {}).get('text', ''),
+            'hot': i.get('detail_text', ''),
+            'url': "https://www.zhihu.com" + i.get('target', {}).get('link', {}).get('url', ''),
+            'time': datetime.now().strftime("%H:%M")
+        } for i in data.get('data', [])[:30]]
     except Exception as e:
-        print(f"知乎热榜获取失败: {e}")
+        print(f"知乎失败: {e}")
         return []
 
-def fetch_toutiao_hot():
-    """获取头条热搜"""
-    try:
-        url = "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao&_signature="
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            results = []
-            for item in data.get('data', [])[:20]:
-                results.append({
-                    'platform': '头条',
-                    'title': item.get('Title', ''),
-                    'hot': item.get('HotValue', 0),
-                    'url': "https://www.toutiao.com" + item.get('Link', ''),
-                    'time': datetime.now().strftime("%H:%M")
-                })
-            return results
-    except Exception as e:
-        print(f"头条热搜获取失败: {e}")
-        return []
-
-def fetch_douyin_hot():
-    """获取抖音热榜"""
+def fetch_douyin():
+    """抖音热榜"""
     try:
         url = "https://www.douyin.com/aweme/v1/web/hot/search/list/"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            results = []
-            for item in data.get('data', {}).get('word_list', [])[:20]:
-                results.append({
-                    'platform': '抖音',
-                    'title': item.get('word', ''),
-                    'hot': item.get('hot_value', 0),
-                    'url': f"https://www.douyin.com/search/{item.get('word', '')}",
-                    'time': datetime.now().strftime("%H:%M")
-                })
-            return results
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15',
+            'Referer': 'https://www.douyin.com/'
+        })
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            return [{
+                'platform': '抖音',
+                'title': i.get('word', ''),
+                'hot': i.get('hot_value', 0),
+                'url': f"https://www.douyin.com/search/{quote(i.get('word', ''))}",
+                'time': datetime.now().strftime("%H:%M")
+            } for i in data.get('data', {}).get('word_list', [])[:30]]
     except Exception as e:
-        print(f"抖音热榜获取失败: {e}")
+        print(f"抖音失败: {e}")
         return []
 
-def fetch_bilibili_hot():
-    """获取B站热搜"""
+def fetch_bilibili():
+    """B站热搜"""
     try:
-        url = "https://api.bilibili.com/x/web-interface/popular?pn=0&ps=20"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            results = []
-            for item in data.get('data', {}).get('list', [])[:20]:
-                results.append({
-                    'platform': 'B站',
-                    'title': item.get('title', ''),
-                    'hot': item.get('desc', ''),
-                    'url': "https://www.bilibili.com/video/" + item.get('bvid', ''),
-                    'time': datetime.now().strftime("%H:%M")
-                })
-            return results
+        data = fetch("https://api.bilibili.com/x/web-interface/popular?pn=0&ps=30")
+        return [{
+            'platform': 'B站',
+            'title': i.get('title', ''),
+            'hot': i.get('desc', ''),
+            'url': "https://www.bilibili.com/video/" + i.get('bvid', ''),
+            'time': datetime.now().strftime("%H:%M")
+        } for i in data.get('data', {}).get('list', [])[:30]]
     except Exception as e:
-        print(f"B站热搜获取失败: {e}")
+        print(f"B站失败: {e}")
         return []
 
-def fetch_36kr_hot():
-    """获取36Kr热搜"""
+def fetch_toutiao():
+    """今日头条热搜"""
     try:
-        url = "https://36kr.com/napi/newsflash"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
+        req = urllib.request.Request(
+            "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc",
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            return [{
+                'platform': '头条',
+                'title': i.get('Title', ''),
+                'hot': i.get('HotValue', ''),
+                'url': i.get('Url', ''),
+                'time': datetime.now().strftime("%H:%M")
+            } for i in data.get('data', [])[:30]]
+    except Exception as e:
+        print(f"头条失败: {e}")
+        return []
+
+def fetch_tieba():
+    """百度贴吧热议"""
+    try:
+        data = fetch("https://tieba.baidu.com/hottopic/browse/topicList")
+        results = []
+        for i in data.get('data', {}).get('bang_topic', {}).get('topic_list', [])[:30]:
+            if i.get('topic_name'):
+                # 转换时间戳
+                create_ts = i.get('create_time', 0)
+                if create_ts:
+                    try:
+                        from datetime import datetime
+                        time_str = datetime.fromtimestamp(create_ts).strftime("%m-%d %H:%M")
+                    except:
+                        time_str = datetime.now().strftime("%H:%M")
+                else:
+                    time_str = datetime.now().strftime("%H:%M")
+                
+                results.append({
+                    'platform': '贴吧',
+                    'title': i.get('topic_name', ''),
+                    'hot': '',
+                    'url': i.get('topic_url', ''),
+                    'time': time_str
+                })
+        return results
+    except Exception as e:
+        print(f"贴吧失败: {e}")
+        return []
+
+def fetch_ithome():
+    """IT之家热榜"""
+    try:
+        req = urllib.request.Request(
+            "https://www.ithome.com/list/",
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+            html = resp.read().decode('utf-8')
+            import re
+            # 解析标题、链接和时间
+            items = re.findall(r'<a class="t" href="([^"]+)"[^>]*>([^<]+)</a>.*?<i>([^<]+)</i>', html, re.S)
             results = []
-            for item in data.get('data', [])[:20]:
+            for url, title, time_str in items[:30]:
+                if title and not any(k in title for k in ['优惠', '促销', '广告']):
+                    # 简化时间格式
+                    time_str = time_str.strip()
+                    if ' ' in time_str:
+                        time_str = time_str.split(' ')[1][:5]  # 取 HH:MM
+                    results.append({
+                        'platform': 'IT之家',
+                        'title': title.strip(),
+                        'hot': '',
+                        'url': 'https://www.ithome.com' + url,
+                        'time': time_str
+                    })
+            return results
+    except Exception as e:
+        print(f"IT之家失败: {e}")
+        return []
+
+def fetch_36kr():
+    """36氪快讯"""
+    try:
+        data = fetch("https://36kr.com/napi/newsflash")
+        results = []
+        for i in data.get('data', {}).get('items', [])[:30]:
+            if i.get('title'):
+                # 转换时间戳
+                published = i.get('published_at', '')
+                if published:
+                    try:
+                        from datetime import datetime
+                        ts = int(published)
+                        time_str = datetime.fromtimestamp(ts).strftime("%m-%d %H:%M")
+                    except:
+                        time_str = published[:16]
+                else:
+                    time_str = datetime.now().strftime("%H:%M")
+                
                 results.append({
                     'platform': '36Kr',
-                    'title': item.get('title', ''),
+                    'title': i.get('title', ''),
                     'hot': '',
-                    'url': "https://36kr.com/news/" + item.get('item_id', ''),
-                    'time': datetime.now().strftime("%H:%M")
+                    'url': 'https://36kr.com/news/' + str(i.get('id', '')),
+                    'time': time_str
                 })
-            return results
+        return results
     except Exception as e:
-        print(f"36Kr获取失败: {e}")
+        print(f"36Kr失败: {e}")
         return []
 
-def fetch_jinri_hot():
-    """获取今日头条热搜"""
-    try:
-        url = "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            results = []
-            for item in data.get('data', [])[:20]:
-                results.append({
-                    'platform': '今日头条',
-                    'title': item.get('Title', ''),
-                    'hot': item.get('HotValue', 0),
-                    'url': "https://www.toutiao.com" + item.get('Link', ''),
-                    'time': datetime.now().strftime("%H:%M")
-                })
-            return results
-    except Exception as e:
-        print(f"今日头条获取失败: {e}")
-        return []
+# 平台映射
+PLATFORMS = {
+    'weibo': ('微博', fetch_weibo),
+    'baidu': ('百度', fetch_baidu),
+    'zhihu': ('知乎', fetch_zhihu),
+    'douyin': ('抖音', fetch_douyin),
+    'bilibili': ('B站', fetch_bilibili),
+    'toutiao': ('今日头条', fetch_toutiao),
+    'tieba': ('贴吧', fetch_tieba),
+    'ithome': ('IT之家', fetch_ithome),
+    '36kr': ('36Kr', fetch_36kr),
+}
 
 # ============== 核心功能 ==============
 
-def fetch_all_hot(platforms=None):
-    """获取所有平台热点"""
-    all_news = []
+def fetch_all(platforms=None, use_cache=True):
+    """获取所有平台热点 - 带缓存"""
+    # 优先使用缓存
+    if use_cache:
+        cached = load_cache()
+        if cached:
+            print(f"使用缓存: {len(cached)} 条")
+            return cached
     
-    fetchers = {
-        'weibo': fetch_weibo_hot,
-        'baidu': fetch_baidu_hot,
-        'zhihu': fetch_zhihu_hot,
-        'toutiao': fetch_toutiao_hot,
-        'douyin': fetch_douyin_hot,
-        'bilibili': fetch_bilibili_hot,
-        '36kr': fetch_36kr_hot,
-        'jinri': fetch_jinri_hot
-    }
+    all_news = []
+    success_count = 0
     
     if platforms is None:
-        platforms = fetchers.keys()
+        platforms = list(PLATFORMS.keys())
     
-    for platform in platforms:
-        if platform in fetchers:
+    for p in platforms:
+        if p in PLATFORMS:
             try:
-                news = fetchers[platform]()
-                all_news.extend(news)
-                print(f"获取 {platform} 成功: {len(news)} 条")
+                _, fetcher = PLATFORMS[p]
+                news = fetcher()
+                if news:
+                    all_news.extend(news)
+                    success_count += 1
+                    print(f"✓ {p}: {len(news)} 条")
+                else:
+                    print(f"✗ {p}: 无数据")
             except Exception as e:
-                print(f"获取 {platform} 失败: {e}")
+                print(f"✗ {p}: {e}")
     
-    # 按热度排序
-    all_news.sort(key=lambda x: x.get('hot', 0), reverse=True)
+    # 排序
+    def get_hot(x):
+        h = x.get('hot', 0)
+        if isinstance(h, str):
+            return 0
+        return h
+    
+    all_news.sort(key=get_hot, reverse=True)
+    
+    # 保存缓存
+    if all_news:
+        save_cache(all_news)
+    else:
+        # 失败时使用缓存
+        cached = load_cache()
+        if cached:
+            print(f"API失败，使用缓存: {len(cached)} 条")
+            return cached
     
     return all_news
 
 def filter_by_keywords(news, keywords=None, blocked=None):
-    """根据关键词过滤新闻"""
+    """关键词过滤"""
     if not keywords and not blocked:
         return news
     
-    filtered = []
+    result = []
     for item in news:
         title = item.get('title', '')
         
-        # 检查屏蔽词
-        if blocked:
-            if any(b in title for b in blocked):
-                continue
+        if blocked and any(b in title for b in blocked):
+            continue
         
-        # 检查关键词（如果没有设置关键词，则返回所有）
         if keywords:
             if any(k in title for k in keywords):
-                filtered.append(item)
+                result.append(item)
         else:
-            filtered.append(item)
+            result.append(item)
     
-    return filtered
-
-def push_to_feishu(webhook, content):
-    """推送到飞书"""
-    if not webhook:
-        return False
-    
-    try:
-        data = {
-            "msg_type": "text",
-            "content": {"text": content}
-        }
-        req = urllib.request.Request(
-            webhook,
-            data=json.dumps(data).encode('utf-8'),
-            headers={'Content-Type': 'application/json'}
-        )
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            return response.status == 200
-    except Exception as e:
-        print(f"飞书推送失败: {e}")
-        return False
-
-def push_to_webhook(url, content):
-    """推送到自定义Webhook"""
-    if not url:
-        return False
-    
-    try:
-        data = {"content": content}
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(data).encode('utf-8'),
-            headers={'Content-Type': 'application/json'}
-        )
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            return response.status == 200
-    except Exception as e:
-        print(f"Webhook推送失败: {e}")
-        return False
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description='热点资讯聚合工具')
-    parser.add_argument('--fetch', action='store_true', help='获取所有热点')
-    parser.add_argument('--platforms', nargs='+', help='指定平台: weibo baidu zhihu toutiao douyin bilibili 36kr')
-    parser.add_argument('--keywords', nargs='+', help='关键词过滤')
-    parser.add_argument('--blocked', nargs='+', help='屏蔽关键词')
-    parser.add_argument('--limit', type=int, default=50, help='返回数量')
-    parser.add_argument('--push', action='store_true', help='推送最新热点')
-    
-    args = parser.parse_args()
-    
-    if args.fetch:
-        # 获取热点
-        news = fetch_all_hot(args.platforms)
-        news = filter_by_keywords(news, args.keywords, args.blocked)
-        news = news[:args.limit]
-        
-        print(json.dumps(news, ensure_ascii=False, indent=2))
-        
-    elif args.push:
-        # 推送到配置渠道
-        config = load_config()
-        
-        if not config.get('push_enabled'):
-            print("推送未启用")
-            return
-        
-        news = fetch_all_hot()
-        news = filter_by_keywords(news, config.get('keywords'), config.get('blocked_keywords'))
-        news = news[:10]
-        
-        # 生成推送内容
-        content = f"📰 热点资讯 ({datetime.now().strftime('%H:%M')})\n\n"
-        for i, item in enumerate(news, 1):
-            content += f"{i}. {item['title']}\n"
-        
-        # 推送
-        if config.get('push_channel') == 'feishu':
-            push_to_feishu(config.get('push_webhook'), content)
-        else:
-            push_to_webhook(config.get('push_webhook'), content)
-        
-        print("推送完成")
-    
-    else:
-        # 默认显示帮助
-        parser.print_help()
-
-if __name__ == '__main__':
-    main()
+    return result
