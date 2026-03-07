@@ -247,6 +247,45 @@ def fetch_all_news(platforms: list[str] = None) -> list[NewsItem]:
     return all_news
 
 
+# 兼容旧 API
+fetch_all = fetch_all_news
+
+
+def get_news_with_cache(platforms: list[str] = None) -> list[NewsItem]:
+    """获取热点（优先使用缓存）"""
+    if is_cache_valid():
+        print("📦 使用缓存数据")
+        cache = load_cache()
+        return [NewsItem(**n) for n in cache.get("news", [])]
+    else:
+        print("🔄 缓存过期，正在更新...")
+        return update_cache(platforms)
+
+
+def filter_by_keywords(news: list, keywords: list, blocked: list = None) -> list:
+    """按关键词过滤（兼容旧 API）"""
+    if blocked is None:
+        blocked = []
+    
+    result = []
+    for item in news:
+        title = item.title if hasattr(item, 'title') else item.get('title', '')
+        
+        # 跳过屏蔽词
+        if any(b in title for b in blocked):
+            continue
+        
+        # 匹配关键词（空关键词表示全部）
+        if not keywords or any(k in title for k in keywords):
+            result.append(item)
+    
+    return result
+
+
+# 兼容 fetch_all_hot
+fetch_all_hot = fetch_all_news
+
+
 def update_cache(platforms: list[str] = None):
     """更新缓存"""
     print("🔄 正在抓取热点...")

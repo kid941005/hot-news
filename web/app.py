@@ -117,8 +117,8 @@ def get_news():
     keywords = config.get('keywords', [])
     blocked = config.get('blocked_keywords', [])
     
-    # 获取热点
-    all_news = hot_news.fetch_all(platforms if platforms else None)
+    # 获取热点（优先使用缓存）
+    all_news = hot_news.get_news_with_cache(platforms if platforms else None)
     
     # 关键词过滤
     if keywords or blocked:
@@ -239,7 +239,7 @@ def push_news():
     if not config.get('push_enabled'):
         return jsonify({"success": False, "error": "推送未启用"})
     
-    news = hot_news.fetch_all_hot(config.get('platforms', []))
+    news = hot_news.get_news_with_cache(config.get('platforms', []))
     news = hot_news.filter_by_keywords(news, config.get('keywords'), config.get('blocked_keywords'))
     news = news[:10]
     

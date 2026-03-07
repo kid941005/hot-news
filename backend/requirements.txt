@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+requests
+beautifulsoup4
+python-multipart
+pymysql
+cryptography

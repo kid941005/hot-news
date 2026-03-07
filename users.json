@@ -44,5 +44,22 @@
       "push_webhook": ""
     },
     "created_at": "2026-03-06 19:00"
+  },
+  "9f86d081884c7d65": {
+    "username": "test",
+    "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "config": {
+      "keywords": [],
+      "blocked_keywords": [],
+      "platforms": [
+        "weibo",
+        "baidu",
+        "douyin"
+      ],
+      "push_enabled": false,
+      "push_channel": "feishu",
+      "push_webhook": ""
+    },
+    "created_at": "2026-03-06 22:16"
   }
 }

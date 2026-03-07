@@ -4,3 +4,8 @@ venv/
 .env
 *.log
 .DS_Store
+node_modules/
+dist/
+*.db
+cache.json
+*.egg-info/
