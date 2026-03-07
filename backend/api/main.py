@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from backend.models.models import init_db, get_db
+from backend.models.models import init_db, get_db, UserConfig
 from backend.db import database
 from backend.spiders import spiders
 
@@ -500,6 +500,36 @@ def get_config(user_id: int = Depends(get_current_user_id), db: Session = Depend
     }
 
 
+@app.get("/api/tags")
+def get_tags(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
+    """获取用户的标签列表"""
+    config = database.get_user_config(db, user_id)
+    if not config or not config.keyword_tags:
+        # 返回默认标签
+        return {
+            "success": True,
+            "tags": ["工作", "生活", "科技"],
+            "keyword_tags": {}
+        }
+    
+    import json
+    keyword_tags = config.keyword_tags
+    if isinstance(keyword_tags, str):
+        keyword_tags = json.loads(keyword_tags)
+    
+    # 提取所有标签
+    all_tags = set(keyword_tags.values())
+    # 添加默认标签
+    default_tags = {"工作", "生活", "科技"}
+    all_tags.update(default_tags)
+    
+    return {
+        "success": True,
+        "tags": list(all_tags),
+        "keyword_tags": keyword_tags
+    }
+
+
 @app.post("/api/config")
 def update_config(req: ConfigRequest, user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     config_data = req.dict(exclude_unset=True)
@@ -508,12 +538,34 @@ def update_config(req: ConfigRequest, user_id: int = Depends(get_current_user_id
 
 
 @app.get("/api/news")
-def get_news(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
-    news_list = database.get_user_filtered_news(db, user_id)
+def get_news(
+    tag: str = None,  # 标签筛选
+    user_id: int = Depends(get_current_user_id), 
+    db: Session = Depends(get_db)
+):
+    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
+    
+    # 如果指定了标签，使用该标签的关键词
+    filter_keywords = None
+    if tag and config and config.keyword_tags:
+        import json
+        if isinstance(config.keyword_tags, str):
+            keyword_tags = json.loads(config.keyword_tags)
+        else:
+            keyword_tags = config.keyword_tags
+        
+        # 查找该标签对应的所有关键词
+        filter_keywords = []
+        for kw, t in keyword_tags.items():
+            if t == tag:
+                filter_keywords.append(kw)
+    
+    news_list = database.get_user_filtered_news(db, user_id, filter_keywords)
     return {
         "success": True,
         "news": [n.to_dict() for n in news_list],
-        "total": len(news_list)
+        "total": len(news_list),
+        "current_tag": tag
     }
 
 

@@ -40,8 +40,10 @@ def get_all_news(db: Session, platforms: List[str] = None) -> List[News]:
     return query.order_by(News.id.desc()).all()
 
 
-def get_user_filtered_news(db: Session, user_id: int) -> List[News]:
-    """获取用户过滤后的新闻"""
+def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str] = None) -> List[News]:
+    """获取用户过滤后的新闻
+    filter_keywords: 可选的关键词列表，用于按标签筛选
+    """
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
     if not config:
         return get_all_news(db)
@@ -69,7 +71,13 @@ def get_user_filtered_news(db: Session, user_id: int) -> List[News]:
     
     # 关键词过滤
     result = []
-    keywords = config.keywords or []
+    
+    # 如果指定了filter_keywords（按标签筛选），优先使用；否则使用用户配置的关键词
+    if filter_keywords is not None:
+        keywords = filter_keywords
+    else:
+        keywords = config.keywords or []
+    
     blocked = config.blocked_keywords or []
     
     # 解析JSON字符串

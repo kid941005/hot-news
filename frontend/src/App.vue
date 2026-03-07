@@ -12,9 +12,17 @@ const loading = ref(false)
 const showLogin = ref(false)
 const showAccount = ref(false)
 
+// 标签相关
+const currentTag = ref(null)  // 当前选中的标签
+const tags = ref(['工作', '生活', '科技'])  // 标签列表
+const keywordTags = ref({})  // 关键词到标签的映射
+
 // 表单
 const username = ref('')
 const password = ref('')
+
+// 新标签
+const newTag = ref('')
 
 // 配置
 const config = ref({
@@ -28,6 +36,19 @@ function getAuthHeader() {
   return token.value ? { headers: { Authorization: `Bearer ${token.value}` } } : {}
 }
 
+// 加载标签
+async function loadTags() {
+  try {
+    const res = await axios.get(`${API_URL}/api/tags`, getAuthHeader())
+    if (res.data.success) {
+      tags.value = res.data.tags || ['工作', '生活', '科技']
+      keywordTags.value = res.data.keyword_tags || {}
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 // 加载配置
 async function loadConfig() {
   try {
@@ -37,7 +58,8 @@ async function loadConfig() {
       config.value = {
         keywords: (res.data.config.keywords || []).join(', '),
         blocked_keywords: (res.data.config.blocked_keywords || []).join(', '),
-        platforms: res.data.config.platforms || []
+        platforms: res.data.config.platforms || [],
+        keyword_tags: res.data.config.keyword_tags || {}
       }
     }
   } catch (e) {
@@ -49,7 +71,11 @@ async function loadConfig() {
 async function loadNews() {
   loading.value = true
   try {
-    const res = await axios.get(`${API_URL}/api/news`, getAuthHeader())
+    const params = currentTag.value ? { tag: currentTag.value } : {}
+    const res = await axios.get(`${API_URL}/api/news`, { 
+      ...getAuthHeader(), 
+      params 
+    })
     if (res.data.success) {
       news.value = res.data.news
     }
@@ -59,8 +85,18 @@ async function loadNews() {
   loading.value = false
 }
 
+// 选择标签
+async function selectTag(tag) {
+  currentTag.value = tag === currentTag.value ? null : tag
+  await loadNews()
+}
+
 // 登录
 async function login() {
+  if (!username.value || !password.value) {
+    alert('请输入用户名和密码')
+    return
+  }
   try {
     const res = await axios.post(`${API_URL}/api/login`, {
       username: username.value,
@@ -72,7 +108,10 @@ async function login() {
       localStorage.setItem('username', res.data.username)
       localStorage.setItem('token', res.data.token)
       showLogin.value = false
+      username.value = ''
+      password.value = ''
       await loadConfig()
+      await loadTags()
       await loadNews()
     } else {
       alert(res.data.error || '登录失败')
@@ -84,6 +123,10 @@ async function login() {
 
 // 注册
 async function register() {
+  if (!username.value || !password.value) {
+    alert('请输入用户名和密码')
+    return
+  }
   try {
     const res = await axios.post(`${API_URL}/api/register`, {
       username: username.value,
@@ -95,7 +138,10 @@ async function register() {
       localStorage.setItem('username', res.data.username)
       localStorage.setItem('token', res.data.token)
       showLogin.value = false
+      username.value = ''
+      password.value = ''
       await loadConfig()
+      await loadTags()
       await loadNews()
     } else {
       alert(res.data.error || '注册失败')
@@ -103,6 +149,28 @@ async function register() {
   } catch (e) {
     alert('注册失败')
   }
+}
+
+// 退出登录
+async function logout() {
+  currentUser.value = null
+  token.value = null
+  currentTag.value = null
+  localStorage.removeItem('username')
+  localStorage.removeItem('token')
+  showAccount.value = false
+  showLogin.value = true
+  username.value = ''
+  password.value = ''
+  news.value = []
+}
+
+// 切换账号
+function switchAccount() {
+  showAccount.value = false
+  showLogin.value = true
+  username.value = ''
+  password.value = ''
 }
 
 // 保存配置
@@ -119,14 +187,32 @@ async function saveConfig() {
     await axios.post(`${API_URL}/api/config`, {
       keywords: keywords,
       blocked_keywords: blocked,
-      platforms: config.value.platforms
+      platforms: config.value.platforms,
+      keyword_tags: keywordTags.value
     }, getAuthHeader())
     alert('保存成功')
     showAccount.value = false
+    await loadConfig()
+    await loadTags()
     await loadNews()
   } catch (e) {
     console.error(e)
     alert('保存失败')
+  }
+}
+
+// 添加关键词到标签
+function addKeywordToTag(keyword, tag) {
+  if (keyword && tag) {
+    keywordTags.value[keyword.trim()] = tag
+  }
+}
+
+// 添加自定义标签
+function addCustomTag() {
+  if (newTag.value && !tags.value.includes(newTag.value)) {
+    tags.value.push(newTag.value)
+    newTag.value = ''
   }
 }
 
@@ -142,19 +228,12 @@ async function refresh() {
   loading.value = false
 }
 
-// 退出登录
-async function logout() {
-  currentUser.value = null
-  token.value = null
-  localStorage.removeItem('username')
-  localStorage.removeItem('token')
-  showAccount.value = false
-  await loadNews()
-}
-
 // 初始化
 onMounted(async () => {
-  await loadConfig()
+  if (currentUser.value && token.value) {
+    await loadConfig()
+    await loadTags()
+  }
   await loadNews()
 })
 </script>
@@ -165,28 +244,59 @@ onMounted(async () => {
     <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-4 sticky top-0 z-50">
       <div class="max-w-2xl mx-auto flex justify-between items-center">
         <h1 class="text-lg font-semibold">热点资讯</h1>
-        <button 
-          v-if="currentUser" 
-          @click="showAccount = true"
-          class="px-3 py-1.5 bg-white/20 rounded-full text-sm"
-        >
-          {{ currentUser }}
-        </button>
-        <button 
-          v-else 
-          @click="showLogin = true"
-          class="px-3 py-1.5 bg-white/20 rounded-full text-sm"
-        >
-          登录
-        </button>
+        <div class="flex gap-2">
+          <button 
+            v-if="currentUser" 
+            @click="showAccount = true"
+            class="px-3 py-1.5 bg-white/20 rounded-full text-sm"
+          >
+            {{ currentUser }}
+          </button>
+          <button 
+            v-if="currentUser" 
+            @click="logout"
+            class="px-3 py-1.5 bg-red-500/50 rounded-full text-sm"
+          >
+            退出
+          </button>
+          <button 
+            v-if="!currentUser" 
+            @click="showLogin = true"
+            class="px-3 py-1.5 bg-white/20 rounded-full text-sm"
+          >
+            登录
+          </button>
+        </div>
       </div>
     </header>
+
+    <!-- 标签筛选 -->
+    <div v-if="currentUser" class="bg-white border-b sticky top-14 z-40">
+      <div class="max-w-2xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
+        <button 
+          @click="selectTag(null)"
+          class="px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors"
+          :class="currentTag === null ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600'"
+        >
+          全部
+        </button>
+        <button 
+          v-for="tag in tags" 
+          :key="tag"
+          @click="selectTag(tag)"
+          class="px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors"
+          :class="currentTag === tag ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600'"
+        >
+          {{ tag }}
+        </button>
+      </div>
+    </div>
 
     <!-- 内容 -->
     <main class="max-w-2xl mx-auto p-4">
       <!-- 操作栏 -->
       <div class="flex justify-between items-center mb-4">
-        <span class="text-gray-500 text-sm">{{ news.length }} 条匹配</span>
+        <span class="text-gray-500 text-sm">{{ news.length }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
         <button 
           @click="refresh" 
           :disabled="loading"
@@ -245,6 +355,7 @@ onMounted(async () => {
           type="password" 
           placeholder="密码" 
           class="w-full px-4 py-3 border rounded-xl mb-4"
+          @keyup.enter="login"
         />
         <button @click="login" class="w-full py-3 bg-indigo-500 text-white rounded-xl mb-2">
           登录
@@ -263,14 +374,44 @@ onMounted(async () => {
       <div class="bg-white rounded-2xl p-6 w-80 mx-4 max-h-[80vh] overflow-y-auto">
         <h2 class="text-lg font-semibold mb-4">账号管理</h2>
         
+        <!-- 切换账号按钮 -->
+        <button @click="switchAccount" class="w-full py-2 mb-4 bg-gray-100 rounded-xl text-gray-600 text-sm">
+          切换账号
+        </button>
+        
         <div class="mb-4">
-          <label class="text-sm text-gray-500 block mb-1">关注关键词</label>
+          <label class="text-sm text-gray-500 block mb-1">关注关键词（逗号分隔）</label>
           <textarea 
             v-model="config.keywords" 
-            placeholder="用逗号分隔，如: AI,科技,基金"
+            placeholder="如: AI,科技,基金"
             class="w-full px-3 py-2 border rounded-lg text-sm"
             rows="3"
           ></textarea>
+        </div>
+        
+        <!-- 关键词标签管理 -->
+        <div class="mb-4">
+          <label class="text-sm text-gray-500 block mb-2">关键词标签</label>
+          <div class="text-xs text-gray-400 mb-2">格式: 关键词=标签</div>
+          <div class="flex flex-wrap gap-2 mb-2">
+            <span v-for="tag in tags" :key="tag" class="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded">
+              {{ tag }}
+            </span>
+          </div>
+          <div class="flex gap-2 mb-2">
+            <input 
+              v-model="newTag" 
+              placeholder="新增标签"
+              class="flex-1 px-2 py-1 border rounded text-sm"
+              @keyup.enter="addCustomTag"
+            />
+            <button @click="addCustomTag" class="px-3 py-1 bg-indigo-500 text-white rounded text-sm">
+              添加
+            </button>
+          </div>
+          <div class="text-xs text-gray-400">
+            当前映射: {{ JSON.stringify(keywordTags) }}
+          </div>
         </div>
         
         <div class="mb-4">
@@ -297,7 +438,7 @@ onMounted(async () => {
           保存
         </button>
         <button @click="showAccount = false" class="w-full py-2 text-gray-400 text-sm">
-          关闭
+          取消
         </button>
       </div>
     </div>
