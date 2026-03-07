@@ -547,6 +547,7 @@ def update_config(req: ConfigRequest, user_id: int = Depends(get_current_user_id
 @app.get("/api/news")
 def get_news(
     tag: str = None,  # 标签筛选
+    today: bool = True,  # 只显示当天发布的文章
     user_id: int = Depends(get_current_user_id), 
     db: Session = Depends(get_db)
 ):
@@ -567,13 +568,22 @@ def get_news(
     # 获取新闻并标记匹配的关键词
     news_list, matched_keywords = database.get_user_filtered_news(db, user_id, filter_keywords)
     
-    # 构建返回数据
+    # 过滤当天发布的文章并按时间倒序
+    today_str = datetime.now().strftime("%Y-%m-%d")
     news_data = []
     for n in news_list:
+        # 检查是否是当天发布的
+        if today and n.created_at:
+            if n.created_at.strftime("%Y-%m-%d") != today_str:
+                continue
+        
         item = n.to_dict()
         # 标记匹配的关键词
         item['matched_keywords'] = matched_keywords.get(n.id, [])
         news_data.append(item)
+    
+    # 按时间倒序排列
+    news_data.sort(key=lambda x: x.get('pub_time', ''), reverse=True)
     
     return {
         "success": True,
@@ -583,13 +593,32 @@ def get_news(
     }
 
 
+from datetime import datetime
+
+# 存储刷新时间
+LAST_REFRESH_TIME = None
+
 @app.post("/api/news/refresh")
 async def refresh_news(db: Session = Depends(get_db)):
+    global LAST_REFRESH_TIME
     results = await spiders.fetch_all_spiders()
     for platform, news in results.items():
         if news:
             database.save_news(db, news)
-    return {"success": True}
+    LAST_REFRESH_TIME = datetime.now()
+    return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat()}
+
+
+@app.get("/api/news/refresh")
+def get_refresh_time():
+    global LAST_REFRESH_TIME
+    if LAST_REFRESH_TIME:
+        return {
+            "success": True,
+            "last_refresh": LAST_REFRESH_TIME.isoformat(),
+            "display": LAST_REFRESH_TIME.strftime("%H:%M")
+        }
+    return {"success": True, "last_refresh": None}
 
 
 @app.on_event("startup")

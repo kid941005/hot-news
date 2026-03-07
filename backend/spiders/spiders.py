@@ -154,12 +154,20 @@ class ZhihuSpider(BaseSpider):
                     web_url = f"https://www.zhihu.com/question/{question_id}"
                 else:
                     web_url = zhihu_url
+                
+                # 获取文章实际发布时间
+                created = target.get("created")
+                if created:
+                    pub_time = datetime.fromtimestamp(created).strftime("%H:%M")
+                else:
+                    pub_time = datetime.now().strftime("%H:%M")
+                
                 items.append({
                     "platform": "知乎",
                     "title": target.get("title", ""),
                     "url": web_url,
                     "hot": str(item.get("detail_text", "")),
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": pub_time
                 })
             return items
         except Exception as e:
@@ -187,12 +195,20 @@ class ToutiaoSpider(BaseSpider):
                     article_url = item.get("source_url", "")
                     if article_url and not article_url.startswith("http"):
                         article_url = "https://www.toutiao.com" + article_url
+                    
+                    # 获取文章发布时间
+                    behot_time = item.get("behot_time", 0)
+                    if behot_time:
+                        pub_time = datetime.fromtimestamp(behot_time).strftime("%H:%M")
+                    else:
+                        pub_time = datetime.now().strftime("%H:%M")
+                    
                     items.append({
                         "platform": "头条",
                         "title": item.get("title", ""),
                         "url": article_url,
                         "hot": str(item.get("read_count", "")),
-                        "time": datetime.now().strftime("%H:%M")
+                        "time": pub_time
                     })
             return items[:30]
         except Exception as e:
@@ -405,38 +421,48 @@ class IthomeSpider(BaseSpider):
     name = "ithome"
     
     def fetch(self) -> List[dict]:
-        url = "https://www.ithome.com/"
+        import xml.etree.ElementTree as ET
+        
+        url = "https://www.ithome.com/rss"
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         }
         
         try:
             resp = requests.get(url, timeout=10, headers=headers)
-            resp.encoding = 'utf-8'  # 手动设置编码
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            items = []
-            # 从首页获取最新文章 - 使用正确的选择器
-            for item in soup.select('a[href*=".htm"]')[:20]:
-                title = item.get_text(strip=True)
-                href = item.get('href', '')
-                # 过滤有效的标题
-                if title and len(title) > 10 and 'href' in item.attrs:
-                    full_url = href if href.startswith('http') else f'https://www.ithome.com{href}'
-                    items.append({
+            resp.encoding = 'utf-8'
+            
+            # 解析RSS
+            root = ET.fromstring(resp.text)
+            items = root.findall('.//item')
+            
+            results = []
+            for item in items[:20]:
+                title = item.find('title').text if item.find('title') is not None else ''
+                link = item.find('link').text if item.find('link') is not None else ''
+                pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ''
+                
+                # 解析时间
+                if pub_date:
+                    # 格式: Sat, 07 Mar 2026 12:47:36 GMT
+                    try:
+                        dt = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %Z")
+                        pub_time = dt.strftime("%H:%M")
+                    except:
+                        pub_time = datetime.now().strftime("%H:%M")
+                else:
+                    pub_time = datetime.now().strftime("%H:%M")
+                
+                if title and link:
+                    results.append({
                         "platform": "IT之家",
                         "title": title,
-                        "url": full_url,
+                        "url": link,
                         "hot": "",
-                        "time": datetime.now().strftime("%H:%M")
+                        "time": pub_time
                     })
-            # 去重
-            seen = set()
-            unique_items = []
-            for item in items:
-                if item['title'] not in seen:
-                    seen.add(item['title'])
-                    unique_items.append(item)
-            return unique_items[:20]
+            
+            return results
         except Exception as e:
             print(f"❌ IT之家: {e}")
             return []

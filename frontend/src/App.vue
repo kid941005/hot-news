@@ -18,6 +18,8 @@ const tags = ref(['工作', '生活', '科技'])  // 标签列表
 const keywordTags = ref({})  // {tag: [keywords]}
 const editingTag = ref(null)  // 当前编辑的标签
 const editingKeywords = ref('')  // 编辑中的关键词（字符串格式）
+const lastRefresh = ref('')  // 上次刷新时间
+const editingTagName = ref('')  // 正在重命名的标签名
 
 // 表单
 const username = ref('')
@@ -239,16 +241,64 @@ function deleteTag(tag) {
   }
 }
 
+// 重命名标签
+function startRenameTag(tag) {
+  editingTagName.value = tag
+}
+
+function confirmRenameTag(oldTag) {
+  const newTag = editingTagName.value.trim()
+  if (newTag && newTag !== oldTag) {
+    // 更新 keywordTags
+    const keywords = keywordTags.value[oldTag] || []
+    delete keywordTags.value[oldTag]
+    keywordTags.value[newTag] = keywords
+    
+    // 更新 tags
+    const index = tags.value.indexOf(oldTag)
+    if (index !== -1) {
+      tags.value[index] = newTag
+    }
+    
+    // 更新 currentTag
+    if (currentTag.value === oldTag) {
+      currentTag.value = newTag
+    }
+  }
+  editingTagName.value = ''
+}
+
+function cancelRenameTag() {
+  editingTagName.value = ''
+}
+
 // 刷新缓存
 async function refresh() {
   loading.value = true
   try {
-    await axios.post(`${API_URL}/api/news/refresh`, {}, getAuthHeader())
+    const res = await axios.post(`${API_URL}/api/news/refresh`, {}, getAuthHeader())
+    if (res.data.last_refresh) {
+      const time = new Date(res.data.last_refresh)
+      lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
+    }
     await loadNews()
   } catch (e) {
     console.error(e)
   }
   loading.value = false
+}
+
+// 加载刷新时间
+async function loadRefreshTime() {
+  try {
+    const res = await axios.get(`${API_URL}/api/news/refresh`, getAuthHeader())
+    if (res.data.last_refresh) {
+      const time = new Date(res.data.last_refresh)
+      lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
+    }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 // 初始化
@@ -258,6 +308,7 @@ onMounted(async () => {
     await loadTags()
   }
   await loadNews()
+  await loadRefreshTime()
 })
 </script>
 
@@ -319,7 +370,10 @@ onMounted(async () => {
     <main class="max-w-2xl mx-auto p-4">
       <!-- 操作栏 -->
       <div class="flex justify-between items-center mb-4">
-        <span class="text-gray-500 text-sm">{{ news.length }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-500 text-sm">{{ news.length }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
+          <span v-if="lastRefresh" class="text-xs text-gray-400">上次刷新: {{ lastRefresh }}</span>
+        </div>
         <button 
           @click="refresh" 
           :disabled="loading"
@@ -435,8 +489,22 @@ onMounted(async () => {
               class="border rounded-lg p-2"
             >
               <div class="flex justify-between items-center mb-1">
-                <span class="font-medium text-sm">{{ tag }}</span>
+                <span v-if="editingTagName !== tag" class="font-medium text-sm">{{ tag }}</span>
+                <input 
+                  v-else
+                  v-model="editingTagName"
+                  @keyup.enter="confirmRenameTag(tag)"
+                  @blur="confirmRenameTag(tag)"
+                  class="font-medium text-sm border rounded px-1 py-0.5 w-24"
+                />
                 <div class="flex gap-1">
+                  <button 
+                    v-if="editingTagName !== tag"
+                    @click="startRenameTag(tag)"
+                    class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded"
+                  >
+                    重命名
+                  </button>
                   <button 
                     @click="editTagKeywords(tag)"
                     class="text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded"
