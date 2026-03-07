@@ -75,7 +75,8 @@ async function loadConfig() {
 async function loadNews() {
   loading.value = true
   try {
-    const params = currentTag.value ? { tag: currentTag.value } : {}
+    // 当currentTag为null时，获取所有热榜；否则按标签筛选
+    const params = currentTag.value ? { tag: currentTag.value } : { all: 'true' }
     const res = await axios.get(`${API_URL}/api/news`, { 
       ...getAuthHeader(), 
       params 
@@ -108,6 +109,31 @@ function saveTagKeywords() {
     // 把字符串转换为数组
     const keywords = editingKeywords.value.split(',').map(s => s.trim()).filter(s => s)
     keywordTags.value[editingTag.value] = keywords
+    editingTag.value = null
+  }
+}
+
+// 保存配置
+async function saveConfig() {
+  try {
+    // 把字符串转换为数组
+    const blocked = typeof config.value.blocked_keywords === 'string'
+      ? config.value.blocked_keywords.split(',').map(s => s.trim()).filter(s => s)
+      : config.value.blocked_keywords
+    
+    await axios.post(`${API_URL}/api/config`, {
+      blocked_keywords: blocked,
+      platforms: config.value.platforms,
+      keyword_tags: keywordTags.value
+    }, getAuthHeader())
+    alert('保存成功')
+    showAccount.value = false
+    await loadConfig()
+    await loadTags()
+    await loadNews()
+  } catch (e) {
+    console.error(e)
+    alert('保存失败')
   }
 }
 
@@ -194,29 +220,6 @@ function switchAccount() {
 }
 
 // 保存配置
-async function saveConfig() {
-  try {
-    // 把字符串转换为数组
-    const blocked = typeof config.value.blocked_keywords === 'string'
-      ? config.value.blocked_keywords.split(',').map(s => s.trim()).filter(s => s)
-      : config.value.blocked_keywords
-    
-    await axios.post(`${API_URL}/api/config`, {
-      blocked_keywords: blocked,
-      platforms: config.value.platforms,
-      keyword_tags: keywordTags.value
-    }, getAuthHeader())
-    alert('保存成功')
-    showAccount.value = false
-    editingTag.value = null
-    await loadConfig()
-    await loadTags()
-    await loadNews()
-  } catch (e) {
-    console.error(e)
-    alert('保存失败')
-  }
-}
 
 // 添加自定义标签
 function addCustomTag() {

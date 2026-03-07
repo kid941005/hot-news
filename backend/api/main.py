@@ -548,14 +548,18 @@ def update_config(req: ConfigRequest, user_id: int = Depends(get_current_user_id
 def get_news(
     tag: str = None,  # 标签筛选
     today: bool = True,  # 只显示当天发布的文章
+    all: bool = False,  # 获取所有热榜，不按关键词过滤
     user_id: int = Depends(get_current_user_id), 
     db: Session = Depends(get_db)
 ):
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
     
-    # 如果指定了标签，使用该标签的关键词
-    filter_keywords = []
-    if tag and config and config.keyword_tags:
+    # 如果指定了all=true，获取所有热榜（不按关键词过滤）
+    if all:
+        news_list = database.get_all_news(db)
+        matched_keywords = {}
+    elif tag and config and config.keyword_tags:
+        # 如果指定了标签，使用该标签的关键词
         import json
         if isinstance(config.keyword_tags, str):
             keyword_tags = json.loads(config.keyword_tags)
@@ -564,9 +568,10 @@ def get_news(
         
         # 直接获取该标签对应的关键词列表
         filter_keywords = keyword_tags.get(tag, [])
-    
-    # 获取新闻并标记匹配的关键词
-    news_list, matched_keywords = database.get_user_filtered_news(db, user_id, filter_keywords)
+        news_list, matched_keywords = database.get_user_filtered_news(db, user_id, filter_keywords)
+    else:
+        # 默认按用户关键词过滤
+        news_list, matched_keywords = database.get_user_filtered_news(db, user_id)
     
     # 过滤当天发布的文章并按时间倒序
     today_str = datetime.now().strftime("%Y-%m-%d")
