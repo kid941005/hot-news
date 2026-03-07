@@ -34,26 +34,65 @@ def save_news(db: Session, news_list: List[dict]):
 
 def get_all_news(db: Session, platforms: List[str] = None) -> List[News]:
     """获取所有新闻"""
+    # 平台名称映射: 英文ID -> 中文
+    platform_map = {
+        "weibo": "微博",
+        "baidu": "百度",
+        "bilibili": "B站",
+        "douyin": "抖音",
+        "zhihu": "知乎",
+        "toutiao": "头条",
+        "wallstreetcn": "华尔街见闻",
+        "thepaper": "澎湃",
+        "ifeng": "凤凰",
+        "sspai": "少数派",
+        "v2ex": "V2EX",
+        "jin10": "金十数据",
+        "ithome": "IT之家",
+        "36kr": "36Kr",
+    }
+    
+    # 转换英文平台名为中文
+    if platforms:
+        chinese_platforms = []
+        for p in platforms:
+            if p in platform_map:
+                chinese_platforms.append(platform_map[p])
+            else:
+                chinese_platforms.append(p)
+        platforms = chinese_platforms
+    
     query = db.query(News)
     if platforms:
         query = query.filter(News.platform.in_(platforms))
     return query.order_by(News.id.desc()).all()
 
 
-def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str] = None) -> List[News]:
+def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str] = None) -> tuple:
     """获取用户过滤后的新闻
     filter_keywords: 可选的关键词列表，用于按标签筛选
+    返回: (新闻列表, {news_id: [匹配的关键词列表]})
     """
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
     if not config:
-        return get_all_news(db)
+        return get_all_news(db), {}
     
-    # 平台名称映射: weibo->微博, baidu->百度, etc.
+    # 平台名称映射: 英文ID -> 中文
     platform_map = {
         "weibo": "微博",
         "baidu": "百度",
         "bilibili": "B站",
         "douyin": "抖音",
+        "zhihu": "知乎",
+        "toutiao": "头条",
+        "wallstreetcn": "华尔街见闻",
+        "thepaper": "澎湃",
+        "ifeng": "凤凰",
+        "sspai": "少数派",
+        "v2ex": "V2EX",
+        "jin10": "金十数据",
+        "ithome": "IT之家",
+        "36kr": "36Kr",
     }
     
     # 将用户平台转换为中文
@@ -71,9 +110,10 @@ def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str]
     
     # 关键词过滤
     result = []
+    matched_keywords = {}  # {news_id: [匹配的关键词]}
     
     # 如果指定了filter_keywords（按标签筛选），优先使用；否则使用用户配置的关键词
-    if filter_keywords is not None:
+    if filter_keywords is not None and len(filter_keywords) > 0:
         keywords = filter_keywords
     else:
         keywords = config.keywords or []
@@ -96,10 +136,17 @@ def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str]
             continue
         
         # 匹配关键词（忽略大小写，空关键词表示全部）
+        matched_kws = []
         if not keywords or any(k.lower() in title_lower for k in keywords):
+            # 找出具体匹配了哪些关键词
+            if keywords:
+                for k in keywords:
+                    if k.lower() in title_lower:
+                        matched_kws.append(k)
             result.append(news)
+            matched_keywords[news.id] = matched_kws
     
-    return result
+    return result, matched_keywords
 
 
 # ============= 用户操作 =============

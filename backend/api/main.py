@@ -505,7 +505,7 @@ def get_tags(user_id: int = Depends(get_current_user_id), db: Session = Depends(
     """获取用户的标签列表"""
     config = database.get_user_config(db, user_id)
     if not config or not config.keyword_tags:
-        # 返回默认标签
+        # 返回默认标签（仅当没有任何配置时）
         return {
             "success": True,
             "tags": ["工作", "生活", "科技"],
@@ -517,15 +517,22 @@ def get_tags(user_id: int = Depends(get_current_user_id), db: Session = Depends(
     if isinstance(keyword_tags, str):
         keyword_tags = json.loads(keyword_tags)
     
-    # 提取所有标签
-    all_tags = set(keyword_tags.values())
-    # 添加默认标签
-    default_tags = {"工作", "生活", "科技"}
-    all_tags.update(default_tags)
+    # 提取所有标签（用户删除的标签不再显示）
+    all_tags = list(keyword_tags.keys())
+    
+    # 按默认顺序排序（工作、生活、科技、其他）
+    default_order = ["工作", "生活", "科技"]
+    sorted_tags = []
+    for tag in default_order:
+        if tag in all_tags:
+            sorted_tags.append(tag)
+    for tag in all_tags:
+        if tag not in default_order:
+            sorted_tags.append(tag)
     
     return {
         "success": True,
-        "tags": list(all_tags),
+        "tags": sorted_tags,
         "keyword_tags": keyword_tags
     }
 
@@ -546,7 +553,7 @@ def get_news(
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
     
     # 如果指定了标签，使用该标签的关键词
-    filter_keywords = None
+    filter_keywords = []
     if tag and config and config.keyword_tags:
         import json
         if isinstance(config.keyword_tags, str):
@@ -554,17 +561,24 @@ def get_news(
         else:
             keyword_tags = config.keyword_tags
         
-        # 查找该标签对应的所有关键词
-        filter_keywords = []
-        for kw, t in keyword_tags.items():
-            if t == tag:
-                filter_keywords.append(kw)
+        # 直接获取该标签对应的关键词列表
+        filter_keywords = keyword_tags.get(tag, [])
     
-    news_list = database.get_user_filtered_news(db, user_id, filter_keywords)
+    # 获取新闻并标记匹配的关键词
+    news_list, matched_keywords = database.get_user_filtered_news(db, user_id, filter_keywords)
+    
+    # 构建返回数据
+    news_data = []
+    for n in news_list:
+        item = n.to_dict()
+        # 标记匹配的关键词
+        item['matched_keywords'] = matched_keywords.get(n.id, [])
+        news_data.append(item)
+    
     return {
         "success": True,
-        "news": [n.to_dict() for n in news_list],
-        "total": len(news_list),
+        "news": news_data,
+        "total": len(news_data),
         "current_tag": tag
     }
 

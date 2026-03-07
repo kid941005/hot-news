@@ -57,7 +57,7 @@ class UserConfig(Base):
     user_id = Column(Integer, ForeignKey('users.id'), unique=True)
     keywords = Column(JSON, default=[])
     blocked_keywords = Column(JSON, default=[])
-    keyword_tags = Column(JSON, default={})  # 关键词标签映射 {keyword: tag}
+    keyword_tags = Column(JSON, default={})  # 标签关键词映射 {tag: [keywords]}
     platforms = Column(JSON, default=[])
     push_enabled = Column(Boolean, default=False)
     push_channel = Column(String(50), default="")

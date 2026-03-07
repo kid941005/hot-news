@@ -15,7 +15,9 @@ const showAccount = ref(false)
 // 标签相关
 const currentTag = ref(null)  // 当前选中的标签
 const tags = ref(['工作', '生活', '科技'])  // 标签列表
-const keywordTags = ref({})  // 关键词到标签的映射
+const keywordTags = ref({})  // {tag: [keywords]}
+const editingTag = ref(null)  // 当前编辑的标签
+const editingKeywords = ref('')  // 编辑中的关键词（字符串格式）
 
 // 表单
 const username = ref('')
@@ -54,13 +56,13 @@ async function loadConfig() {
   try {
     const res = await axios.get(`${API_URL}/api/config`, getAuthHeader())
     if (res.data.success) {
-      // 数组转字符串（给textarea用）
       config.value = {
         keywords: (res.data.config.keywords || []).join(', '),
         blocked_keywords: (res.data.config.blocked_keywords || []).join(', '),
         platforms: res.data.config.platforms || [],
         keyword_tags: res.data.config.keyword_tags || {}
       }
+      keywordTags.value = res.data.config.keyword_tags || {}
     }
   } catch (e) {
     console.error(e)
@@ -89,6 +91,22 @@ async function loadNews() {
 async function selectTag(tag) {
   currentTag.value = tag === currentTag.value ? null : tag
   await loadNews()
+}
+
+// 编辑标签关键词
+function editTagKeywords(tag) {
+  editingTag.value = tag
+  // 把数组转换为逗号分隔的字符串
+  editingKeywords.value = (keywordTags.value[tag] || []).join(', ')
+}
+
+// 保存标签关键词
+function saveTagKeywords() {
+  if (editingTag.value) {
+    // 把字符串转换为数组
+    const keywords = editingKeywords.value.split(',').map(s => s.trim()).filter(s => s)
+    keywordTags.value[editingTag.value] = keywords
+  }
 }
 
 // 登录
@@ -177,21 +195,18 @@ function switchAccount() {
 async function saveConfig() {
   try {
     // 把字符串转换为数组
-    const keywords = typeof config.value.keywords === 'string' 
-      ? config.value.keywords.split(',').map(s => s.trim()).filter(s => s)
-      : config.value.keywords
     const blocked = typeof config.value.blocked_keywords === 'string'
       ? config.value.blocked_keywords.split(',').map(s => s.trim()).filter(s => s)
       : config.value.blocked_keywords
     
     await axios.post(`${API_URL}/api/config`, {
-      keywords: keywords,
       blocked_keywords: blocked,
       platforms: config.value.platforms,
       keyword_tags: keywordTags.value
     }, getAuthHeader())
     alert('保存成功')
     showAccount.value = false
+    editingTag.value = null
     await loadConfig()
     await loadTags()
     await loadNews()
@@ -201,18 +216,26 @@ async function saveConfig() {
   }
 }
 
-// 添加关键词到标签
-function addKeywordToTag(keyword, tag) {
-  if (keyword && tag) {
-    keywordTags.value[keyword.trim()] = tag
-  }
-}
-
 // 添加自定义标签
 function addCustomTag() {
   if (newTag.value && !tags.value.includes(newTag.value)) {
     tags.value.push(newTag.value)
+    keywordTags.value[newTag.value] = []  // 新标签初始关键词为空
     newTag.value = ''
+  }
+}
+
+// 删除标签
+function deleteTag(tag) {
+  if (confirm(`确定删除标签"${tag}"吗？`)) {
+    delete keywordTags.value[tag]
+    tags.value = tags.value.filter(t => t !== tag)
+    if (currentTag.value === tag) {
+      currentTag.value = null
+    }
+    if (editingTag.value === tag) {
+      editingTag.value = null
+    }
   }
 }
 
@@ -322,15 +345,35 @@ onMounted(async () => {
               {{ item.title }}
             </a>
             <span 
-              class="text-xs px-2 py-0.5 rounded ml-2"
+              class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
               :class="{
                 'bg-red-100 text-red-600': item.platform === '微博',
                 'bg-blue-100 text-blue-600': item.platform === '百度',
                 'bg-pink-100 text-pink-600': item.platform === 'B站',
                 'bg-orange-100 text-orange-600': item.platform === '抖音',
+                'bg-green-100 text-green-600': item.platform === '36Kr',
+                'bg-cyan-100 text-cyan-600': item.platform === 'IT之家',
+                'bg-indigo-100 text-indigo-600': item.platform === '知乎',
+                'bg-yellow-100 text-yellow-600': item.platform === '头条',
               }"
             >
               {{ item.platform }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center mt-2">
+            <!-- 匹配关键词标签 -->
+            <div class="flex gap-1 flex-wrap">
+              <span 
+                v-for="kw in item.matched_keywords" 
+                :key="kw"
+                class="text-xs px-2 py-0.5 bg-purple-100 text-purple-600 rounded"
+              >
+                {{ kw }}
+              </span>
+            </div>
+            <!-- 发布时间 -->
+            <span class="text-xs text-gray-400">
+              {{ item.pub_time || item.created_at?.slice(11,16) || '' }}
             </span>
           </div>
         </div>
@@ -379,26 +422,66 @@ onMounted(async () => {
           切换账号
         </button>
         
+        <!-- 标签关键词管理 -->
         <div class="mb-4">
-          <label class="text-sm text-gray-500 block mb-1">关注关键词（逗号分隔）</label>
-          <textarea 
-            v-model="config.keywords" 
-            placeholder="如: AI,科技,基金"
-            class="w-full px-3 py-2 border rounded-lg text-sm"
-            rows="3"
-          ></textarea>
-        </div>
-        
-        <!-- 关键词标签管理 -->
-        <div class="mb-4">
-          <label class="text-sm text-gray-500 block mb-2">关键词标签</label>
-          <div class="text-xs text-gray-400 mb-2">格式: 关键词=标签</div>
-          <div class="flex flex-wrap gap-2 mb-2">
-            <span v-for="tag in tags" :key="tag" class="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded">
-              {{ tag }}
-            </span>
+          <label class="text-sm text-gray-500 block mb-2">标签关键词设置</label>
+          <div class="text-xs text-gray-400 mb-2">点击标签设置其关键词</div>
+          
+          <!-- 标签列表 -->
+          <div class="space-y-2 mb-3">
+            <div 
+              v-for="tag in tags" 
+              :key="tag"
+              class="border rounded-lg p-2"
+            >
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-medium text-sm">{{ tag }}</span>
+                <div class="flex gap-1">
+                  <button 
+                    @click="editTagKeywords(tag)"
+                    class="text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded"
+                  >
+                    {{ (keywordTags[tag] || []).length ? '编辑' : '设置' }}
+                  </button>
+                  <button 
+                    v-if="!['工作', '生活', '科技'].includes(tag)"
+                    @click="deleteTag(tag)"
+                    class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded"
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+              <div v-if="editingTag === tag" class="mt-2">
+                <textarea 
+                  v-model="editingKeywords"
+                  :placeholder="`${tag}标签的关键词，用逗号分隔`"
+                  class="w-full px-2 py-1 border rounded text-sm"
+                  rows="2"
+                ></textarea>
+                <div class="flex gap-2 mt-1">
+                  <button 
+                    @click="saveTagKeywords"
+                    class="text-xs px-2 py-1 bg-indigo-500 text-white rounded"
+                  >
+                    保存
+                  </button>
+                  <button 
+                    @click="editingTag = null"
+                    class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded"
+                  >
+                    取消
+                  </button>
+                </div>
+              </div>
+              <div v-else class="text-xs text-gray-400">
+                关键词: {{ (keywordTags[tag] || []).join(', ') || '未设置' }}
+              </div>
+            </div>
           </div>
-          <div class="flex gap-2 mb-2">
+          
+          <!-- 添加新标签 -->
+          <div class="flex gap-2">
             <input 
               v-model="newTag" 
               placeholder="新增标签"
@@ -408,9 +491,6 @@ onMounted(async () => {
             <button @click="addCustomTag" class="px-3 py-1 bg-indigo-500 text-white rounded text-sm">
               添加
             </button>
-          </div>
-          <div class="text-xs text-gray-400">
-            当前映射: {{ JSON.stringify(keywordTags) }}
           </div>
         </div>
         
@@ -427,9 +507,24 @@ onMounted(async () => {
         <div class="mb-4">
           <label class="text-sm text-gray-500 block mb-2">监控平台</label>
           <div class="flex flex-wrap gap-2">
-            <label v-for="p in ['weibo', 'baidu', 'douyin', 'bilibili']" :key="p" class="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-sm">
-              <input type="checkbox" :value="p" v-model="config.platforms">
-              {{ p }}
+            <label v-for="p in [
+              {id: 'weibo', name: '微博'},
+              {id: 'baidu', name: '百度'},
+              {id: 'douyin', name: '抖音'},
+              {id: 'bilibili', name: 'B站'},
+              {id: 'zhihu', name: '知乎'},
+              {id: 'toutiao', name: '头条'},
+              {id: 'wallstreetcn', name: '华尔街见闻'},
+              {id: 'thepaper', name: '澎湃'},
+              {id: 'ifeng', name: '凤凰'},
+              {id: 'sspai', name: '少数派'},
+              {id: 'v2ex', name: 'V2EX'},
+              {id: 'jin10', name: '金十数据'},
+              {id: 'ithome', name: 'IT之家'},
+              {id: '36kr', name: '36Kr'}
+            ]" :key="p.id" class="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-sm">
+              <input type="checkbox" :value="p.id" v-model="config.platforms">
+              {{ p.name }}
             </label>
           </div>
         </div>
