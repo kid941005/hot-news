@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from backend.models.models import init_db, get_db, UserConfig
 from backend.db import database
 from backend.spiders import spiders
+from backend.models.models import News
 
 app = FastAPI(title="热点资讯", version="2.0")
 
@@ -598,6 +599,64 @@ def get_news(
     }
 
 
+@app.get("/api/news/by_platform")
+def get_news_by_platform(
+    user_id: int = Depends(get_current_user_id), 
+    db: Session = Depends(get_db)
+):
+    """按平台分组获取新闻"""
+    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
+    
+    # 获取用户监控的平台
+    platform_map = {
+        "weibo": "微博",
+        "baidu": "百度",
+        "bilibili": "B站",
+        "douyin": "抖音",
+        "zhihu": "知乎",
+        "toutiao": "头条",
+        "wallstreetcn": "华尔街见闻",
+        "thepaper": "澎湃",
+        "ifeng": "凤凰",
+        "sspai": "少数派",
+        "v2ex": "V2EX",
+        "jin10": "金十数据",
+        "ithome": "IT之家",
+        "36kr": "36Kr",
+    }
+    
+    user_platforms = config.platforms if config.platforms else None
+    if user_platforms:
+        if isinstance(user_platforms, str):
+            import json
+            user_platforms = json.loads(user_platforms)
+        # 转换为中文平台名
+        chinese_platforms = [platform_map.get(p, p) for p in user_platforms]
+    else:
+        chinese_platforms = list(platform_map.values())
+    
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    
+    # 按平台分组获取新闻
+    platform_news = {}
+    for platform in chinese_platforms:
+        news_items = db.query(News).filter(News.platform == platform).order_by(News.id.desc()).all()
+        # 过滤当天
+        items = []
+        for n in news_items:
+            if n.created_at and n.created_at.strftime("%Y-%m-%d") == today_str:
+                items.append(n.to_dict())
+            elif not n.created_at:
+                items.append(n.to_dict())
+        if items:
+            platform_news[platform] = items[:10]  # 每个平台最多10条
+    
+    return {
+        "success": True,
+        "platforms": platform_news
+    }
+
+
 from datetime import datetime
 
 # 存储刷新时间
@@ -606,12 +665,23 @@ LAST_REFRESH_TIME = None
 @app.post("/api/news/refresh")
 async def refresh_news(db: Session = Depends(get_db)):
     global LAST_REFRESH_TIME
-    results = await spiders.fetch_all_spiders()
-    for platform, news in results.items():
-        if news:
-            database.save_news(db, news)
-    LAST_REFRESH_TIME = datetime.now()
-    return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat()}
+    try:
+        results = await spiders.fetch_all_spiders()
+        saved_count = 0
+        for platform, news in results.items():
+            if news:
+                try:
+                    database.save_news(db, news)
+                    saved_count += len(news)
+                    print(f"✅ 保存 {platform}: {len(news)} 条")
+                except Exception as e:
+                    print(f"❌ 保存失败 {platform}: {e}")
+        print(f"📊 共保存 {saved_count} 条新闻")
+        LAST_REFRESH_TIME = datetime.now()
+        return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat(), "count": saved_count}
+    except Exception as e:
+        print(f"❌ 刷新失败: {e}")
+        return {"success": False, "error": str(e)}
 
 
 @app.get("/api/news/refresh")

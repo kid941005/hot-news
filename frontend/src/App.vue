@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
 const API_URL = ''  // 通过代理访问
@@ -12,6 +12,12 @@ const loading = ref(false)
 const showLogin = ref(false)
 const showAccount = ref(false)
 
+// 刷新控制
+const lastRefreshTime = ref(0)  // 上次刷新时间戳
+const REFRESH_INTERVAL = 20 * 60 * 1000  // 20分钟自动刷新
+const MIN_REFRESH_INTERVAL = 5 * 60 * 1000  // 5分钟最低间隔
+let autoRefreshTimer = null  // 定时器
+
 // 标签相关
 const currentTag = ref(null)  // 当前选中的标签
 const tags = ref(['工作', '生活', '科技'])  // 标签列表
@@ -19,7 +25,8 @@ const keywordTags = ref({})  // {tag: [keywords]}
 const editingTag = ref(null)  // 当前编辑的标签
 const editingKeywords = ref('')  // 编辑中的关键词（字符串格式）
 const lastRefresh = ref('')  // 上次刷新时间
-const editingTagName = ref('')  // 正在重命名的标签名
+const renamingTag = ref(null)  // 正在重命名的标签
+const tempRenameName = ref('')  // 重命名时的临时名称
 
 // 表单
 const username = ref('')
@@ -246,43 +253,58 @@ function deleteTag(tag) {
 
 // 重命名标签
 function startRenameTag(tag) {
-  editingTagName.value = tag
+  renamingTag.value = tag
+  tempRenameName.value = tag
 }
 
 function confirmRenameTag(oldTag) {
-  const newTag = editingTagName.value.trim()
-  if (newTag && newTag !== oldTag) {
+  const newTagName = tempRenameName.value.trim()
+  if (newTagName && newTagName !== oldTag) {
     // 更新 keywordTags
     const keywords = keywordTags.value[oldTag] || []
     delete keywordTags.value[oldTag]
-    keywordTags.value[newTag] = keywords
+    keywordTags.value[newTagName] = keywords
     
     // 更新 tags
     const index = tags.value.indexOf(oldTag)
     if (index !== -1) {
-      tags.value[index] = newTag
+      tags.value[index] = newTagName
     }
     
     // 更新 currentTag
     if (currentTag.value === oldTag) {
-      currentTag.value = newTag
+      currentTag.value = newTagName
     }
   }
-  editingTagName.value = ''
+  renamingTag.value = null
+  tempRenameName.value = ''
 }
 
 function cancelRenameTag() {
-  editingTagName.value = ''
+  renamingTag.value = null
+  tempRenameName.value = ''
 }
 
-// 刷新缓存
-async function refresh() {
+// 刷新缓存（带限流，强制刷新时忽略时间限制）
+async function refresh(force = false) {
+  const now = Date.now()
+  const timeSinceLastRefresh = now - lastRefreshTime.value
+  
+  // 非强制刷新时检查时间间隔
+  if (!force && lastRefreshTime.value > 0 && timeSinceLastRefresh < MIN_REFRESH_INTERVAL) {
+    const remainingSeconds = Math.ceil((MIN_REFRESH_INTERVAL - timeSinceLastRefresh) / 1000)
+    alert(`刷新太频繁，请等待 ${remainingSeconds} 秒后再试`)
+    return
+  }
+  
   loading.value = true
   try {
     const res = await axios.post(`${API_URL}/api/news/refresh`, {}, getAuthHeader())
     if (res.data.last_refresh) {
       const time = new Date(res.data.last_refresh)
       lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
+      lastRefreshTime.value = now  // 更新刷新时间戳
+      localStorage.setItem('lastRefreshTime', now.toString())
     }
     await loadNews()
   } catch (e) {
@@ -298,20 +320,58 @@ async function loadRefreshTime() {
     if (res.data.last_refresh) {
       const time = new Date(res.data.last_refresh)
       lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
+      
+      // 恢复刷新时间戳（如果本地存储的时间是今天的）
+      const savedTime = localStorage.getItem('lastRefreshTime')
+      if (savedTime) {
+        const savedDate = new Date(parseInt(savedTime))
+        const today = new Date()
+        if (savedDate.toDateString() === today.toDateString()) {
+          lastRefreshTime.value = parseInt(savedTime)
+        } else {
+          // 新的一天，重置刷新时间
+          lastRefreshTime.value = 0
+          localStorage.removeItem('lastRefreshTime')
+        }
+      }
     }
   } catch (e) {
     console.error(e)
   }
 }
 
+// 自动刷新定时器
+function startAutoRefresh() {
+  // 清除已有的定时器
+  if (autoRefreshTimer) {
+    clearInterval(autoRefreshTimer)
+  }
+  // 每20分钟自动刷新
+  autoRefreshTimer = setInterval(() => {
+    console.log('自动刷新热点资讯...')
+    refresh(false)  // 非强制刷新，会检查时间限制
+  }, REFRESH_INTERVAL)
+}
+
 // 初始化
 onMounted(async () => {
+  // 页面加载时不自动刷新，只加载已有数据（刷新操作由用户手动触发或定时任务）
   if (currentUser.value && token.value) {
     await loadConfig()
     await loadTags()
   }
   await loadNews()
   await loadRefreshTime()
+  
+  // 启动自动刷新定时器
+  startAutoRefresh()
+})
+
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  if (autoRefreshTimer) {
+    clearInterval(autoRefreshTimer)
+  }
 })
 </script>
 
@@ -378,7 +438,7 @@ onMounted(async () => {
           <span v-if="lastRefresh" class="text-xs text-gray-400">上次刷新: {{ lastRefresh }}</span>
         </div>
         <button 
-          @click="refresh" 
+          @click="refresh(true)" 
           :disabled="loading"
           class="px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm"
         >
@@ -492,17 +552,22 @@ onMounted(async () => {
               class="border rounded-lg p-2"
             >
               <div class="flex justify-between items-center mb-1">
-                <span v-if="editingTagName !== tag" class="font-medium text-sm">{{ tag }}</span>
-                <input 
-                  v-else
-                  v-model="editingTagName"
-                  @keyup.enter="confirmRenameTag(tag)"
-                  @blur="confirmRenameTag(tag)"
-                  class="font-medium text-sm border rounded px-1 py-0.5 w-24"
-                />
+                <!-- 显示标签名 -->
+                <span v-if="renamingTag !== tag" class="font-medium text-sm">{{ tag }}</span>
+                <!-- 重命名输入框 -->
+                <div v-else class="flex items-center gap-1">
+                  <input 
+                    v-model="tempRenameName"
+                    @keyup.enter="confirmRenameTag(tag)"
+                    class="font-medium text-sm border rounded px-1 py-0.5 w-20"
+                  />
+                  <button @click="confirmRenameTag(tag)" class="text-green-500">✓</button>
+                  <button @click="cancelRenameTag" class="text-gray-500">✕</button>
+                </div>
+                <!-- 操作按钮 -->
                 <div class="flex gap-1">
                   <button 
-                    v-if="editingTagName !== tag"
+                    v-if="renamingTag !== tag"
                     @click="startRenameTag(tag)"
                     class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded"
                   >

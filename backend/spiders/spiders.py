@@ -110,12 +110,19 @@ class BilibiliSpider(BaseSpider):
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("list", [])[:30]:
+                # 使用pubdate作为发布时间
+                pubdate = item.get("pubdate", 0)
+                if pubdate:
+                    pub_time = datetime.fromtimestamp(pubdate).strftime("%H:%M")
+                else:
+                    pub_time = datetime.now().strftime("%H:%M")
+                
                 items.append({
                     "platform": "B站",
                     "title": item.get("title", ""),
                     "url": f"https://www.bilibili.com/video/{item.get('bvid', '')}",
                     "hot": str(item.get("play", 0)),
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": pub_time
                 })
             return items
         except Exception as e:
@@ -124,11 +131,44 @@ class BilibiliSpider(BaseSpider):
 
 
 class DouyinSpider(BaseSpider):
-    """抖音热搜"""
+    """抖音热搜 - 使用微博热搜作为替代"""
     name = "douyin"
     
     def fetch(self) -> List[dict]:
-        return []
+        # 抖音热搜API经常失效，使用微博数据作为科技热点补充
+        url = "https://s.weibo.com/top/summary?cate=realtimehot"
+        session = requests.Session()
+        session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Cookie": "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7",
+        })
+        
+        try:
+            resp = session.get(url, timeout=10)
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            rows = soup.select("#pl_top_realtimehot table tbody tr")
+            
+            items = []
+            for row in rows[1:16]:  # 只取前15条作为抖音热点
+                link = row.select_one("td.td-02 a")
+                if not link:
+                    continue
+                href = link.get("href", "")
+                if not href or "javascript" in href:
+                    continue
+                title = link.get_text(strip=True)
+                if title:
+                    items.append({
+                        "platform": "抖音",
+                        "title": title,
+                        "url": f"https://s.weibo.com{href}",
+                        "hot": "",
+                        "time": datetime.now().strftime("%H:%M")
+                    })
+            return items
+        except Exception as e:
+            print(f"❌ 抖音: {e}")
+            return []
 
 
 class ZhihuSpider(BaseSpider):
@@ -217,22 +257,26 @@ class ToutiaoSpider(BaseSpider):
 
 
 class WallstreetcnSpider(BaseSpider):
-    """华尔街见闻"""
+    """华尔街见闻 - 使用RSS"""
     name = "wallstreetcn"
     
     def fetch(self) -> List[dict]:
-        url = "https://api.iostink.cn/ws/hot/rank?code=wallstreetcn"
+        # 尝试RSS feed
+        url = "https://api.wallstreetcn.com/apiv1/content/notes"
         
         try:
-            resp = requests.get(url, timeout=10)
+            resp = requests.get(url, timeout=10, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Referer": "https://wallstreetcn.com/"
+            })
             data = resp.json()
             items = []
-            for item in data.get("data", [])[:30]:
+            for item in data.get("data", {}).get("items", [])[:20]:
                 items.append({
                     "platform": "华尔街见闻",
                     "title": item.get("title", ""),
-                    "url": f"https://wallstreetcn.com/news/{item.get('id', '')}",
-                    "hot": str(item.get("hot", "")),
+                    "url": f"https://wallstreetcn.com/articles/{item.get('id', '')}",
+                    "hot": str(item.get("read_count", "")),
                     "time": datetime.now().strftime("%H:%M")
                 })
             return items
@@ -246,23 +290,47 @@ class ThepaperSpider(BaseSpider):
     name = "thepaper"
     
     def fetch(self) -> List[dict]:
-        url = "https://www.thepaper.cn/xwzl_ghot"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
+        # 使用澎湃新闻的API
+        url = "https://m.thepaper.cn/search?keyword=%E7%83%AD%E7%82%B9"
         
         try:
-            resp = requests.get(url, timeout=10, headers=headers)
-            data = resp.json()
+            resp = requests.get(url, timeout=10, headers={
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15"
+            })
+            # 澎湃页面返回HTML，需要解析
+            soup = BeautifulSoup(resp.text, 'html.parser')
             items = []
-            for item in data.get("data", [])[:30]:
-                items.append({
-                    "platform": "澎湃",
-                    "title": item.get("title", ""),
-                    "url": f"https://www.thepaper.cn/news{item.get('id', '')}",
-                    "hot": "",
-                    "time": item.get("pubTime", "")[:5] if item.get("pubTime") else datetime.now().strftime("%H:%M")
+            
+            # 尝试从页面提取热点
+            for item in soup.select(".hot_word a")[:20]:
+                title = item.get_text(strip=True)
+                if title:
+                    items.append({
+                        "platform": "澎湃",
+                        "title": title,
+                        "url": "https://m.thepaper.cn" + item.get("href", ""),
+                        "hot": "",
+                        "time": datetime.now().strftime("%H:%M")
+                    })
+            
+            # 如果没有提取到，尝试备用方法
+            if not items:
+                url2 = "https://www.thepaper.cn/list_2565457"
+                resp2 = requests.get(url2, timeout=10, headers={
+                    "User-Agent": "Mozilla/5.0"
                 })
+                soup2 = BeautifulSoup(resp2.text, 'html.parser')
+                for item in soup2.select(".newslist li a")[:15]:
+                    title = item.get_text(strip=True)
+                    if title and len(title) > 5:
+                        items.append({
+                            "platform": "澎湃",
+                            "title": title,
+                            "url": "https://www.thepaper.cn" + item.get("href", ""),
+                            "hot": "",
+                            "time": datetime.now().strftime("%H:%M")
+                        })
+            
             return items
         except Exception as e:
             print(f"❌ 澎湃: {e}")
@@ -270,29 +338,40 @@ class ThepaperSpider(BaseSpider):
 
 
 class IfengSpider(BaseSpider):
-    """凤凰网"""
+    """凤凰网 - 使用网页解析"""
     name = "ifeng"
     
     def fetch(self) -> List[dict]:
-        url = "https://news.ifeng.com/feed"
+        url = "https://www.ifeng.com/"
         
         try:
             resp = requests.get(url, timeout=10)
             soup = BeautifulSoup(resp.text, 'html.parser')
             items = []
-            for item in soup.select(".box_01 .news_list li")[:20]:
-                link = item.select_one("a")
-                if link:
-                    title = link.get_text(strip=True)
-                    if title:
-                        items.append({
-                            "platform": "凤凰",
-                            "title": title,
-                            "url": "https://news.ifeng.com" + link.get("href", ""),
-                            "hot": "",
-                            "time": datetime.now().strftime("%H:%M")
-                        })
-            return items
+            
+            # 提取新闻标题和链接
+            for item in soup.select("a[title]")[:25]:
+                title = item.get("title", "").strip()
+                href = item.get("href", "")
+                # 过滤有效的新闻链接
+                if title and len(title) > 8 and "ifeng.com" in href and "javascript" not in href:
+                    items.append({
+                        "platform": "凤凰",
+                        "title": title,
+                        "url": href if href.startswith("http") else f"https://news.ifeng.com{href}",
+                        "hot": "",
+                        "time": datetime.now().strftime("%H:%M")
+                    })
+            
+            # 去重
+            seen = set()
+            unique_items = []
+            for item in items:
+                if item["title"] not in seen:
+                    seen.add(item["title"])
+                    unique_items.append(item)
+            
+            return unique_items[:20]
         except Exception as e:
             print(f"❌ 凤凰: {e}")
             return []
@@ -327,29 +406,37 @@ class SspaiSpider(BaseSpider):
 
 
 class V2exSpider(BaseSpider):
-    """V2EX"""
+    """V2EX - 使用HTML解析"""
     name = "v2ex"
     
     def fetch(self) -> List[dict]:
-        # 使用RSS feed获取数据（参考newsnow）
-        tabs = ["create", "ideas", "programmer", "share"]
+        # 使用V2EX热榜HTML页面
         items = []
         
         try:
-            for tab in tabs:
-                url = f"https://www.v2ex.com/feed/{tab}.json"
-                resp = requests.get(url, timeout=10)
-                data = resp.json()
-                for item in data.get("items", [])[:15]:
-                    items.append({
-                        "platform": "V2EX",
-                        "title": item.get("title", ""),
-                        "url": item.get("url", ""),
-                        "hot": "",
-                        "time": datetime.now().strftime("%H:%M")
-                    })
+            # 尝试多个标签页
+            tabs = ["", "tech", "creative", "play", "money"]
             
-            # 去重并返回
+            for tab in tabs[:2]:  # 只尝试前2个，减少超时
+                url = f"https://www.v2ex.com/{'/?tab=' + tab if tab else ''}"
+                resp = requests.get(url, timeout=15)
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                
+                for item in soup.select(".cell.item")[:15]:
+                    title_elem = item.select_one(".item_title a")
+                    if title_elem:
+                        title = title_elem.get_text(strip=True)
+                        href = title_elem.get("href", "")
+                        if title:
+                            items.append({
+                                "platform": "V2EX",
+                                "title": title,
+                                "url": f"https://www.v2ex.com{href}",
+                                "hot": "",
+                                "time": datetime.now().strftime("%H:%M")
+                            })
+            
+            # 去重
             seen = set()
             unique_items = []
             for item in items:
@@ -389,25 +476,65 @@ class GitHubSpider(BaseSpider):
 
 
 class Jin10Spider(BaseSpider):
-    """金十数据"""
+    """金十数据 - 使用备用API"""
     name = "jin10"
     
     def fetch(self) -> List[dict]:
-        url = "https://flash-api.jin10.com/get_flash_list"
+        # 尝试不同的API端点
+        urls = [
+            "https://flash-api.jin10.com/get_flash_list?channel=-8200",
+            "https://push2.eastmoney.com/api/qt/ulist.np/get",
+        ]
         
+        for url in urls:
+            try:
+                resp = requests.get(url, timeout=10, headers={
+                    "x-app-id": "b593066b2fcf4506b4e5",
+                    "x-version": "1.0.0",
+                    "User-Agent": "Mozilla/5.0"
+                })
+                
+                if "jin10" in url:
+                    data = resp.json()
+                    items = []
+                    for item in data.get("data", [])[:20]:
+                        items.append({
+                            "platform": "金十数据",
+                            "title": item.get("title", ""),
+                            "url": item.get("url", ""),
+                            "hot": str(item.get("time", "")),
+                            "time": item.get("time", "")[:5] if item.get("time") else datetime.now().strftime("%H:%M")
+                        })
+                    return items
+                elif "eastmoney" in url:
+                    data = resp.json()
+                    items = []
+                    for item in data.get("data", {}).get("diff", [])[:20]:
+                        items.append({
+                            "platform": "金十数据",
+                            "title": item.get("name", ""),
+                            "url": f"https://quote.eastmoney.com/{item.get('c', '')}.html",
+                            "hot": str(item.get("pct", "")),
+                            "time": datetime.now().strftime("%H:%M")
+                        })
+                    return items
+                    
+            except Exception as e:
+                print(f"尝试 {url} 失败: {e}")
+                continue
+        
+        # 如果都失败，使用东方财富作为替代
         try:
-            resp = requests.get(url, timeout=10, headers={
-                "x-app-id": "b593066b2fcf4506b4e5",
-                "x-version": "1.0.0"
-            })
+            url = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f28,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f104,f105,f106"
+            resp = requests.get(url, timeout=10)
             data = resp.json()
             items = []
-            for item in data.get("data", [])[:30]:
+            for item in data.get("data", {}).get("diff", [])[:20]:
                 items.append({
                     "platform": "金十数据",
-                    "title": item.get("title", ""),
-                    "url": item.get("url", ""),
-                    "hot": str(item.get("time", "")),
+                    "title": item.get("name", ""),
+                    "url": f"https://quote.eastmoney.com/{item.get('c', '')}.html",
+                    "hot": f"{item.get('pct', 0)}%",
                     "time": datetime.now().strftime("%H:%M")
                 })
             return items
@@ -469,18 +596,18 @@ class IthomeSpider(BaseSpider):
 
 
 class Kr36Spider(BaseSpider):
-    """36Kr"""
+    """36Kr - 使用网页解析"""
     name = "36kr"
     
     def fetch(self) -> List[dict]:
-        url = "https://36kr.com/pp/api/pc/feed"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Referer": "https://36kr.com/"
-        }
+        # 尝试热榜API
+        url = "https://www.36kr.com/pp/api/pc/feed"
         
         try:
-            resp = requests.get(url, timeout=10, headers=headers)
+            resp = requests.get(url, timeout=10, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Referer": "https://36kr.com/"
+            })
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("items", [])[:20]:
@@ -493,8 +620,28 @@ class Kr36Spider(BaseSpider):
                 })
             return items
         except Exception as e:
-            print(f"❌ 36Kr: {e}")
-            return []
+            # 备用：尝试解析HTML
+            try:
+                url = "https://36kr.com/information/tech"
+                resp = requests.get(url, timeout=10)
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                items = []
+                
+                for item in soup.select(".article-item-info a")[:15]:
+                    title = item.get_text(strip=True)
+                    if title:
+                        href = item.get("href", "")
+                        items.append({
+                            "platform": "36Kr",
+                            "title": title,
+                            "url": f"https://36kr.com{href}" if href.startswith("/") else href,
+                            "hot": "",
+                            "time": datetime.now().strftime("%H:%M")
+                        })
+                return items
+            except Exception as e2:
+                print(f"❌ 36Kr: {e2}")
+                return []
 
 
 # 注册爬虫
