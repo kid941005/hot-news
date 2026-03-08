@@ -43,6 +43,9 @@ class ConfigRequest(BaseModel):
     blocked_keywords: Optional[List[str]] = None
     keyword_tags: Optional[dict] = None  # 关键词标签映射
     platforms: Optional[List[str]] = None
+    push_enabled: Optional[bool] = None
+    push_channel: Optional[str] = None
+    push_webhook: Optional[str] = None
 
 
 # ============= 依赖 =============
@@ -497,6 +500,9 @@ def get_config(user_id: int = Depends(get_current_user_id), db: Session = Depend
             "blocked_keywords": config.blocked_keywords or [],
             "keyword_tags": config.keyword_tags or {},
             "platforms": config.platforms or [],
+            "push_enabled": config.push_enabled or False,
+            "push_channel": config.push_channel or "feishu",
+            "push_webhook": config.push_webhook or "",
         }
     }
 
@@ -543,6 +549,104 @@ def update_config(req: ConfigRequest, user_id: int = Depends(get_current_user_id
     config_data = req.dict(exclude_unset=True)
     database.update_user_config(db, user_id, config_data)
     return {"success": True}
+
+
+# ============= 推送功能 =============
+
+def push_to_feishu(webhook: str, content: str) -> bool:
+    """推送消息到飞书"""
+    import requests
+    
+    # 飞书机器人webhook格式: https://open.feishu.cn/open-apis/bot/v2/hook/xxx
+    try:
+        # 构建消息体
+        payload = {
+            "msg_type": "text",
+            "content": {
+                "text": content
+            }
+        }
+        
+        response = requests.post(webhook, json=payload, timeout=10)
+        if response.status_code == 200:
+            result = response.json()
+            return result.get("code", 0) == 0
+        return False
+    except Exception as e:
+        print(f"飞书推送失败: {e}")
+        return False
+
+
+def push_to_dingtalk(webhook: str, content: str) -> bool:
+    """推送消息到钉钉"""
+    import requests
+    
+    try:
+        # 钉钉机器人webhook格式: https://oapi.dingtalk.com/robot/send?access_token=xxx
+        payload = {
+            "msgtype": "text",
+            "text": {
+                "content": content
+            }
+        }
+        
+        response = requests.post(webhook, json=payload, timeout=10)
+        if response.status_code == 200:
+            result = response.json()
+            return result.get("errcode", 0) == 0
+        return False
+    except Exception as e:
+        print(f"钉钉推送失败: {e}")
+        return False
+
+
+@app.post("/api/push")
+def push_news(
+    user_id: int = Depends(get_current_user_id), 
+    db: Session = Depends(get_db)
+):
+    """手动触发推送"""
+    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
+    
+    if not config or not config.push_enabled:
+        return {"success": False, "error": "推送未启用"}
+    
+    if not config.push_webhook:
+        return {"success": False, "error": "未配置Webhook"}
+    
+    # 获取筛选后的新闻
+    news_list, _ = database.get_user_filtered_news(db, user_id, config.keywords or [])
+    
+    # 过滤屏蔽词
+    if config.blocked_keywords:
+        news_list = [n for n in news_list if not any(kw in n.title for kw in config.blocked_keywords)]
+    
+    # 取最新10条
+    news_list = news_list[:10]
+    
+    if not news_list:
+        return {"success": False, "error": "没有可推送的新闻"}
+    
+    # 生成内容
+    from datetime import datetime
+    content = f"📰 热点资讯 ({datetime.now().strftime('%H:%M')})\n\n"
+    for i, item in enumerate(news_list, 1):
+        content += f"{i}. {item.title}\n"
+        if i >= 10:
+            break
+    
+    # 推送到对应渠道
+    if config.push_channel == "feishu":
+        success = push_to_feishu(config.push_webhook, content)
+    elif config.push_channel == "dingtalk":
+        success = push_to_dingtalk(config.push_webhook, content)
+    else:
+        return {"success": False, "error": f"不支持的推送渠道: {config.push_channel}"}
+    
+    if success:
+        return {"success": True, "message": f"成功推送{len(news_list)}条新闻"}
+    else:
+        return {"success": False, "error": "推送失败"}
 
 
 @app.get("/api/news")

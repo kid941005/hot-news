@@ -40,8 +40,15 @@ const newTag = ref('')
 const config = ref({
   keywords: [],
   blocked_keywords: [],
-  platforms: []
+  platforms: [],
+  push_enabled: false,
+  push_channel: 'feishu',
+  push_webhook: ''
 })
+
+// 推送状态
+const pushLoading = ref(false)
+const pushMessage = ref('')
 
 // 请求头
 function getAuthHeader() {
@@ -70,7 +77,10 @@ async function loadConfig() {
         keywords: (res.data.config.keywords || []).join(', '),
         blocked_keywords: (res.data.config.blocked_keywords || []).join(', '),
         platforms: res.data.config.platforms || [],
-        keyword_tags: res.data.config.keyword_tags || {}
+        keyword_tags: res.data.config.keyword_tags || {},
+        push_enabled: res.data.config.push_enabled || false,
+        push_channel: res.data.config.push_channel || 'feishu',
+        push_webhook: res.data.config.push_webhook || ''
       }
       keywordTags.value = res.data.config.keyword_tags || {}
     }
@@ -85,21 +95,30 @@ async function loadNews() {
   try {
     // 当currentTag为null时，获取按平台分组的数据；否则按标签筛选
     if (currentTag.value === null) {
-      // 全部标签：按平台分组
-      const res = await axios.get(`${API_URL}/api/news/by_platform`, getAuthHeader())
+      // 全部标签：按平台分组（不需要认证）
+      const res = await axios.get(`${API_URL}/api/news/by_platform`)
       if (res.data.success) {
         newsByPlatform.value = res.data.platforms || {}
         news.value = []  // 清空普通列表
       }
     } else {
-      // 其他标签：按关键词筛选
+      // 其他标签：按关键词筛选（需要认证）
       newsByPlatform.value = {}  // 清空分组数据
-      const res = await axios.get(`${API_URL}/api/news`, { 
-        ...getAuthHeader(), 
-        params: { tag: currentTag.value }
-      })
-      if (res.data.success) {
-        news.value = res.data.news
+      const authHeader = getAuthHeader()
+      if (token.value) {
+        const res = await axios.get(`${API_URL}/api/news`, { 
+          ...authHeader, 
+          params: { tag: currentTag.value }
+        })
+        if (res.data.success) {
+          news.value = res.data.news
+        }
+      } else {
+        // 未登录时获取所有数据
+        const res = await axios.get(`${API_URL}/api/news?all=true`)
+        if (res.data.success) {
+          news.value = res.data.news || []
+        }
       }
     }
   } catch (e) {
@@ -142,7 +161,10 @@ async function saveConfig() {
     await axios.post(`${API_URL}/api/config`, {
       blocked_keywords: blocked,
       platforms: config.value.platforms,
-      keyword_tags: keywordTags.value
+      keyword_tags: keywordTags.value,
+      push_enabled: config.value.push_enabled,
+      push_channel: config.value.push_channel,
+      push_webhook: config.value.push_webhook
     }, getAuthHeader())
     alert('保存成功')
     showAccount.value = false
@@ -153,6 +175,28 @@ async function saveConfig() {
     console.error(e)
     alert('保存失败')
   }
+}
+
+// 手动触发推送
+async function pushNews() {
+  if (!config.value.push_enabled || !config.value.push_webhook) {
+    alert('请先启用推送并配置Webhook')
+    return
+  }
+  
+  pushLoading.value = true
+  pushMessage.value = ''
+  try {
+    const res = await axios.post(`${API_URL}/api/push`, {}, getAuthHeader())
+    if (res.data.success) {
+      pushMessage.value = res.data.message || '推送成功'
+    } else {
+      pushMessage.value = res.data.error || '推送失败'
+    }
+  } catch (e) {
+    pushMessage.value = '推送失败: ' + (e.response?.data?.detail || e.message)
+  }
+  pushLoading.value = false
 }
 
 // 登录
@@ -719,6 +763,53 @@ onUnmounted(() => {
               <input type="checkbox" :value="p.id" v-model="config.platforms">
               {{ p.name }}
             </label>
+          </div>
+        </div>
+        
+        <!-- 推送设置 -->
+        <div class="mb-4 border-t pt-4">
+          <label class="text-sm text-gray-500 block mb-2">📣 推送设置</label>
+          
+          <div class="mb-3">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" v-model="config.push_enabled" class="w-4 h-4">
+              <span class="text-sm">启用推送</span>
+            </label>
+          </div>
+          
+          <div v-if="config.push_enabled" class="space-y-3">
+            <div>
+              <label class="text-xs text-gray-500 block mb-1">推送渠道</label>
+              <select v-model="config.push_channel" class="w-full px-3 py-2 border rounded-lg text-sm">
+                <option value="feishu">飞书</option>
+                <option value="dingtalk">钉钉</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="text-xs text-gray-500 block mb-1">Webhook地址</label>
+              <input 
+                v-model="config.push_webhook" 
+                type="text" 
+                placeholder="飞书机器人Webhook地址"
+                class="w-full px-3 py-2 border rounded-lg text-sm"
+              >
+              <div class="text-xs text-gray-400 mt-1">
+                如何获取？<a href="https://open.feishu.cn/document/ukTMukTMukTM/uADOwUjLwgDM14CM4ATN" target="_blank" class="text-blue-500">查看教程</a>
+              </div>
+            </div>
+            
+            <button 
+              @click="pushNews" 
+              :disabled="pushLoading"
+              class="w-full py-2 bg-green-500 text-white rounded-lg text-sm"
+            >
+              {{ pushLoading ? '推送中...' : '📤 立即推送测试' }}
+            </button>
+            
+            <div v-if="pushMessage" class="text-xs text-center" :class="pushMessage.includes('成功') ? 'text-green-600' : 'text-red-500'">
+              {{ pushMessage }}
+            </div>
           </div>
         </div>
         
