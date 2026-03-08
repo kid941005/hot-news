@@ -11,7 +11,8 @@ from datetime import datetime
 from functools import wraps
 
 # Add scripts to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+scripts_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts')
+sys.path.insert(0, scripts_dir)
 
 from flask import Flask, render_template, jsonify, request, session, send_from_directory
 from flask_cors import CORS
@@ -117,8 +118,8 @@ def get_news():
     keywords = config.get('keywords', [])
     blocked = config.get('blocked_keywords', [])
     
-    # 获取热点（优先使用缓存）
-    all_news = hot_news.get_news_with_cache(platforms if platforms else None)
+    # 获取热点
+    all_news = hot_news.fetch_all(platforms if platforms else None)
     
     # 关键词过滤
     if keywords or blocked:
@@ -239,7 +240,7 @@ def push_news():
     if not config.get('push_enabled'):
         return jsonify({"success": False, "error": "推送未启用"})
     
-    news = hot_news.get_news_with_cache(config.get('platforms', []))
+    news = hot_news.fetch_all_hot(config.get('platforms', []))
     news = hot_news.filter_by_keywords(news, config.get('keywords'), config.get('blocked_keywords'))
     news = news[:10]
     
@@ -256,4 +257,4 @@ def push_news():
     return jsonify({"success": True, "message": "推送成功"})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=16888, debug=True)
