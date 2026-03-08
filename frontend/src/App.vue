@@ -8,6 +8,7 @@ const API_URL = ''  // 通过代理访问
 const currentUser = ref(localStorage.getItem('username') || null)
 const token = ref(localStorage.getItem('token') || null)
 const news = ref([])
+const newsByPlatform = ref({})  // 按平台分组的新闻
 const loading = ref(false)
 const showLogin = ref(false)
 const showAccount = ref(false)
@@ -82,14 +83,24 @@ async function loadConfig() {
 async function loadNews() {
   loading.value = true
   try {
-    // 当currentTag为null时，获取所有热榜；否则按标签筛选
-    const params = currentTag.value ? { tag: currentTag.value } : { all: 'true' }
-    const res = await axios.get(`${API_URL}/api/news`, { 
-      ...getAuthHeader(), 
-      params 
-    })
-    if (res.data.success) {
-      news.value = res.data.news
+    // 当currentTag为null时，获取按平台分组的数据；否则按标签筛选
+    if (currentTag.value === null) {
+      // 全部标签：按平台分组
+      const res = await axios.get(`${API_URL}/api/news/by_platform`, getAuthHeader())
+      if (res.data.success) {
+        newsByPlatform.value = res.data.platforms || {}
+        news.value = []  // 清空普通列表
+      }
+    } else {
+      // 其他标签：按关键词筛选
+      newsByPlatform.value = {}  // 清空分组数据
+      const res = await axios.get(`${API_URL}/api/news`, { 
+        ...getAuthHeader(), 
+        params: { tag: currentTag.value }
+      })
+      if (res.data.success) {
+        news.value = res.data.news
+      }
     }
   } catch (e) {
     console.error(e)
@@ -378,7 +389,7 @@ onUnmounted(() => {
 <template>
   <div class="min-h-screen bg-gray-100">
     <!-- 头部 -->
-    <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-4 sticky top-0 z-50">
+    <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-4 sticky top-0 z-50 safe-area-top">
       <div class="max-w-2xl mx-auto flex justify-between items-center">
         <h1 class="text-lg font-semibold">热点资讯</h1>
         <div class="flex gap-2">
@@ -408,7 +419,7 @@ onUnmounted(() => {
     </header>
 
     <!-- 标签筛选 -->
-    <div v-if="currentUser" class="bg-white border-b sticky top-14 z-40">
+    <div v-if="currentUser" class="bg-white border-b sticky z-40 safe-area-top" style="top: max(3.5rem, env(safe-area-inset-top))">
       <div class="max-w-2xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
         <button 
           @click="selectTag(null)"
@@ -447,7 +458,53 @@ onUnmounted(() => {
       </div>
 
       <!-- 新闻列表 -->
-      <div class="space-y-3">
+      <!-- 按平台分组显示（全部标签） -->
+      <div v-if="Object.keys(newsByPlatform).length > 0" class="space-y-4">
+        <div 
+          v-for="(platformNews, platform) in newsByPlatform" 
+          :key="platform"
+          class="bg-white rounded-xl shadow-sm overflow-hidden"
+        >
+          <!-- 平台标题 -->
+          <div class="px-4 py-2 bg-gray-50 border-b flex justify-between items-center">
+            <span class="font-medium text-gray-700">{{ platform }}</span>
+            <span class="text-xs text-gray-400">{{ platformNews.length }}条</span>
+          </div>
+          <!-- 平台新闻列表 -->
+          <div class="divide-y">
+            <div 
+              v-for="(item, index) in platformNews" 
+              :key="index"
+              class="p-4"
+            >
+              <a 
+                :href="item.url" 
+                target="_blank"
+                class="text-base font-medium text-gray-800 hover:text-indigo-600"
+              >
+                {{ item.title }}
+              </a>
+              <div class="flex justify-between items-center mt-2">
+                <div class="flex gap-1 flex-wrap">
+                  <span 
+                    v-for="kw in item.matched_keywords" 
+                    :key="kw"
+                    class="text-xs px-2 py-0.5 bg-purple-100 text-purple-600 rounded"
+                  >
+                    {{ kw }}
+                  </span>
+                </div>
+                <span class="text-xs text-gray-400">
+                  {{ item.pub_time || item.created_at?.slice(11,16) || '' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 普通列表（筛选标签） -->
+      <div v-else class="space-y-3">
         <div 
           v-for="(item, index) in news" 
           :key="index"
@@ -494,10 +551,10 @@ onUnmounted(() => {
             </span>
           </div>
         </div>
-        
-        <div v-if="news.length === 0 && !loading" class="text-center py-12 text-gray-400">
-          暂无匹配的热点资讯
-        </div>
+      </div>
+
+      <div v-if="news.length === 0 && !loading" class="text-center py-12 text-gray-400">
+        暂无匹配的热点资讯
       </div>
     </main>
 

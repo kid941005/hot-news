@@ -13,3 +13,48 @@ body {
   background: #f5f5f7;
   color: #1a1a2e;
 }
+
+/* 刘海屏/打孔屏安全区域适配 */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-left {
+    padding-left: max(0px, env(safe-area-inset-left));
+  }
+  
+  .safe-area-right {
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* 确保header和底部导航不被刘海遮挡 */
+.fixed-header {
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+
+.fixed-footer {
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+}
+
+/* Header安全区域 - 使用固定padding */
+header.safe-area-top {
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
+/* 标签栏跟随header */
+.sticky.top-14 {
+  top: max(3.5rem, calc(3.5rem + env(safe-area-inset-top)));
+}
