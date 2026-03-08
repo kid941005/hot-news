@@ -1,6 +1,25 @@
+# Dependencies
+node_modules/
 __pycache__/
 *.pyc
-venv/
-.env
-*.log
+*.pyo
+
+# Build
+frontend/dist/
+backend/api/static/assets/
+*.db
+*.sqlite
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
+nohup.out
