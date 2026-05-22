@@ -100,8 +100,8 @@ def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str]
     result = []
     matched_keywords = {}  # {news_id: [匹配的关键词]}
     
-    # 如果指定了filter_keywords（按标签筛选），优先使用；否则使用用户配置的关键词
-    if filter_keywords is not None and len(filter_keywords) > 0:
+    # 如果指定了filter_keywords（按标签筛选），优先使用；即使为空列表也使用（空标签 = 全部匹配）
+    if filter_keywords is not None:
         keywords = filter_keywords
     else:
         keywords = config.keywords or []

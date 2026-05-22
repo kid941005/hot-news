@@ -179,7 +179,7 @@ def get_config(user_id: int = Depends(get_current_user_id), db: Session = Depend
 def get_tags(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     """获取用户的标签列表"""
     config = database.get_user_config(db, user_id)
-    if not config or not config.keyword_tags:
+    if not config or config.keyword_tags is None:
         # 返回默认标签（仅当没有任何配置时）
         return {
             "success": True,
@@ -331,7 +331,7 @@ def get_news(
     if all:
         news_list = database.get_all_news(db)
         matched_keywords = {}
-    elif tag and config and config.keyword_tags:
+    elif tag and config and config.keyword_tags is not None:
         # 如果指定了标签，使用该标签的关键词
         import json
         if isinstance(config.keyword_tags, str):
