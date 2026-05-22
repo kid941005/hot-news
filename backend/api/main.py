@@ -246,15 +246,16 @@ def push_to_feishu(webhook: str, content: str) -> bool:
 
 
 def push_to_dingtalk(webhook: str, content: str) -> bool:
-    """推送消息到钉钉"""
+    """推送消息到钉钉（支持Markdown格式）"""
     import requests
     
     try:
         # 钉钉机器人webhook格式: https://oapi.dingtalk.com/robot/send?access_token=***
         payload = {
-            "msgtype": "text",
-            "text": {
-                "content": content
+            "msgtype": "markdown",
+            "markdown": {
+                "title": "热点资讯",
+                "text": content
             }
         }
         
@@ -306,8 +307,8 @@ def push_news(
     if not config.push_webhook:
         return {"success": False, "error": "未配置Webhook"}
     
-    # 获取筛选后的新闻
-    news_list, _ = database.get_user_filtered_news(db, user_id, config.keywords or [])
+    # 获取筛选后的新闻（保留匹配关键词信息用于标签分组）
+    news_list, matched_keywords = database.get_user_filtered_news(db, user_id, config.keywords or [])
     
     # 过滤屏蔽词
     if config.blocked_keywords:
@@ -319,13 +320,53 @@ def push_news(
     if not news_list:
         return {"success": False, "error": "没有可推送的新闻"}
     
-    # 生成内容
     from datetime import datetime
-    content = f"📰 热点资讯 ({datetime.now().strftime('%H:%M')})\n\n"
-    for i, item in enumerate(news_list, 1):
-        content += f"{i}. {item.title}\n"
-        if i >= 10:
-            break
+    time_str = datetime.now().strftime('%H:%M')
+    
+    # 按标签分组
+    keyword_tags = config.keyword_tags or {}
+    keyword_to_tag = {}
+    for tag, kws in keyword_tags.items():
+        for kw in (kws or []):
+            keyword_to_tag[kw.lower()] = tag
+    
+    tag_news = {}  # {tag_name: [(news, [matched_kw])]}
+    untagged = []
+    for n in news_list:
+        m_kws = matched_keywords.get(n.id, [])
+        tags_found = set()
+        for kw in m_kws:
+            tag = keyword_to_tag.get(kw.lower())
+            if tag:
+                tags_found.add(tag)
+        if tags_found:
+            for tag in tags_found:
+                tag_news.setdefault(tag, []).append((n, m_kws))
+        else:
+            untagged.append(n)
+    
+    # 为钉钉生成带超链接的 Markdown 内容，其他渠道保持纯文本
+    content = f"📰 热点资讯 ({time_str})\n\n"
+    if config.push_channel == "dingtalk":
+        for tag in sorted(tag_news.keys()):
+            content += f"### {tag}\n"
+            for i, (n, _) in enumerate(tag_news[tag], 1):
+                content += f"{i}. [{n.title}]({n.url})\n"
+            content += "\n"
+        if untagged:
+            content += "### 其他\n"
+            for i, n in enumerate(untagged, 1):
+                content += f"{i}. [{n.title}]({n.url})\n"
+    else:
+        for tag in sorted(tag_news.keys()):
+            content += f"— {tag} —\n"
+            for i, (n, _) in enumerate(tag_news[tag], 1):
+                content += f"{i}. {n.title}\n"
+            content += "\n"
+        if untagged:
+            content += "— 其他 —\n"
+            for i, n in enumerate(untagged, 1):
+                content += f"{i}. {n.title}\n"
     
     # 推送到对应渠道
     if config.push_channel == "feishu":
