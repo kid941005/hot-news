@@ -17,6 +17,8 @@ from backend.db.database import PLATFORM_MAP
 from backend.spiders import spiders
 from backend.models.models import News
 
+from datetime import timezone
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
