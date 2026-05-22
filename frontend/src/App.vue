@@ -112,8 +112,8 @@ async function loadNews() {
   try {
     // 当currentTag为null时，获取按平台分组的数据；否则按标签筛选
     if (currentTag.value === null) {
-      // 全部标签：按平台分组（不需要认证）
-      const res = await axios.get(`${API_URL}/api/news/by_platform`)
+      // 全部标签：按平台分组（登录用户按平台筛选）
+      const res = await axios.get(`${API_URL}/api/news/by_platform`, getAuthHeader())
       if (res.data.success) {
         newsByPlatform.value = res.data.platforms || {}
         news.value = []  // 清空普通列表
