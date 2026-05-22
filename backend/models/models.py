@@ -62,7 +62,9 @@ class UserConfig(Base):
     push_enabled = Column(Boolean, default=False)
     push_channel = Column(String(50), default="")
     push_webhook = Column(String(500), default="")
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    push_interval = Column(Integer, default=4)  # 推送间隔（小时）
+    last_push_at = Column(DateTime, nullable=True)  # 最后一次成功推送时间
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     user = relationship("User", back_populates="config")
 

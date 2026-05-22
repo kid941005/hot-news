@@ -52,6 +52,7 @@ class ConfigRequest(BaseModel):
     push_enabled: Optional[bool] = None
     push_channel: Optional[str] = None
     push_webhook: Optional[str] = None
+    push_interval: Optional[int] = None  # 推送间隔（小时）
 
 
 # ============= 依赖 =============
@@ -176,6 +177,8 @@ def get_config(user_id: int = Depends(get_current_user_id), db: Session = Depend
             "push_enabled": config.push_enabled or False,
             "push_channel": config.push_channel or "feishu",
             "push_webhook": config.push_webhook or "",
+            "push_interval": config.push_interval or 4,
+            "last_push_at": config.last_push_at.isoformat() + "Z" if config.last_push_at else None,
         }
     }
 
@@ -383,7 +386,7 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
 
 
 def scheduled_push():
-    """定时调度：遍历所有启用推送的用户"""
+    """定时调度：遍历所有启用推送的用户，按各自间隔推送"""
     from backend.models.models import SessionLocal
     db = SessionLocal()
     try:
@@ -391,11 +394,21 @@ def scheduled_push():
         if not configs:
             print("⏰ 定时推送：没有启用推送的用户")
             return
+        now = datetime.utcnow()
         for config in configs:
             if not config.push_webhook:
                 continue
+            # 检查是否到了该用户的推送时间
+            interval_hours = config.push_interval or 4
+            if config.last_push_at:
+                elapsed = (now - config.last_push_at).total_seconds()
+                if elapsed < interval_hours * 3600:
+                    continue
             success, message = _push_for_user(db, config)
             print(f"📬 定时推送 [用户{config.user_id}] {message}")
+            if success:
+                config.last_push_at = now
+                db.commit()
     except Exception as e:
         print(f"❌ 定时推送失败: {e}")
     finally:

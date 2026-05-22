@@ -207,8 +207,10 @@ def update_user_config(db: Session, user_id: int, config_data: dict) -> UserConf
         config.push_channel = config_data['push_channel']
     if 'push_webhook' in config_data:
         config.push_webhook = config_data['push_webhook']
+    if 'push_interval' in config_data:
+        config.push_interval = config_data['push_interval']
     
-    config.updated_at = datetime.now()
+    config.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(config)
     

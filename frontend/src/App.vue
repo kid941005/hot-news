@@ -44,12 +44,14 @@ const config = ref({
   platforms: [],
   push_enabled: false,
   push_channel: 'feishu',
-  push_webhook: ''
+  push_webhook: '',
+  push_interval: 4
 })
 
 // 推送状态
 const pushLoading = ref(false)
 const pushMessage = ref('')
+const lastPushTime = ref(null)
 const newsCount = computed(() => currentTag.value === null
   ? Object.values(newsByPlatform.value).reduce((sum, items) => sum + items.length, 0)
   : news.value.length
@@ -97,9 +99,11 @@ async function loadConfig() {
         keyword_tags: res.data.config.keyword_tags || {},
         push_enabled: res.data.config.push_enabled || false,
         push_channel: res.data.config.push_channel || 'feishu',
-        push_webhook: res.data.config.push_webhook || ''
+        push_webhook: res.data.config.push_webhook || '',
+        push_interval: res.data.config.push_interval || 4
       }
       keywordTags.value = res.data.config.keyword_tags || {}
+      lastPushTime.value = res.data.config.last_push_at || null
     }
   } catch (e) {
     console.error(e)
@@ -188,7 +192,8 @@ async function saveConfig() {
       keyword_tags: keywordTags.value,
       push_enabled: config.value.push_enabled,
       push_channel: config.value.push_channel,
-      push_webhook: config.value.push_webhook
+      push_webhook: config.value.push_webhook,
+      push_interval: config.value.push_interval
     }, getAuthHeader())
     alert('保存成功')
     showAccount.value = false
@@ -807,6 +812,25 @@ onUnmounted(() => {
               <div class="text-xs text-gray-400 mt-1">
                 如何获取？请查看飞书/钉钉/Bark 的 Webhook 配置文档
               </div>
+            </div>
+
+            <div>
+              <label class="text-xs text-gray-500 block mb-1">推送间隔</label>
+              <div class="flex items-center gap-2">
+                <input
+                  v-model.number="config.push_interval"
+                  type="range"
+                  min="1"
+                  max="24"
+                  class="flex-1"
+                >
+                <span class="text-sm text-gray-600 min-w-[4rem] text-right">{{ config.push_interval }} 小时</span>
+              </div>
+              <div class="text-xs text-gray-400 mt-1">每 {{ config.push_interval }} 小时自动推送一次</div>
+            </div>
+
+            <div v-if="lastPushTime" class="text-xs text-gray-400 text-center">
+              上次推送：{{ new Date(lastPushTime).toLocaleString('zh-CN') }}
             </div>
             
             <button 
