@@ -16,11 +16,11 @@ services:
 
   backend:
     image: kid941005/hot-news:latest
-    # build: .  # 本地构建取消注释，同时注释上面 image 行
     ports:
       - "16888:16888"
     environment:
       - DATABASE_URL=mysql+pymysql://root:hotnews123@mysql:3306/hot_news
+      - TZ=Asia/Shanghai
     depends_on:
       mysql:
         condition: service_healthy

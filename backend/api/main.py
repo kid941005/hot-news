@@ -403,9 +403,8 @@ def get_news_by_platform(
     }
 
 
-from datetime import datetime
+from datetime import datetime, timezone
 
-# 存储刷新时间
 LAST_REFRESH_TIME = None
 
 @app.post("/api/news/refresh")
@@ -423,8 +422,8 @@ async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session 
                 except Exception as e:
                     print(f"❌ 保存失败 {platform}: {e}")
         print(f"📊 共保存 {saved_count} 条新闻")
-        LAST_REFRESH_TIME = datetime.now()
-        return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat(), "count": saved_count}
+        LAST_REFRESH_TIME = datetime.now(timezone.utc)
+        return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count}
     except Exception as e:
         print(f"❌ 刷新失败: {e}")
         return {"success": False, "error": str(e)}
@@ -436,7 +435,7 @@ def get_refresh_time():
     if LAST_REFRESH_TIME:
         return {
             "success": True,
-            "last_refresh": LAST_REFRESH_TIME.isoformat(),
+            "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"),
             "display": LAST_REFRESH_TIME.strftime("%H:%M")
         }
     return {"success": True, "last_refresh": None}
