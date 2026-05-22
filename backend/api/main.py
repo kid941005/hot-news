@@ -222,14 +222,14 @@ def update_config(req: ConfigRequest, user_id: int = Depends(get_current_user_id
 # ============= 推送功能 =============
 
 def push_to_feishu(webhook: str, content: str) -> bool:
-    """推送消息到飞书"""
+    """推送消息到飞书（支持Markdown格式）"""
     import requests
     
     # 飞书机器人webhook格式: https://open.feishu.cn/open-apis/bot/v2/hook/xxx
     try:
         # 构建消息体
         payload = {
-            "msg_type": "text",
+            "msg_type": "markdown",
             "content": {
                 "text": content
             }
@@ -345,9 +345,9 @@ def push_news(
         else:
             untagged.append(n)
     
-    # 为钉钉生成带超链接的 Markdown 内容，其他渠道保持纯文本
+    # 生成 Markdown 内容（带超链接），Bark 保持纯文本
     content = f"📰 热点资讯 ({time_str})\n\n"
-    if config.push_channel == "dingtalk":
+    if config.push_channel in ("dingtalk", "feishu"):
         for tag in sorted(tag_news.keys()):
             content += f"### {tag}\n"
             for i, (n, _) in enumerate(tag_news[tag], 1):
