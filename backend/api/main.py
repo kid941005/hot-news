@@ -17,6 +17,11 @@ from backend.db.database import PLATFORM_MAP
 from backend.spiders import spiders
 from backend.models.models import News
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler()
+PUSH_INTERVAL_HOURS = int(os.getenv("PUSH_INTERVAL_HOURS", "4"))
+
 app = FastAPI(title="热点资讯", version="2.0")
 
 # 静态文件路径
@@ -293,44 +298,37 @@ def push_to_bark(webhook: str, content: str) -> bool:
         return False
 
 
-@app.post("/api/push")
-def push_news(
-    user_id: int = Depends(get_current_user_id), 
-    db: Session = Depends(get_db)
-):
-    """手动触发推送"""
-    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
-    
-    if not config or not config.push_enabled:
-        return {"success": False, "error": "推送未启用"}
-    
-    if not config.push_webhook:
-        return {"success": False, "error": "未配置Webhook"}
-    
-    # 获取筛选后的新闻（保留匹配关键词信息用于标签分组）
+def _push_for_user(db: Session, config: UserConfig) -> tuple:
+    """为单个用户执行推送。返回 (success: bool, message: str)"""
+    if not config or not config.push_enabled or not config.push_webhook:
+        return (False, "推送未启用或未配置Webhook")
+
+    user_id = config.user_id
+
+    # 获取筛选后的新闻
     news_list, matched_keywords = database.get_user_filtered_news(db, user_id, config.keywords or [])
-    
+
     # 过滤屏蔽词
     if config.blocked_keywords:
         news_list = [n for n in news_list if not any(kw in n.title for kw in config.blocked_keywords)]
-    
+
     # 取最新10条
     news_list = news_list[:10]
-    
+
     if not news_list:
-        return {"success": False, "error": "没有可推送的新闻"}
-    
+        return (False, "没有可推送的新闻")
+
     from datetime import datetime
     time_str = datetime.now().strftime('%H:%M')
-    
+
     # 按标签分组
     keyword_tags = config.keyword_tags or {}
     keyword_to_tag = {}
     for tag, kws in keyword_tags.items():
         for kw in (kws or []):
             keyword_to_tag[kw.lower()] = tag
-    
-    tag_news = {}  # {tag_name: [(news, [matched_kw])]}
+
+    tag_news = {}
     untagged = []
     for n in news_list:
         m_kws = matched_keywords.get(n.id, [])
@@ -344,8 +342,8 @@ def push_news(
                 tag_news.setdefault(tag, []).append((n, m_kws))
         else:
             untagged.append(n)
-    
-    # 生成 Markdown 内容（带超链接），三个渠道均支持
+
+    # 生成 Markdown 内容（带超链接）
     content = f"📰 热点资讯 ({time_str})\n\n"
     if config.push_channel in ("dingtalk", "feishu", "bark"):
         for tag in sorted(tag_news.keys()):
@@ -367,7 +365,7 @@ def push_news(
             content += "— 其他 —\n"
             for i, n in enumerate(untagged, 1):
                 content += f"{i}. {n.title}\n"
-    
+
     # 推送到对应渠道
     if config.push_channel == "feishu":
         success = push_to_feishu(config.push_webhook, content)
@@ -376,12 +374,68 @@ def push_news(
     elif config.push_channel == "bark":
         success = push_to_bark(config.push_webhook, content)
     else:
-        return {"success": False, "error": f"不支持的推送渠道: {config.push_channel}"}
-    
+        return (False, f"不支持的推送渠道: {config.push_channel}")
+
     if success:
-        return {"success": True, "message": f"成功推送{len(news_list)}条新闻"}
+        return (True, f"成功推送{len(news_list)}条新闻")
     else:
-        return {"success": False, "error": "推送失败"}
+        return (False, "推送失败")
+
+
+def scheduled_push():
+    """定时调度：遍历所有启用推送的用户"""
+    from backend.models.models import SessionLocal
+    db = SessionLocal()
+    try:
+        configs = db.query(UserConfig).filter(UserConfig.push_enabled == True).all()
+        if not configs:
+            print("⏰ 定时推送：没有启用推送的用户")
+            return
+        for config in configs:
+            if not config.push_webhook:
+                continue
+            success, message = _push_for_user(db, config)
+            print(f"📬 定时推送 [用户{config.user_id}] {message}")
+    except Exception as e:
+        print(f"❌ 定时推送失败: {e}")
+    finally:
+        db.close()
+
+
+@app.on_event("startup")
+def start_scheduler():
+    """启动定时推送调度器"""
+    scheduler.add_job(scheduled_push, 'interval', hours=PUSH_INTERVAL_HOURS, id='push_job')
+    scheduler.start()
+    print(f"⏰ 定时推送已启动，间隔 {PUSH_INTERVAL_HOURS} 小时")
+
+
+@app.on_event("shutdown")
+def stop_scheduler():
+    """关闭定时推送调度器"""
+    scheduler.shutdown(wait=False)
+    print("⏰ 定时推送已关闭")
+
+
+@app.post("/api/push")
+def push_news(
+    user_id: int = Depends(get_current_user_id), 
+    db: Session = Depends(get_db)
+):
+    """手动触发推送"""
+    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
+    
+    if not config or not config.push_enabled:
+        return {"success": False, "error": "推送未启用"}
+    
+    if not config.push_webhook:
+        return {"success": False, "error": "未配置Webhook"}
+    
+    success, message = _push_for_user(db, config)
+    if success:
+        return {"success": True, "message": message}
+    else:
+        return {"success": False, "error": message}
 
 
 @app.get("/api/news")
