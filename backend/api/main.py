@@ -18,8 +18,10 @@ from backend.spiders import spiders
 from backend.models.models import News
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 scheduler = BackgroundScheduler()
+UTC = timezone.utc
 PUSH_INTERVAL_HOURS = int(os.getenv("PUSH_INTERVAL_HOURS", "4"))
 
 app = FastAPI(title="热点资讯", version="2.0")
@@ -52,14 +54,14 @@ class ConfigRequest(BaseModel):
     push_enabled: Optional[bool] = None
     push_channel: Optional[str] = None
     push_webhook: Optional[str] = None
-    push_interval: Optional[int] = None  # 推送间隔（小时）
+    push_cron: Optional[str] = None  # cron 表达式，如 "0 */4 * * *"
 
 
 # ============= 依赖 =============
 
 # Token 认证
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict
 
 # 简单的 token 存储 (生产环境应该用数据库或 Redis)
@@ -177,7 +179,7 @@ def get_config(user_id: int = Depends(get_current_user_id), db: Session = Depend
             "push_enabled": config.push_enabled or False,
             "push_channel": config.push_channel or "feishu",
             "push_webhook": config.push_webhook or "",
-            "push_interval": config.push_interval or 4,
+            "push_cron": config.push_cron or "0 */4 * * *",
             "last_push_at": config.last_push_at.isoformat() + "Z" if config.last_push_at else None,
         }
     }
@@ -386,29 +388,37 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
 
 
 def scheduled_push():
-    """定时调度：遍历所有启用推送的用户，按各自间隔推送"""
+    """定时调度：遍历所有启用推送的用户，按各自 cron 表达式推送"""
     from backend.models.models import SessionLocal
     db = SessionLocal()
     try:
         configs = db.query(UserConfig).filter(UserConfig.push_enabled == True).all()
         if not configs:
-            print("⏰ 定时推送：没有启用推送的用户")
             return
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         for config in configs:
             if not config.push_webhook:
                 continue
-            # 检查是否到了该用户的推送时间
-            interval_hours = config.push_interval or 4
-            if config.last_push_at:
-                elapsed = (now - config.last_push_at).total_seconds()
-                if elapsed < interval_hours * 3600:
-                    continue
-            success, message = _push_for_user(db, config)
-            print(f"📬 定时推送 [用户{config.user_id}] {message}")
-            if success:
-                config.last_push_at = now
-                db.commit()
+            # 解析用户的 cron 表达式
+            cron_str = config.push_cron or "0 */4 * * *"
+            try:
+                trigger = CronTrigger.from_crontab(cron_str, timezone=UTC)
+            except (ValueError, KeyError):
+                print(f"⚠️ 用户{config.user_id} cron 表达式无效: {cron_str}")
+                continue
+            # 判断是否需要推送
+            if config.last_push_at is None:
+                should_push = True  # 首次推送
+            else:
+                last = config.last_push_at.replace(tzinfo=UTC)
+                next_time = trigger.get_next_fire_time(last, now)
+                should_push = next_time is not None and next_time <= now
+            if should_push:
+                success, message = _push_for_user(db, config)
+                print(f"📬 定时推送 [用户{config.user_id}] {message}")
+                if success:
+                    config.last_push_at = now
+                    db.commit()
     except Exception as e:
         print(f"❌ 定时推送失败: {e}")
     finally:
@@ -418,9 +428,9 @@ def scheduled_push():
 @app.on_event("startup")
 def start_scheduler():
     """启动定时推送调度器"""
-    scheduler.add_job(scheduled_push, 'interval', hours=PUSH_INTERVAL_HOURS, id='push_job')
+    scheduler.add_job(scheduled_push, 'interval', minutes=1, id='push_job')
     scheduler.start()
-    print(f"⏰ 定时推送已启动，间隔 {PUSH_INTERVAL_HOURS} 小时")
+    print(f"⏰ 定时推送已启动（每分钟检查 cron 表达式）")
 
 
 @app.on_event("shutdown")

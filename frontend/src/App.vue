@@ -45,13 +45,28 @@ const config = ref({
   push_enabled: false,
   push_channel: 'feishu',
   push_webhook: '',
-  push_interval: 4
+  push_cron: '0 */4 * * *'
 })
 
 // 推送状态
 const pushLoading = ref(false)
 const pushMessage = ref('')
 const lastPushTime = ref(null)
+
+// cron 预设
+const cronPresets = [
+  { label: '每 2 小时', value: '0 */2 * * *' },
+  { label: '每 4 小时', value: '0 */4 * * *' },
+  { label: '每 6 小时', value: '0 */6 * * *' },
+  { label: '每 8 小时', value: '0 */8 * * *' },
+  { label: '每天 3 次 (8,12,18)', value: '0 8,12,18 * * *' },
+  { label: '每天 2 次 (9,21)', value: '0 9,21 * * *' },
+  { label: '每天 1 次 (9:00)', value: '0 9 * * *' },
+]
+
+function selectCronPreset(event) {
+  config.value.push_cron = event.target.value
+}
 const newsCount = computed(() => currentTag.value === null
   ? Object.values(newsByPlatform.value).reduce((sum, items) => sum + items.length, 0)
   : news.value.length
@@ -100,7 +115,7 @@ async function loadConfig() {
         push_enabled: res.data.config.push_enabled || false,
         push_channel: res.data.config.push_channel || 'feishu',
         push_webhook: res.data.config.push_webhook || '',
-        push_interval: res.data.config.push_interval || 4
+        push_cron: res.data.config.push_cron || '0 */4 * * *'
       }
       keywordTags.value = res.data.config.keyword_tags || {}
       lastPushTime.value = res.data.config.last_push_at || null
@@ -193,7 +208,7 @@ async function saveConfig() {
       push_enabled: config.value.push_enabled,
       push_channel: config.value.push_channel,
       push_webhook: config.value.push_webhook,
-      push_interval: config.value.push_interval
+      push_cron: config.value.push_cron
     }, getAuthHeader())
     alert('保存成功')
     showAccount.value = false
@@ -815,18 +830,22 @@ onUnmounted(() => {
             </div>
 
             <div>
-              <label class="text-xs text-gray-500 block mb-1">推送间隔</label>
-              <div class="flex items-center gap-2">
-                <input
-                  v-model.number="config.push_interval"
-                  type="range"
-                  min="1"
-                  max="24"
-                  class="flex-1"
-                >
-                <span class="text-sm text-gray-600 min-w-[4rem] text-right">{{ config.push_interval }} 小时</span>
-              </div>
-              <div class="text-xs text-gray-400 mt-1">每 {{ config.push_interval }} 小时自动推送一次</div>
+              <label class="text-xs text-gray-500 block mb-1">推送规则</label>
+              <select
+                :value="cronPresets.find(p => p.value === config.push_cron)?.value || ''"
+                @change="selectCronPreset"
+                class="w-full px-3 py-2 border rounded-lg text-sm mb-2"
+              >
+                <option value="">自定义</option>
+                <option v-for="p in cronPresets" :key="p.value" :value="p.value">{{ p.label }}</option>
+              </select>
+              <input
+                v-model="config.push_cron"
+                type="text"
+                placeholder="分 时 日 月 周  (如 0 */4 * * *)"
+                class="w-full px-3 py-2 border rounded-lg text-sm font-mono"
+              >
+              <div class="text-xs text-gray-400 mt-1">cron 表达式：自动按设定规则推送</div>
             </div>
 
             <div v-if="lastPushTime" class="text-xs text-gray-400 text-center">
