@@ -15,7 +15,8 @@ services:
     command: --default-authentication-plugin=mysql_native_password
 
   backend:
-    build: .
+    image: kid941005/hot-news:latest
+    # build: .  # 本地构建取消注释，同时注释上面 image 行
     ports:
       - "16888:16888"
     environment:
@@ -23,6 +24,7 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   mysql_data:
