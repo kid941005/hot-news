@@ -563,7 +563,7 @@ onUnmounted(() => {
                   </span>
                 </div>
                 <span class="text-xs text-gray-400">
-                  {{ item.pub_time || item.created_at?.slice(11,16) || '' }}
+                  {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
                 </span>
               </div>
             </div>
@@ -615,7 +615,7 @@ onUnmounted(() => {
             </div>
             <!-- 发布时间 -->
             <span class="text-xs text-gray-400">
-              {{ item.pub_time || item.created_at?.slice(11,16) || '' }}
+              {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
             </span>
           </div>
         </div>

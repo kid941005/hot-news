@@ -22,8 +22,8 @@ class News(Base):
     hot_value = Column(String(100), default="")
     pub_time = Column(String(50), default="")
     raw_data = Column(JSON, default={})
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     def to_dict(self):
         return {
@@ -33,7 +33,7 @@ class News(Base):
             "url": self.url,
             "hot_value": self.hot_value,
             "pub_time": self.pub_time,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": (self.created_at.isoformat() + "Z") if self.created_at else None
         }
 
 
