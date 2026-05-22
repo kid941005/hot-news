@@ -345,9 +345,9 @@ def push_news(
         else:
             untagged.append(n)
     
-    # 生成 Markdown 内容（带超链接），Bark 保持纯文本
+    # 生成 Markdown 内容（带超链接），三个渠道均支持
     content = f"📰 热点资讯 ({time_str})\n\n"
-    if config.push_channel in ("dingtalk", "feishu"):
+    if config.push_channel in ("dingtalk", "feishu", "bark"):
         for tag in sorted(tag_news.keys()):
             content += f"### {tag}\n"
             for i, (n, _) in enumerate(tag_news[tag], 1):
