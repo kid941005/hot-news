@@ -150,10 +150,14 @@ async function selectTag(tag) {
   await loadNews()
 }
 
+// 拆分关键词：支持半角逗号、全角逗号、半角分号、全角分号
+function splitKeywords(text) {
+  return text.split(/[，,；;]/).map(s => s.trim()).filter(s => s)
+}
+
 // 编辑标签关键词
 function editTagKeywords(tag) {
   editingTag.value = tag
-  // 把数组转换为逗号分隔的字符串
   editingKeywords.value = (keywordTags.value[tag] || []).join(', ')
 }
 
@@ -161,7 +165,7 @@ function editTagKeywords(tag) {
 function saveTagKeywords() {
   if (editingTag.value) {
     // 把字符串转换为数组
-    const keywords = editingKeywords.value.split(',').map(s => s.trim()).filter(s => s)
+    const keywords = splitKeywords(editingKeywords.value)
     keywordTags.value[editingTag.value] = keywords
     editingTag.value = null
   }
@@ -172,7 +176,7 @@ async function saveConfig() {
   try {
     // 把字符串转换为数组
     const blocked = typeof config.value.blocked_keywords === 'string'
-      ? config.value.blocked_keywords.split(',').map(s => s.trim()).filter(s => s)
+      ? splitKeywords(config.value.blocked_keywords)
       : config.value.blocked_keywords
     
     const keywords = Array.from(new Set(Object.values(keywordTags.value).flat().map(s => s.trim()).filter(s => s)))
