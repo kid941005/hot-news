@@ -162,12 +162,13 @@ docker compose up -d
 
 ## 📝 更新日志
 
-### v2.1.0 (2026-05-22)
-- 全新 Vue3 + FastAPI 架构
-- 后端定时任务
-- 数据缓存机制
-- 新增 Dockerfile、.dockerignore 与 GitHub Actions Docker 构建 workflow
-- 平台配置一致性校验脚本
+### v2.2.0 (2026-06-10)
+- 修复："全部"标签页缺少认证头导致无法按用户平台筛选
+- 修复：keyword_tags 空字典被当成 falsy 导致标签关键词不生效
+- 修复：空 filter_keywords 错误回退到全局关键词
+- 修复：Docker 容器时区 UTC 导致刷新时间显示错误
+- 修复：Docker 镜像自动推送到 Docker Hub + ghcr.io
+- 修复：docker-compose.yml 使用预构建镜像，开箱即用
 
 ### v1.0
 - 初始版本 Flask + 简单前端
