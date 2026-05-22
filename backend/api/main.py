@@ -250,7 +250,7 @@ def push_to_dingtalk(webhook: str, content: str) -> bool:
     import requests
     
     try:
-        # 钉钉机器人webhook格式: https://oapi.dingtalk.com/robot/send?access_token=xxx
+        # 钉钉机器人webhook格式: https://oapi.dingtalk.com/robot/send?access_token=***
         payload = {
             "msgtype": "text",
             "text": {
@@ -265,6 +265,30 @@ def push_to_dingtalk(webhook: str, content: str) -> bool:
         return False
     except Exception as e:
         print(f"钉钉推送失败: {e}")
+        return False
+
+
+def push_to_bark(webhook: str, content: str) -> bool:
+    """推送消息到 Bark（iOS 推送）
+
+    webhook 格式: https://api.day.app/XXXXXXXXX（保留或自定义 Bark 服务器地址）
+    """
+    import requests
+
+    try:
+        payload = {
+            "title": "热点资讯",
+            "body": content,
+            "group": "hot-news",
+            "icon": "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f525.png",
+        }
+        response = requests.post(webhook, json=payload, timeout=10)
+        if response.status_code == 200:
+            result = response.json()
+            return result.get("code", 200) == 200
+        return False
+    except Exception as e:
+        print(f"Bark 推送失败: {e}")
         return False
 
 
@@ -308,6 +332,8 @@ def push_news(
         success = push_to_feishu(config.push_webhook, content)
     elif config.push_channel == "dingtalk":
         success = push_to_dingtalk(config.push_webhook, content)
+    elif config.push_channel == "bark":
+        success = push_to_bark(config.push_webhook, content)
     else:
         return {"success": False, "error": f"不支持的推送渠道: {config.push_channel}"}
     

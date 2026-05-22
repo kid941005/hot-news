@@ -147,6 +147,7 @@ hot-news/
 在用户配置中设置 Webhook 地址：
 - 飞书: `https://open.feishu.cn/open-apis/bot/v2/hook/YOUR_TOKEN`
 - 钉钉: `https://oapi.dingtalk.com/robot/send?access_token=YOUR_TOKEN`
+- Bark: `https://api.day.app/YOUR_KEY`
 
 ## 🛠️ 部署
 

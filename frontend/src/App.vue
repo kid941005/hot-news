@@ -792,6 +792,7 @@ onUnmounted(() => {
               <select v-model="config.push_channel" class="w-full px-3 py-2 border rounded-lg text-sm">
                 <option value="feishu">飞书</option>
                 <option value="dingtalk">钉钉</option>
+                <option value="bark">Bark</option>
               </select>
             </div>
             
@@ -804,7 +805,7 @@ onUnmounted(() => {
                 class="w-full px-3 py-2 border rounded-lg text-sm"
               >
               <div class="text-xs text-gray-400 mt-1">
-                如何获取？请查看飞书/钉钉机器人 Webhook 配置文档
+                如何获取？请查看飞书/钉钉/Bark 的 Webhook 配置文档
               </div>
             </div>
             
