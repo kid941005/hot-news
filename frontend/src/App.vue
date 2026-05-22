@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
 const API_URL = ''  // 通过代理访问
@@ -9,6 +9,7 @@ const currentUser = ref(localStorage.getItem('username') || null)
 const token = ref(localStorage.getItem('token') || null)
 const news = ref([])
 const newsByPlatform = ref({})  // 按平台分组的新闻
+const platformOptions = ref([])
 const loading = ref(false)
 const showLogin = ref(false)
 const showAccount = ref(false)
@@ -49,10 +50,26 @@ const config = ref({
 // 推送状态
 const pushLoading = ref(false)
 const pushMessage = ref('')
+const newsCount = computed(() => currentTag.value === null
+  ? Object.values(newsByPlatform.value).reduce((sum, items) => sum + items.length, 0)
+  : news.value.length
+)
 
 // 请求头
 function getAuthHeader() {
   return token.value ? { headers: { Authorization: `Bearer ${token.value}` } } : {}
+}
+
+// 加载平台列表
+async function loadPlatforms() {
+  try {
+    const res = await axios.get(`${API_URL}/api/platforms`)
+    if (res.data.success) {
+      platformOptions.value = res.data.platforms || []
+    }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 // 加载标签
@@ -158,7 +175,10 @@ async function saveConfig() {
       ? config.value.blocked_keywords.split(',').map(s => s.trim()).filter(s => s)
       : config.value.blocked_keywords
     
+    const keywords = Array.from(new Set(Object.values(keywordTags.value).flat().map(s => s.trim()).filter(s => s)))
+
     await axios.post(`${API_URL}/api/config`, {
+      keywords: keywords,
       blocked_keywords: blocked,
       platforms: config.value.platforms,
       keyword_tags: keywordTags.value,
@@ -403,7 +423,6 @@ function startAutoRefresh() {
   }
   // 每20分钟自动刷新
   autoRefreshTimer = setInterval(() => {
-    console.log('自动刷新热点资讯...')
     refresh(false)  // 非强制刷新，会检查时间限制
   }, REFRESH_INTERVAL)
 }
@@ -411,6 +430,7 @@ function startAutoRefresh() {
 // 初始化
 onMounted(async () => {
   // 页面加载时不自动刷新，只加载已有数据（刷新操作由用户手动触发或定时任务）
+  await loadPlatforms()
   if (currentUser.value && token.value) {
     await loadConfig()
     await loadTags()
@@ -489,7 +509,7 @@ onUnmounted(() => {
       <!-- 操作栏 -->
       <div class="flex justify-between items-center mb-4">
         <div class="flex items-center gap-2">
-          <span class="text-gray-500 text-sm">{{ news.length }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
+          <span class="text-gray-500 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
           <span v-if="lastRefresh" class="text-xs text-gray-400">上次刷新: {{ lastRefresh }}</span>
         </div>
         <button 
@@ -744,22 +764,7 @@ onUnmounted(() => {
         <div class="mb-4">
           <label class="text-sm text-gray-500 block mb-2">监控平台</label>
           <div class="flex flex-wrap gap-2">
-            <label v-for="p in [
-              {id: 'weibo', name: '微博'},
-              {id: 'baidu', name: '百度'},
-              {id: 'douyin', name: '抖音'},
-              {id: 'bilibili', name: 'B站'},
-              {id: 'zhihu', name: '知乎'},
-              {id: 'toutiao', name: '头条'},
-              {id: 'wallstreetcn', name: '华尔街见闻'},
-              {id: 'thepaper', name: '澎湃'},
-              {id: 'ifeng', name: '凤凰'},
-              {id: 'sspai', name: '少数派'},
-              {id: 'v2ex', name: 'V2EX'},
-              {id: 'jin10', name: '金十数据'},
-              {id: 'ithome', name: 'IT之家'},
-              {id: '36kr', name: '36Kr'}
-            ]" :key="p.id" class="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-sm">
+            <label v-for="p in platformOptions" :key="p.id" class="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-sm">
               <input type="checkbox" :value="p.id" v-model="config.platforms">
               {{ p.name }}
             </label>
@@ -791,11 +796,11 @@ onUnmounted(() => {
               <input 
                 v-model="config.push_webhook" 
                 type="text" 
-                placeholder="飞书机器人Webhook地址"
+                placeholder="Webhook地址"
                 class="w-full px-3 py-2 border rounded-lg text-sm"
               >
               <div class="text-xs text-gray-400 mt-1">
-                如何获取？<a href="https://open.feishu.cn/document/ukTMukTMukTM/uADOwUjLwgDM14CM4ATN" target="_blank" class="text-blue-500">查看教程</a>
+                如何获取？请查看飞书/钉钉机器人 Webhook 配置文档
               </div>
             </div>
             

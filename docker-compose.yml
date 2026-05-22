@@ -15,7 +15,7 @@ services:
     command: --default-authentication-plugin=mysql_native_password
 
   backend:
-    build: ./backend
+    build: .
     ports:
       - "16888:16888"
     environment:

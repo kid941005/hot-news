@@ -1,0 +1,11 @@
+.git
+.github
+__pycache__
+*.pyc
+*.pyo
+*.db
+*.sqlite
+frontend/node_modules
+frontend/dist
+backend/api/static/assets
+backend/api/static/index.html

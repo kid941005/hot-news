@@ -2,6 +2,9 @@
 """
 数据库操作
 """
+import os
+import base64
+import hashlib
 from datetime import datetime
 from typing import List, Optional
 from sqlalchemy.orm import Session
@@ -10,9 +13,30 @@ from backend.models.models import News, User, UserConfig, CacheRecord, init_db
 
 # ============= 新闻操作 =============
 
+PLATFORM_MAP = {
+    "weibo": "微博",
+    "baidu": "百度",
+    "bilibili": "B站",
+    "douyin": "抖音",
+    "zhihu": "知乎",
+    "toutiao": "头条",
+    "wallstreetcn": "华尔街见闻",
+    "thepaper": "澎湃",
+    "ifeng": "凤凰",
+    "sspai": "少数派",
+    "v2ex": "V2EX",
+    "github": "GitHub",
+    "jin10": "金十数据",
+    "ithome": "IT之家",
+    "36kr": "36Kr",
+}
+
 def save_news(db: Session, news_list: List[dict]):
     """批量保存新闻"""
-    platform = news_list[0].get('platform', '') if news_list else ''
+    if not news_list:
+        return
+
+    platform = news_list[0].get('platform', '')
     
     # 清理旧数据
     db.query(News).filter(News.platform == platform).delete()
@@ -34,30 +58,12 @@ def save_news(db: Session, news_list: List[dict]):
 
 def get_all_news(db: Session, platforms: List[str] = None) -> List[News]:
     """获取所有新闻"""
-    # 平台名称映射: 英文ID -> 中文
-    platform_map = {
-        "weibo": "微博",
-        "baidu": "百度",
-        "bilibili": "B站",
-        "douyin": "抖音",
-        "zhihu": "知乎",
-        "toutiao": "头条",
-        "wallstreetcn": "华尔街见闻",
-        "thepaper": "澎湃",
-        "ifeng": "凤凰",
-        "sspai": "少数派",
-        "v2ex": "V2EX",
-        "jin10": "金十数据",
-        "ithome": "IT之家",
-        "36kr": "36Kr",
-    }
-    
     # 转换英文平台名为中文
     if platforms:
         chinese_platforms = []
         for p in platforms:
-            if p in platform_map:
-                chinese_platforms.append(platform_map[p])
+            if p in PLATFORM_MAP:
+                chinese_platforms.append(PLATFORM_MAP[p])
             else:
                 chinese_platforms.append(p)
         platforms = chinese_platforms
@@ -77,31 +83,13 @@ def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str]
     if not config:
         return get_all_news(db), {}
     
-    # 平台名称映射: 英文ID -> 中文
-    platform_map = {
-        "weibo": "微博",
-        "baidu": "百度",
-        "bilibili": "B站",
-        "douyin": "抖音",
-        "zhihu": "知乎",
-        "toutiao": "头条",
-        "wallstreetcn": "华尔街见闻",
-        "thepaper": "澎湃",
-        "ifeng": "凤凰",
-        "sspai": "少数派",
-        "v2ex": "V2EX",
-        "jin10": "金十数据",
-        "ithome": "IT之家",
-        "36kr": "36Kr",
-    }
-    
     # 将用户平台转换为中文
     user_platforms = config.platforms if config.platforms else None
     if user_platforms:
         if isinstance(user_platforms, str):
             import json
             user_platforms = json.loads(user_platforms)
-        db_platforms = [platform_map.get(p, p) for p in user_platforms]
+        db_platforms = [PLATFORM_MAP.get(p, p) for p in user_platforms]
     else:
         db_platforms = None
     
@@ -151,12 +139,25 @@ def get_user_filtered_news(db: Session, user_id: int, filter_keywords: List[str]
 
 # ============= 用户操作 =============
 
+def hash_password(password: str) -> str:
+    salt = os.urandom(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100_000)
+    return "pbkdf2_sha256$100000$" + base64.b64encode(salt).decode() + "$" + base64.b64encode(digest).decode()
+
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    if stored_hash.startswith("pbkdf2_sha256$"):
+        _, iterations, salt_b64, digest_b64 = stored_hash.split("$", 3)
+        salt = base64.b64decode(salt_b64)
+        expected = base64.b64decode(digest_b64)
+        actual = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, int(iterations))
+        return actual == expected
+    return hashlib.sha256(password.encode()).hexdigest() == stored_hash
+
+
 def create_user(db: Session, username: str, password: str) -> User:
     """创建用户"""
-    import hashlib
-    
-    # 简单密码哈希
-    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    password_hash = hash_password(password)
     
     user = User(username=username, password_hash=password_hash)
     db.add(user)
@@ -173,11 +174,8 @@ def create_user(db: Session, username: str, password: str) -> User:
 
 def verify_user(db: Session, username: str, password: str) -> Optional[User]:
     """验证用户"""
-    import hashlib
-    password_hash = hashlib.sha256(password.encode()).hexdigest()
-    
     user = db.query(User).filter(User.username == username).first()
-    if user and user.password_hash == password_hash:
+    if user and verify_password(password, user.password_hash):
         return user
     return None
 

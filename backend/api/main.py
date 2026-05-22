@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from backend.models.models import init_db, get_db, UserConfig
 from backend.db import database
+from backend.db.database import PLATFORM_MAP
 from backend.spiders import spiders
 from backend.models.models import News
 
@@ -80,372 +81,31 @@ def delete_token(token: str):
     if token in _tokens:
         del _tokens[token]
 
+def get_optional_user_id(Authorization: Optional[str] = Header(None)) -> Optional[int]:
+    """获取可选用户ID - 无有效 token 时返回 None"""
+    if Authorization and Authorization.startswith("Bearer "):
+        token = Authorization[7:]
+        return verify_token(token)
+    return None
+
+
 def get_current_user_id(Authorization: Optional[str] = Header(None)) -> int:
     """获取当前用户ID - 从 Authorization header 获取 token"""
-    # 尝试从 header 获取 token
-    if Authorization and Authorization.startswith("Bearer "):
-        token = Authorization[7:]  # 去掉 "Bearer " 前缀
-        user_id = verify_token(token)
-        if user_id:
-            return user_id
-    return 1  # 默认返回用户1
+    user_id = get_optional_user_id(Authorization)
+    if user_id:
+        return user_id
+    raise HTTPException(status_code=401, detail="未认证")
 
 
 # ============= 前端页面 =============
 
-HTML_PAGE = """
+FALLBACK_PAGE = """
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>热点资讯</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #f5f5f7; color: #1a1a2e; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px; color: white; position: sticky; top: 0; z-index: 100; }
-        .header h1 { font-size: 18px; font-weight: 600; }
-        .user-btn { float: right; padding: 6px 14px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; color: white; font-size: 13px; cursor: pointer; }
-        .main { max-width: 600px; margin: 0 auto; padding: 16px; }
-        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .count { color: #666; font-size: 14px; }
-        .refresh-btn { padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
-        .news-item { background: white; padding: 14px; margin-bottom: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .news-title { font-size: 15px; font-weight: 500; color: #1a1a2e; text-decoration: none; }
-        .news-title:hover { color: #667eea; }
-        .news-platform { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
-        .weibo { background: #ffefe0; color: #e6162d; }
-        .baidu { background: #e3f1fd; color: #2932e1; }
-        .bilibili { background: #fceef5; color: #fb7299; }
-        .douyin { background: #fff5e6; color: #ff6b00; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 200; }
-        .modal.show { display: flex; }
-        .modal-content { background: white; padding: 24px; border-radius: 16px; width: 90%; max-width: 360px; }
-        .modal h2 { font-size: 18px; margin-bottom: 16px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e8e8e8; border-radius: 10px; font-size: 14px; }
-        .form-group textarea { resize: vertical; min-height: 60px; }
-        .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
-        .checkbox-group label { background: #f5f5f7; padding: 6px 12px; border-radius: 16px; font-size: 13px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; margin-bottom: 8px; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-secondary { background: #f5f5f7; color: #666; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn-group .btn { flex: 1; min-width: 80px; }
-        .tag-selector { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-        .tag-btn { padding: 6px 12px; border: none; border-radius: 16px; font-size: 13px; cursor: pointer; }
-        .tag-hint { font-size: 12px; color: #999; margin: 4px 0; }
-        .keyword-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-        .keyword-tag { padding: 4px 10px; border-radius: 12px; font-size: 12px; color: white; }
-        .empty { text-align: center; padding: 40px; color: #999; }
-    </style>
-</head>
+<head><meta charset="UTF-8"><title>热点资讯</title></head>
 <body>
-    <header class="header">
-        <h1>热点资讯</h1>
-        <button class="user-btn" id="userBtn" onclick="showLogin()">登录</button>
-    </header>
-    <main class="main">
-        <div class="toolbar">
-            <span class="count" id="count">0 条匹配</span>
-            <button class="refresh-btn" onclick="refreshCache()">刷新</button>
-        </div>
-        <div id="newsList"></div>
-    </main>
-
-    <!-- 登录/注册弹窗 -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2>登录 / 注册</h2>
-            <div class="form-group">
-                <input type="text" id="username" placeholder="用户名">
-            </div>
-            <div class="form-group">
-                <input type="password" id="password" placeholder="密码">
-            </div>
-            <button class="btn btn-primary" onclick="login()">登录</button>
-            <button class="btn btn-secondary" onclick="register()">注册</button>
-            <button class="btn btn-secondary" onclick="hideLogin()">取消</button>
-        </div>
-    </div>
-
-    <!-- 账号管理弹窗 -->
-    <div class="modal" id="accountModal">
-        <div class="modal-content">
-            <h2>账号管理</h2>
-            <div class="form-group">
-                <label>关注关键词（逗号分隔）</label>
-                <textarea id="keywordsInput" placeholder="如: 小米,比亚迪,华为"></textarea>
-                <div class="keyword-tags" id="keywordTags"></div>
-            </div>
-            <div class="form-group">
-                <label>关键词标签</label>
-                <div class="tag-selector">
-                    <button class="tag-btn" data-tag="工作" style="background:#3b82f6;color:white" onclick="applyTag('工作')">工作</button>
-                    <button class="tag-btn" data-tag="日常" style="background:#10b981;color:white" onclick="applyTag('日常')">日常</button>
-                    <button class="tag-btn" data-tag="科技" style="background:#8b5cf6;color:white" onclick="applyTag('科技')">科技</button>
-                    <button class="tag-btn" data-tag="投资" style="background:#f59e0b;color:white" onclick="applyTag('投资')">投资</button>
-                    <button class="tag-btn" data-tag="自定义" style="background:#6b7280;color:white" onclick="applyCustomTag()">自定义</button>
-                </div>
-                <p class="tag-hint">选择关键词后点击标签即可标记</p>
-            </div>
-            <div class="form-group">
-                <label>屏蔽关键词</label>
-                <textarea id="blockedInput" placeholder="不想看到的内容"></textarea>
-            </div>
-            <div class="form-group">
-                <label>监控平台</label>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" value="weibo"> 微博</label>
-                    <label><input type="checkbox" value="baidu"> 百度</label>
-                    <label><input type="checkbox" value="douyin"> 抖音</label>
-                    <label><input type="checkbox" value="bilibili"> B站</label>
-                    <label><input type="checkbox" value="zhihu"> 知乎</label>
-                    <label><input type="checkbox" value="toutiao"> 头条</label>
-                    <label><input type="checkbox" value="36kr"> 36Kr</label>
-                    <label><input type="checkbox" value="ithome"> IT之家</label>
-                    <label><input type="checkbox" value="sspai"> 少数派</label>
-                    <label><input type="checkbox" value="v2ex"> V2EX</label>
-                </div>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="saveConfig()">保存</button>
-                <button class="btn btn-secondary" onclick="switchAccount()">切换账号</button>
-                <button class="btn btn-danger" onclick="logout()">退出登录</button>
-                <button class="btn btn-secondary" onclick="hideAccount()">关闭</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let currentUser = localStorage.getItem('username') || null;
-        let authToken = localStorage.getItem('token') || null;
-        
-        // 获取认证头
-        function getAuthHeader() {
-            return authToken ? { 'Authorization': 'Bearer ' + authToken } : {};
-        }
-        
-        // 页面加载时恢复登录状态
-        document.addEventListener('DOMContentLoaded', () => {
-            if (currentUser) {
-                document.getElementById('userBtn').textContent = currentUser;
-                document.getElementById('userBtn').onclick = showAccount;
-            }
-            loadNews();
-        });
-        
-        async function refreshCache() {
-            const btn = document.querySelector('.refresh-btn');
-            btn.textContent = '刷新中...';
-            try {
-                await fetch('/api/news/refresh', {
-                    method: 'POST',
-                    headers: getAuthHeader()
-                });
-                await loadNews();
-            } catch(e) {}
-            btn.textContent = '刷新';
-        }
-        
-        async function loadNews() {
-            const r = await fetch('/api/news', { headers: getAuthHeader() });
-            const d = await r.json();
-            document.getElementById('count').textContent = d.total + ' 条匹配';
-            
-            const list = document.getElementById('newsList');
-            if (d.news.length === 0) {
-                list.innerHTML = '<div class="empty">暂无匹配的热点资讯</div>';
-                return;
-            }
-            
-            list.innerHTML = d.news.map(n => {
-                const platformClass = n.platform === '微博' ? 'weibo' : n.platform === '百度' ? 'baidu' : n.platform === 'B站' ? 'bilibili' : 'douyin';
-                return '<div class="news-item"><a class="news-title" href="' + n.url + '" target="_blank">' + n.title + '</a><span class="news-platform ' + platformClass + '">' + n.platform + '</span></div>';
-            }).join('');
-        }
-        
-        async function loadConfig() {
-            const r = await fetch('/api/config', { headers: getAuthHeader() });
-            const d = await r.json();
-            if (d.success && d.config) {
-                document.getElementById('keywordsInput').value = (d.config.keywords || []).join(', ');
-                document.getElementById('blockedInput').value = (d.config.blocked_keywords || []).join(', ');
-                document.querySelectorAll('#accountModal input[type="checkbox"]').forEach(cb => {
-                    cb.checked = (d.config.platforms || []).includes(cb.value);
-                });
-                // 加载关键词标签
-                window.keywordTags = d.config.keyword_tags || {};
-                renderKeywordTags();
-            }
-        }
-        
-        function renderKeywordTags() {
-            const container = document.getElementById('keywordTags');
-            const keywords = document.getElementById('keywordsInput').value.split(',').map(s => s.trim()).filter(s => s);
-            const tagColors = {
-                '工作': '#3b82f6', '日常': '#10b981', '科技': '#8b5cf6',
-                '投资': '#f59e0b', '自定义': '#6b7280'
-            };
-            container.innerHTML = keywords.map(kw => {
-                const tag = window.keywordTags?.[kw] || '';
-                const color = tagColors[tag] || '#6b7280';
-                return tag ? `<span class="keyword-tag" style="background:${color}">${kw} · ${tag}</span>` : '';
-            }).join('');
-        }
-        
-        function applyTag(tagName) {
-            const input = document.getElementById('keywordsInput');
-            const keywords = input.value.split(',').map(s => s.trim()).filter(s => s);
-            if (keywords.length === 0) {
-                alert('请先输入关键词');
-                return;
-            }
-            // 为最后一个关键词添加标签
-            const lastKeyword = keywords[keywords.length - 1];
-            window.keywordTags = window.keywordTags || {};
-            window.keywordTags[lastKeyword] = tagName;
-            renderKeywordTags();
-            alert(`已为 "${lastKeyword}" 添加标签: ${tagName}`);
-        }
-        
-        function applyCustomTag() {
-            const customTag = prompt('请输入自定义标签名称:');
-            if (customTag && customTag.trim()) {
-                applyTag(customTag.trim());
-            }
-        }
-        
-        function switchAccount() {
-            logout();
-            showLogin();
-        }
-        
-        async function login() {
-            const r = await fetch('/api/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value
-                })
-            });
-            const d = await r.json();
-            if (d.success) {
-                currentUser = d.username;
-                authToken = d.token;
-                localStorage.setItem('username', d.username);
-                localStorage.setItem('token', d.token);
-                document.getElementById('userBtn').textContent = d.username;
-                document.getElementById('userBtn').onclick = showAccount;
-                hideLogin();
-                loadConfig();
-                loadNews();
-            } else {
-                alert(d.error || '登录失败');
-            }
-        }
-        
-        async function register() {
-            const r = await fetch('/api/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value
-                })
-            });
-            const d = await r.json();
-            if (d.success) {
-                currentUser = d.username;
-                authToken = d.token;
-                localStorage.setItem('username', d.username);
-                localStorage.setItem('token', d.token);
-                document.getElementById('userBtn').textContent = d.username;
-                document.getElementById('userBtn').onclick = showAccount;
-                hideLogin();
-                loadConfig();
-                loadNews();
-            } else {
-                alert(d.error || '注册失败');
-            }
-        }
-        
-        async function saveConfig() {
-            try {
-                const keywordsInput = document.getElementById('keywordsInput');
-                const blockedInput = document.getElementById('blockedInput');
-                
-                if (!keywordsInput || !blockedInput) {
-                    alert('页面加载错误，请刷新重试');
-                    return;
-                }
-                
-                const keywords = keywordsInput.value.split(',').map(s => s.trim()).filter(s => s);
-                const blocked = blockedInput.value.split(',').map(s => s.trim()).filter(s => s);
-                const platforms = [];
-                document.querySelectorAll('#accountModal input[type="checkbox"]:checked').forEach(cb => platforms.push(cb.value));
-                
-                const payload = { 
-                    keywords: keywords, 
-                    blocked_keywords: blocked, 
-                    platforms: platforms 
-                };
-                
-                console.log('发送数据:', JSON.stringify(payload));
-                
-                const res = await fetch('/api/config', {
-                    method: 'POST',
-                    headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                console.log('响应状态:', res.status);
-                const text = await res.text();
-                console.log('响应内容:', text);
-                
-                if (!res.ok) {
-                    alert('保存失败: HTTP ' + res.status);
-                    return;
-                }
-                
-                const d = JSON.parse(text);
-                if (d.success) {
-                    alert('保存成功！关键词: ' + keywords.join(', '));
-                    hideAccount();
-                    loadNews();
-                } else {
-                    alert('保存失败: ' + (d.error || '未知错误'));
-                }
-            } catch(e) {
-                alert('保存失败: ' + e.message);
-            }
-        }
-        
-        async function logout() {
-            await fetch('/api/logout', { 
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + authToken }
-            });
-            currentUser = null;
-            authToken = null;
-            localStorage.removeItem('username');
-            localStorage.removeItem('token');
-            document.getElementById('userBtn').textContent = '登录';
-            document.getElementById('userBtn').onclick = showLogin;
-            hideAccount();
-            loadNews();
-        }
-        
-        function showLogin() { document.getElementById('loginModal').classList.add('show'); }
-        function hideLogin() { document.getElementById('loginModal').classList.remove('show'); }
-        function showAccount() { loadConfig(); document.getElementById('accountModal').classList.add('show'); }
-        function hideAccount() { document.getElementById('accountModal').classList.remove('show'); }
-        
-        loadNews();
-    </script>
+    <h1>前端静态文件未构建</h1>
+    <p>请先在 frontend 目录运行 npm run build，并将构建产物部署到 backend/api/static。</p>
 </body>
 </html>
 """
@@ -456,7 +116,7 @@ def index():
     index_path = os.path.join(STATIC_DIR, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return HTML_PAGE
+    return FALLBACK_PAGE
 
 
 # ============= API接口 =============
@@ -481,11 +141,19 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
 
 
 @app.post("/api/logout")
-def logout(Authorization: Optional[str] = None):
+def logout(Authorization: Optional[str] = Header(None)):
     if Authorization and Authorization.startswith("Bearer "):
         token = Authorization[7:]
         delete_token(token)
     return {"success": True}
+
+
+@app.get("/api/platforms")
+def get_platforms():
+    return {
+        "success": True,
+        "platforms": [{"id": k, "name": v} for k, v in PLATFORM_MAP.items()]
+    }
 
 
 @app.get("/api/config")
@@ -652,7 +320,7 @@ def push_news(
 @app.get("/api/news")
 def get_news(
     tag: str = None,  # 标签筛选
-    today: bool = True,  # 只显示当天发布的文章
+    today: bool = False,  # 是否只显示当天入库的文章
     all: bool = False,  # 获取所有热榜，不按关键词过滤
     user_id: int = Depends(get_current_user_id), 
     db: Session = Depends(get_db)
@@ -678,11 +346,10 @@ def get_news(
         # 默认按用户关键词过滤
         news_list, matched_keywords = database.get_user_filtered_news(db, user_id)
     
-    # 过滤当天发布的文章并按时间倒序
+    # 可选过滤当天入库的文章并按时间倒序
     today_str = datetime.now().strftime("%Y-%m-%d")
     news_data = []
     for n in news_list:
-        # 检查是否是当天发布的
         if today and n.created_at:
             if n.created_at.strftime("%Y-%m-%d") != today_str:
                 continue
@@ -705,53 +372,28 @@ def get_news(
 
 @app.get("/api/news/by_platform")
 def get_news_by_platform(
-    user_id: int = Depends(get_current_user_id), 
+    user_id: Optional[int] = Depends(get_optional_user_id),
     db: Session = Depends(get_db)
 ):
-    """按平台分组获取新闻"""
-    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
+    """按平台分组获取新闻；未登录时返回公共全平台数据"""
+    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first() if user_id else None
     
     # 获取用户监控的平台
-    platform_map = {
-        "weibo": "微博",
-        "baidu": "百度",
-        "bilibili": "B站",
-        "douyin": "抖音",
-        "zhihu": "知乎",
-        "toutiao": "头条",
-        "wallstreetcn": "华尔街见闻",
-        "thepaper": "澎湃",
-        "ifeng": "凤凰",
-        "sspai": "少数派",
-        "v2ex": "V2EX",
-        "jin10": "金十数据",
-        "ithome": "IT之家",
-        "36kr": "36Kr",
-    }
-    
-    user_platforms = config.platforms if config.platforms else None
+    user_platforms = config.platforms if config and config.platforms else None
     if user_platforms:
         if isinstance(user_platforms, str):
             import json
             user_platforms = json.loads(user_platforms)
         # 转换为中文平台名
-        chinese_platforms = [platform_map.get(p, p) for p in user_platforms]
+        chinese_platforms = [PLATFORM_MAP.get(p, p) for p in user_platforms]
     else:
-        chinese_platforms = list(platform_map.values())
-    
-    today_str = datetime.now().strftime("%Y-%m-%d")
+        chinese_platforms = list(PLATFORM_MAP.values())
     
     # 按平台分组获取新闻
     platform_news = {}
     for platform in chinese_platforms:
         news_items = db.query(News).filter(News.platform == platform).order_by(News.id.desc()).all()
-        # 过滤当天
-        items = []
-        for n in news_items:
-            if n.created_at and n.created_at.strftime("%Y-%m-%d") == today_str:
-                items.append(n.to_dict())
-            elif not n.created_at:
-                items.append(n.to_dict())
+        items = [n.to_dict() for n in news_items]
         if items:
             platform_news[platform] = items[:10]  # 每个平台最多10条
     
@@ -767,7 +409,7 @@ from datetime import datetime
 LAST_REFRESH_TIME = None
 
 @app.post("/api/news/refresh")
-async def refresh_news(db: Session = Depends(get_db)):
+async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     global LAST_REFRESH_TIME
     try:
         results = await spiders.fetch_all_spiders()

@@ -131,44 +131,11 @@ class BilibiliSpider(BaseSpider):
 
 
 class DouyinSpider(BaseSpider):
-    """抖音热搜 - 使用微博热搜作为替代"""
+    """抖音热搜"""
     name = "douyin"
     
     def fetch(self) -> List[dict]:
-        # 抖音热搜API经常失效，使用微博数据作为科技热点补充
-        url = "https://s.weibo.com/top/summary?cate=realtimehot"
-        session = requests.Session()
-        session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Cookie": "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7",
-        })
-        
-        try:
-            resp = session.get(url, timeout=10)
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            rows = soup.select("#pl_top_realtimehot table tbody tr")
-            
-            items = []
-            for row in rows[1:16]:  # 只取前15条作为抖音热点
-                link = row.select_one("td.td-02 a")
-                if not link:
-                    continue
-                href = link.get("href", "")
-                if not href or "javascript" in href:
-                    continue
-                title = link.get_text(strip=True)
-                if title:
-                    items.append({
-                        "platform": "抖音",
-                        "title": title,
-                        "url": f"https://s.weibo.com{href}",
-                        "hot": "",
-                        "time": datetime.now().strftime("%H:%M")
-                    })
-            return items
-        except Exception as e:
-            print(f"❌ 抖音: {e}")
-            return []
+        return []
 
 
 class ZhihuSpider(BaseSpider):
@@ -657,6 +624,7 @@ SPIDERS = {
     "ifeng": IfengSpider,
     "sspai": SspaiSpider,
     "v2ex": V2exSpider,
+    "github": GitHubSpider,
     "jin10": Jin10Spider,
     "ithome": IthomeSpider,
     "36kr": Kr36Spider,
