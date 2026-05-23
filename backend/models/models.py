@@ -75,15 +75,18 @@ def ensure_user_config_schema():
         cur = conn.cursor()
         if 'mysql' in DB_URL:
             cur.execute("SHOW COLUMNS FROM user_configs")
-            cols = [r[0] for r in cur.fetchall()]
-            if 'push_cron' not in cols:
-                cur.execute("ALTER TABLE user_configs ADD COLUMN push_cron VARCHAR(50) NOT NULL DEFAULT '0 */4 * * *'")
-                conn.commit()
+            cols = {r[0] for r in cur.fetchall()}
         elif 'sqlite' in DB_URL:
             cur.execute("PRAGMA table_info(user_configs)")
-            cols = [r[1] for r in cur.fetchall()]
-            if 'push_cron' not in cols:
-                cur.execute("ALTER TABLE user_configs ADD COLUMN push_cron VARCHAR(50) NOT NULL DEFAULT '0 */4 * * *'")
+            cols = {r[1] for r in cur.fetchall()}
+        else:
+            cols = set()
+        for column in ['push_cron', 'last_push_at']:
+            if column not in cols:
+                if column == 'push_cron':
+                    cur.execute("ALTER TABLE user_configs ADD COLUMN push_cron VARCHAR(50) NOT NULL DEFAULT '0 */4 * * *'")
+                else:
+                    cur.execute("ALTER TABLE user_configs ADD COLUMN last_push_at DATETIME")
                 conn.commit()
     finally:
         conn.close()

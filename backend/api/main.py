@@ -24,6 +24,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 scheduler = BackgroundScheduler()
 UTC = timezone.utc
+REFRESH_INTERVAL_MINUTES = int(os.environ.get("REFRESH_INTERVAL_MINUTES", "15"))
 PUSH_INTERVAL_HOURS = int(os.getenv("PUSH_INTERVAL_HOURS", "4"))
 
 app = FastAPI(title="热点资讯", version="2.0")
@@ -389,6 +390,21 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
         return (False, "推送失败")
 
 
+def scheduled_refresh():
+    """独立定时刷新新闻数据"""
+    from backend.models.models import SessionLocal
+    db = SessionLocal()
+    try:
+        saved_count = refresh_news_data(db)
+        global LAST_REFRESH_TIME
+        LAST_REFRESH_TIME = datetime.now(timezone.utc)
+        print(f"🔄 定时刷新完成，共保存 {saved_count} 条新闻")
+    except Exception as e:
+        print(f"❌ 定时刷新失败: {e}")
+    finally:
+        db.close()
+
+
 def scheduled_push():
     """定时调度：遍历所有启用推送的用户，按各自 cron 表达式推送"""
     from backend.models.models import SessionLocal
@@ -430,10 +446,12 @@ def scheduled_push():
 
 @app.on_event("startup")
 def start_scheduler():
-    """启动定时推送调度器"""
+    """启动定时任务调度器"""
+    scheduler.add_job(scheduled_refresh, 'interval', minutes=REFRESH_INTERVAL_MINUTES, id='refresh_job')
     scheduler.add_job(scheduled_push, 'interval', minutes=1, id='push_job')
     scheduler.start()
-    print(f"⏰ 定时推送已启动（每分钟检查 cron 表达式）")
+    print(f"⏰ 定时刷新已启动（每 {REFRESH_INTERVAL_MINUTES} 分钟抓取一次）")
+    print("⏰ 定时推送已启动（每分钟检查 cron 表达式）")
 
 
 @app.on_event("shutdown")

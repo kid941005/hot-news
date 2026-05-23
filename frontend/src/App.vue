@@ -776,7 +776,7 @@ onUnmounted(() => {
 
     <!-- 账号管理弹窗 -->
     <div v-if="showAccount" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
-      <div class="glass-scroll relative w-80 mx-4 max-h-[80vh] overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80">
+      <div class="glass-scroll relative w-80 mx-4 max-h-[80vh] overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/40 after:pointer-events-none after:absolute after:inset-x-6 after:bottom-0 after:h-px after:bg-white/25">
         <div class="mb-4">
           <div class="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">Workspace Settings</div>
           <h2 class="mt-1 text-lg font-semibold text-slate-800">账号管理</h2>
@@ -1086,6 +1086,30 @@ body::before {
   border-color: rgba(147, 197, 253, 0.92);
   transform: translateY(-1px);
   box-shadow: 0 14px 30px rgba(148, 163, 184, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.glass-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.55) rgba(255, 255, 255, 0.28);
+}
+
+.glass-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.glass-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+
+.glass-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.42), rgba(203, 213, 225, 0.62));
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.62);
+}
+
+.glass-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(100, 116, 139, 0.56), rgba(148, 163, 184, 0.74));
 }
 
 .account-section,

@@ -150,6 +150,8 @@ hot-news/
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | `DATABASE_URL` | 数据库连接 | `sqlite:///./hot_news.db` |
+| `REFRESH_INTERVAL_MINUTES` | 独立定时刷新新闻的间隔分钟数 | `15` |
+| `PUSH_INTERVAL_HOURS` | 推送间隔小时数（兼容旧配置） | `4` |
 
 ### 推送配置
 
@@ -171,6 +173,11 @@ docker compose up -d
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.12 (2026-05-23)
+- 新增：独立定时刷新任务，后台默认每 15 分钟自动抓取一次新闻，不依赖推送配置
+- 保持：定时推送仍每分钟检查 cron，到点后再执行推送
+- 配置：新增 `REFRESH_INTERVAL_MINUTES` 环境变量用于控制定时刷新频率
 
 ### v2.5.11 (2026-05-23)
 - 修复：手动刷新接口在异步 FastAPI 请求中不再错误调用 `asyncio.run()`，避免刷新时报 `running event loop`
