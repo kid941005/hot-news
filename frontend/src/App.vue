@@ -481,30 +481,31 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.35),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.28),_transparent_32%),radial-gradient(circle_at_bottom,_rgba(56,189,248,0.2),_transparent_30%)]"></div>
     <!-- 头部 -->
-    <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-4 sticky top-0 z-50 safe-area-top">
+    <header class="sticky top-0 z-50 safe-area-top border-b border-white/10 bg-white/10 px-4 py-4 text-white backdrop-blur-2xl">
       <div class="max-w-2xl mx-auto flex justify-between items-center">
         <h1 class="text-lg font-semibold">热点资讯</h1>
         <div class="flex gap-2">
           <button 
             v-if="currentUser" 
             @click="showAccount = true"
-            class="px-3 py-1.5 bg-white/20 rounded-full text-sm"
+            class="px-3 py-1.5 rounded-full text-sm border border-white/20 bg-white/12 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.18)]"
           >
             {{ currentUser }}
           </button>
           <button 
             v-if="currentUser" 
             @click="logout"
-            class="px-3 py-1.5 bg-red-500/50 rounded-full text-sm"
+            class="px-3 py-1.5 rounded-full text-sm border border-white/10 bg-red-400/25 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.18)]"
           >
             退出
           </button>
           <button 
             v-if="!currentUser" 
             @click="showLogin = true"
-            class="px-3 py-1.5 bg-white/20 rounded-full text-sm"
+            class="px-3 py-1.5 rounded-full text-sm border border-white/20 bg-white/12 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.18)]"
           >
             登录
           </button>
@@ -513,12 +514,12 @@ onUnmounted(() => {
     </header>
 
     <!-- 标签筛选 -->
-    <div v-if="currentUser" class="bg-white border-b sticky z-40 safe-area-top" style="top: max(3.5rem, env(safe-area-inset-top))">
-      <div class="max-w-2xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
+    <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/10 bg-white/8 backdrop-blur-2xl" style="top: max(3.5rem, env(safe-area-inset-top))">
+      <div class="glass-scroll max-w-2xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
         <button 
           @click="selectTag(null)"
-          class="px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors"
-          :class="currentTag === null ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600'"
+          class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all border backdrop-blur-xl"
+          :class="currentTag === null ? 'bg-white/20 text-white border-white/30 shadow-[0_8px_24px_rgba(99,102,241,0.25)]' : 'bg-white/8 text-slate-300 border-white/10 hover:bg-white/12'"
         >
           全部
         </button>
@@ -526,8 +527,8 @@ onUnmounted(() => {
           v-for="tag in tags" 
           :key="tag"
           @click="selectTag(tag)"
-          class="px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors"
-          :class="currentTag === tag ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600'"
+          class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all border backdrop-blur-xl"
+          :class="currentTag === tag ? 'bg-white/20 text-white border-white/30 shadow-[0_8px_24px_rgba(99,102,241,0.25)]' : 'bg-white/8 text-slate-300 border-white/10 hover:bg-white/12'"
         >
           {{ tag }}
         </button>
@@ -535,17 +536,17 @@ onUnmounted(() => {
     </div>
 
     <!-- 内容 -->
-    <main class="max-w-2xl mx-auto p-4">
+    <main class="relative max-w-2xl mx-auto p-4">
       <!-- 操作栏 -->
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-5 flex items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-4 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.16)] backdrop-blur-2xl">
         <div class="flex items-center gap-2">
-          <span class="text-gray-500 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
-          <span v-if="lastRefresh" class="text-xs text-gray-400">上次刷新: {{ lastRefresh }}</span>
+          <span class="text-slate-200 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
+          <span v-if="lastRefresh" class="text-xs text-slate-400">上次刷新: {{ lastRefresh }}</span>
         </div>
         <button 
           @click="refresh(true)" 
           :disabled="loading"
-          class="px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm"
+          class="px-4 py-2 rounded-xl text-sm border border-white/20 bg-white/12 text-white backdrop-blur-xl shadow-[0_12px_32px_rgba(99,102,241,0.22)] disabled:opacity-50"
         >
           {{ loading ? '刷新中...' : '刷新' }}
         </button>
@@ -557,24 +558,24 @@ onUnmounted(() => {
         <div 
           v-for="(platformNews, platform) in newsByPlatform" 
           :key="platform"
-          class="bg-white rounded-xl shadow-sm overflow-hidden"
+          class="overflow-hidden rounded-2xl border border-white/12 bg-white/10 shadow-[0_16px_40px_rgba(15,23,42,0.22)] backdrop-blur-2xl"
         >
           <!-- 平台标题 -->
-          <div class="px-4 py-2 bg-gray-50 border-b flex justify-between items-center">
-            <span class="font-medium text-gray-700">{{ platform }}</span>
-            <span class="text-xs text-gray-400">{{ platformNews.length }}条</span>
+          <div class="px-4 py-3 bg-white/8 border-b border-white/10 flex justify-between items-center">
+            <span class="font-medium text-slate-100">{{ platform }}</span>
+            <span class="text-xs text-slate-400">{{ platformNews.length }}条</span>
           </div>
           <!-- 平台新闻列表 -->
-          <div class="divide-y">
+          <div class="divide-y divide-white/10">
             <div 
               v-for="(item, index) in platformNews" 
               :key="index"
-              class="p-4"
+              class="group p-4 transition-all duration-300 hover:bg-white/6"
             >
               <a 
                 :href="item.url" 
                 target="_blank"
-                class="text-base font-medium text-gray-800 hover:text-indigo-600"
+                class="text-base font-medium text-slate-100 transition-colors group-hover:text-indigo-200"
               >
                 {{ item.title }}
               </a>
@@ -583,12 +584,12 @@ onUnmounted(() => {
                   <span 
                     v-for="kw in item.matched_keywords" 
                     :key="kw"
-                    class="text-xs px-2 py-0.5 bg-purple-100 text-purple-600 rounded"
+                    class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/12 text-fuchsia-200"
                   >
                     {{ kw }}
                   </span>
                 </div>
-                <span class="text-xs text-gray-400">
+                <span class="text-xs text-slate-400">
                   {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
                 </span>
               </div>
@@ -602,37 +603,37 @@ onUnmounted(() => {
         <div 
           v-for="(keywordNews, keyword) in newsByKeyword" 
           :key="keyword"
-          class="bg-white rounded-xl shadow-sm overflow-hidden"
+          class="overflow-hidden rounded-2xl border border-white/12 bg-white/10 shadow-[0_16px_40px_rgba(15,23,42,0.22)] backdrop-blur-2xl"
         >
-          <div class="px-4 py-2 bg-purple-50 border-b flex justify-between items-center">
-            <span class="font-medium text-gray-700">{{ keyword }}</span>
-            <span class="text-xs text-gray-400">{{ keywordNews.length }}条</span>
+          <div class="px-4 py-3 bg-white/8 border-b border-white/10 flex justify-between items-center">
+            <span class="font-medium text-slate-100">{{ keyword }}</span>
+            <span class="text-xs text-slate-400">{{ keywordNews.length }}条</span>
           </div>
-          <div class="divide-y">
+          <div class="divide-y divide-white/10">
             <div 
               v-for="(item, index) in keywordNews" 
               :key="index"
-              class="p-4"
+              class="group p-4 transition-all duration-300 hover:bg-white/6"
             >
               <div class="flex justify-between items-start">
                 <a 
                   :href="item.url" 
                   target="_blank"
-                  class="text-base font-medium text-gray-800 hover:text-indigo-600 flex-1"
+                  class="text-base font-medium text-slate-100 transition-colors group-hover:text-indigo-200 flex-1"
                 >
                   {{ item.title }}
                 </a>
                 <span 
                   class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
                   :class="{
-                    'bg-red-100 text-red-600': item.platform === '微博',
-                    'bg-blue-100 text-blue-600': item.platform === '百度',
-                    'bg-pink-100 text-pink-600': item.platform === 'B站',
-                    'bg-orange-100 text-orange-600': item.platform === '抖音',
-                    'bg-green-100 text-green-600': item.platform === '36Kr',
-                    'bg-cyan-100 text-cyan-600': item.platform === 'IT之家',
-                    'bg-indigo-100 text-indigo-600': item.platform === '知乎',
-                    'bg-yellow-100 text-yellow-600': item.platform === '头条',
+                    'bg-red-400/15 text-red-200 border border-red-300/20': item.platform === '微博',
+                    'bg-blue-400/15 text-blue-200 border border-blue-300/20': item.platform === '百度',
+                    'bg-pink-400/15 text-pink-200 border border-pink-300/20': item.platform === 'B站',
+                    'bg-orange-400/15 text-orange-200 border border-orange-300/20': item.platform === '抖音',
+                    'bg-green-400/15 text-green-200 border border-green-300/20': item.platform === '36Kr',
+                    'bg-cyan-400/15 text-cyan-200 border border-cyan-300/20': item.platform === 'IT之家',
+                    'bg-indigo-400/15 text-indigo-200 border border-indigo-300/20': item.platform === '知乎',
+                    'bg-yellow-400/15 text-yellow-200 border border-yellow-300/20': item.platform === '头条',
                   }"
                 >
                   {{ item.platform }}
@@ -643,12 +644,12 @@ onUnmounted(() => {
                   <span 
                     v-for="kw in item.matched_keywords" 
                     :key="kw"
-                    class="text-xs px-2 py-0.5 bg-purple-100 text-purple-600 rounded"
+                    class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/12 text-fuchsia-200"
                   >
                     {{ kw }}
                   </span>
                 </div>
-                <span class="text-xs text-gray-400">
+                <span class="text-xs text-slate-400">
                   {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
                 </span>
               </div>
@@ -661,27 +662,27 @@ onUnmounted(() => {
         <div 
           v-for="(item, index) in news" 
           :key="index"
-          class="bg-white p-4 rounded-xl shadow-sm"
+          class="group rounded-2xl border border-white/12 bg-white/10 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.22)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/12 hover:shadow-[0_20px_48px_rgba(15,23,42,0.28)]"
         >
           <div class="flex justify-between items-start">
             <a 
               :href="item.url" 
               target="_blank"
-              class="text-base font-medium text-gray-800 hover:text-indigo-600 flex-1"
+              class="text-base font-medium text-slate-100 transition-colors group-hover:text-indigo-200 flex-1"
             >
               {{ item.title }}
             </a>
             <span 
               class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
               :class="{
-                'bg-red-100 text-red-600': item.platform === '微博',
-                'bg-blue-100 text-blue-600': item.platform === '百度',
-                'bg-pink-100 text-pink-600': item.platform === 'B站',
-                'bg-orange-100 text-orange-600': item.platform === '抖音',
-                'bg-green-100 text-green-600': item.platform === '36Kr',
-                'bg-cyan-100 text-cyan-600': item.platform === 'IT之家',
-                'bg-indigo-100 text-indigo-600': item.platform === '知乎',
-                'bg-yellow-100 text-yellow-600': item.platform === '头条',
+                'bg-red-400/15 text-red-200 border border-red-300/20': item.platform === '微博',
+                'bg-blue-400/15 text-blue-200 border border-blue-300/20': item.platform === '百度',
+                'bg-pink-400/15 text-pink-200 border border-pink-300/20': item.platform === 'B站',
+                'bg-orange-400/15 text-orange-200 border border-orange-300/20': item.platform === '抖音',
+                'bg-green-400/15 text-green-200 border border-green-300/20': item.platform === '36Kr',
+                'bg-cyan-400/15 text-cyan-200 border border-cyan-300/20': item.platform === 'IT之家',
+                'bg-indigo-400/15 text-indigo-200 border border-indigo-300/20': item.platform === '知乎',
+                'bg-yellow-400/15 text-yellow-200 border border-yellow-300/20': item.platform === '头条',
               }"
             >
               {{ item.platform }}
@@ -693,86 +694,86 @@ onUnmounted(() => {
               <span 
                 v-for="kw in item.matched_keywords" 
                 :key="kw"
-                class="text-xs px-2 py-0.5 bg-purple-100 text-purple-600 rounded"
+                class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/12 text-fuchsia-200"
               >
                 {{ kw }}
               </span>
             </div>
             <!-- 发布时间 -->
-            <span class="text-xs text-gray-400">
+            <span class="text-xs text-slate-400">
               {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
             </span>
           </div>
         </div>
       </div>
 
-      <div v-if="currentTag !== null && Object.keys(newsByKeyword).length === 0 && !loading" class="text-center py-12 text-gray-400">
+      <div v-if="currentTag !== null && Object.keys(newsByKeyword).length === 0 && !loading" class="text-center py-12 text-slate-400">
         暂无匹配的热点资讯
       </div>
-      <div v-else-if="currentTag === null && news.length === 0 && Object.keys(newsByPlatform).length === 0 && !loading" class="text-center py-12 text-gray-400">
+      <div v-else-if="currentTag === null && news.length === 0 && Object.keys(newsByPlatform).length === 0 && !loading" class="text-center py-12 text-slate-400">
         暂无匹配的热点资讯
       </div>
     </main>
 
     <!-- 登录弹窗 -->
-    <div v-if="showLogin" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-2xl p-6 w-80 mx-4">
+    <div v-if="showLogin" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
+      <div class="glass-scroll relative w-80 mx-4 rounded-[28px] border border-white/15 bg-white/12 p-6 text-slate-100 shadow-[0_24px_80px_rgba(15,23,42,0.45)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/30">
         <h2 class="text-lg font-semibold mb-4">登录/注册</h2>
         <input 
           v-model="username" 
           placeholder="用户名" 
-          class="w-full px-4 py-3 border rounded-xl mb-3"
+          class="glass-input w-full px-4 py-3 border border-white/10 bg-white/10 rounded-2xl mb-3 text-white placeholder:text-slate-400"
         />
         <input 
           v-model="password" 
           type="password" 
           placeholder="密码" 
-          class="w-full px-4 py-3 border rounded-xl mb-4"
+          class="glass-input w-full px-4 py-3 border border-white/10 bg-white/10 rounded-2xl mb-4 text-white placeholder:text-slate-400"
           @keyup.enter="login"
         />
-        <button @click="login" class="w-full py-3 bg-indigo-500 text-white rounded-xl mb-2">
+        <button @click="login" class="w-full py-3 rounded-2xl border border-white/20 bg-white/14 text-white backdrop-blur-xl mb-2">
           登录
         </button>
-        <button @click="register" class="w-full py-3 bg-gray-100 rounded-xl text-gray-600">
+        <button @click="register" class="w-full py-3 rounded-2xl border border-white/10 bg-white/8 text-slate-200">
           注册
         </button>
-        <button @click="showLogin = false" class="w-full py-2 mt-2 text-gray-400 text-sm">
+        <button @click="showLogin = false" class="w-full py-2 mt-2 text-slate-400 text-sm">
           取消
         </button>
       </div>
     </div>
 
     <!-- 账号管理弹窗 -->
-    <div v-if="showAccount" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-2xl p-6 w-80 mx-4 max-h-[80vh] overflow-y-auto">
+    <div v-if="showAccount" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
+      <div class="glass-scroll relative w-80 mx-4 max-h-[80vh] overflow-y-auto rounded-[28px] border border-white/15 bg-white/12 p-6 text-slate-100 shadow-[0_24px_80px_rgba(15,23,42,0.45)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/30">
         <h2 class="text-lg font-semibold mb-4">账号管理</h2>
         
         <!-- 切换账号按钮 -->
-        <button @click="switchAccount" class="w-full py-2 mb-4 bg-gray-100 rounded-xl text-gray-600 text-sm">
+        <button @click="switchAccount" class="w-full py-2 mb-4 rounded-2xl border border-white/10 bg-white/8 text-slate-200 text-sm">
           切换账号
         </button>
         
         <!-- 标签关键词管理 -->
         <div class="mb-4">
-          <label class="text-sm text-gray-500 block mb-2">标签关键词设置</label>
-          <div class="text-xs text-gray-400 mb-2">点击标签设置其关键词</div>
+          <label class="text-sm text-slate-300 block mb-2">标签关键词设置</label>
+          <div class="text-xs text-slate-400 mb-2">点击标签设置其关键词</div>
           
           <!-- 标签列表 -->
           <div class="space-y-2 mb-3">
             <div 
               v-for="tag in tags" 
               :key="tag"
-              class="border rounded-lg p-2"
+              class="border border-white/10 bg-white/6 rounded-2xl p-3"
             >
               <div class="flex justify-between items-center mb-1">
                 <!-- 显示标签名 -->
-                <span v-if="renamingTag !== tag" class="font-medium text-sm">{{ tag }}</span>
+                <span v-if="renamingTag !== tag" class="font-medium text-sm text-slate-100">{{ tag }}</span>
                 <!-- 重命名输入框 -->
                 <div v-else class="flex items-center gap-1">
                   <input 
                     v-model="tempRenameName"
                     @keyup.enter="confirmRenameTag(tag)"
-                    class="font-medium text-sm border rounded px-1 py-0.5 w-20"
+                    class="glass-input font-medium text-sm border border-white/10 bg-white/10 rounded px-1 py-0.5 w-20 text-white"
                   />
                   <button @click="confirmRenameTag(tag)" class="text-green-500">✓</button>
                   <button @click="cancelRenameTag" class="text-gray-500">✕</button>
@@ -782,20 +783,20 @@ onUnmounted(() => {
                   <button 
                     v-if="renamingTag !== tag"
                     @click="startRenameTag(tag)"
-                    class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded"
+                    class="text-xs px-2 py-1 rounded-full border border-blue-300/20 bg-blue-400/12 text-blue-200"
                   >
                     重命名
                   </button>
                   <button 
                     @click="editTagKeywords(tag)"
-                    class="text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded"
+                    class="text-xs px-2 py-1 rounded-full border border-indigo-300/20 bg-indigo-400/12 text-indigo-200"
                   >
                     {{ (keywordTags[tag] || []).length ? '编辑' : '设置' }}
                   </button>
                   <button 
                     v-if="!['工作', '生活', '科技'].includes(tag)"
                     @click="deleteTag(tag)"
-                    class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded"
+                    class="text-xs px-2 py-1 rounded-full border border-red-300/20 bg-red-400/12 text-red-200"
                   >
                     删除
                   </button>
@@ -805,25 +806,25 @@ onUnmounted(() => {
                 <textarea 
                   v-model="editingKeywords"
                   :placeholder="`${tag}标签的关键词，用逗号分隔`"
-                  class="w-full px-2 py-1 border rounded text-sm"
+                  class="glass-input w-full px-2 py-1 border border-white/10 bg-white/10 rounded-xl text-sm text-white placeholder:text-slate-400"
                   rows="2"
                 ></textarea>
                 <div class="flex gap-2 mt-1">
                   <button 
                     @click="saveTagKeywords"
-                    class="text-xs px-2 py-1 bg-indigo-500 text-white rounded"
+                    class="text-xs px-2 py-1 rounded-full border border-white/20 bg-white/14 text-white"
                   >
                     保存
                   </button>
                   <button 
                     @click="editingTag = null"
-                    class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded"
+                    class="text-xs px-2 py-1 rounded-full border border-white/10 bg-white/8 text-slate-300"
                   >
                     取消
                   </button>
                 </div>
               </div>
-              <div v-else class="text-xs text-gray-400">
+              <div v-else class="text-xs text-slate-400">
                 关键词: {{ (keywordTags[tag] || []).join(', ') || '未设置' }}
               </div>
             </div>
@@ -834,50 +835,50 @@ onUnmounted(() => {
             <input 
               v-model="newTag" 
               placeholder="新增标签"
-              class="flex-1 px-2 py-1 border rounded text-sm"
+              class="glass-input flex-1 px-2 py-1 border border-white/10 bg-white/10 rounded-xl text-sm text-white placeholder:text-slate-400"
               @keyup.enter="addCustomTag"
             />
-            <button @click="addCustomTag" class="px-3 py-1 bg-indigo-500 text-white rounded text-sm">
+            <button @click="addCustomTag" class="px-3 py-1 rounded-xl border border-white/20 bg-white/14 text-white text-sm">
               添加
             </button>
           </div>
         </div>
         
         <div class="mb-4">
-          <label class="text-sm text-gray-500 block mb-1">屏蔽关键词</label>
+          <label class="text-sm text-slate-300 block mb-1">屏蔽关键词</label>
           <textarea 
             v-model="config.blocked_keywords" 
             placeholder="不想看到的内容"
-            class="w-full px-3 py-2 border rounded-lg text-sm"
+            class="glass-input w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm text-white placeholder:text-slate-400"
             rows="2"
           ></textarea>
         </div>
         
         <div class="mb-4">
-          <label class="text-sm text-gray-500 block mb-2">监控平台</label>
+          <label class="text-sm text-slate-300 block mb-2">监控平台</label>
           <div class="flex flex-wrap gap-2">
-            <label v-for="p in platformOptions" :key="p.id" class="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-sm">
-              <input type="checkbox" :value="p.id" v-model="config.platforms">
+            <label v-for="p in platformOptions" :key="p.id" class="flex items-center gap-2 border border-white/10 bg-white/8 px-3 py-1.5 rounded-full text-sm text-slate-200">
+              <input type="checkbox" :value="p.id" v-model="config.platforms" class="glass-checkbox">
               {{ p.name }}
             </label>
           </div>
         </div>
         
         <!-- 推送设置 -->
-        <div class="mb-4 border-t pt-4">
-          <label class="text-sm text-gray-500 block mb-2">📣 推送设置</label>
+        <div class="mb-4 border-t border-white/10 pt-4">
+          <label class="text-sm text-slate-300 block mb-2">📣 推送设置</label>
           
           <div class="mb-3">
             <label class="flex items-center gap-2">
-              <input type="checkbox" v-model="config.push_enabled" class="w-4 h-4">
+              <input type="checkbox" v-model="config.push_enabled" class="glass-checkbox">
               <span class="text-sm">启用推送</span>
             </label>
           </div>
           
           <div v-if="config.push_enabled" class="space-y-3">
             <div>
-              <label class="text-xs text-gray-500 block mb-1">推送渠道</label>
-              <select v-model="config.push_channel" class="w-full px-3 py-2 border rounded-lg text-sm">
+              <label class="text-xs text-slate-400 block mb-1">推送渠道</label>
+              <select v-model="config.push_channel" class="glass-select w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm text-white">
                 <option value="feishu">飞书</option>
                 <option value="dingtalk">钉钉</option>
                 <option value="bark">Bark</option>
@@ -885,24 +886,24 @@ onUnmounted(() => {
             </div>
             
             <div>
-              <label class="text-xs text-gray-500 block mb-1">Webhook地址</label>
+              <label class="text-xs text-slate-400 block mb-1">Webhook地址</label>
               <input 
                 v-model="config.push_webhook" 
                 type="text" 
                 placeholder="Webhook地址"
-                class="w-full px-3 py-2 border rounded-lg text-sm"
+                class="glass-input w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm text-white placeholder:text-slate-400"
               >
-              <div class="text-xs text-gray-400 mt-1">
+              <div class="text-xs text-slate-400 mt-1">
                 如何获取？请查看飞书/钉钉/Bark 的 Webhook 配置文档
               </div>
             </div>
 
             <div>
-              <label class="text-xs text-gray-500 block mb-1">推送规则</label>
+              <label class="text-xs text-slate-400 block mb-1">推送规则</label>
               <select
                 :value="cronPresets.find(p => p.value === config.push_cron)?.value || ''"
                 @change="selectCronPreset"
-                class="w-full px-3 py-2 border rounded-lg text-sm mb-2"
+                class="glass-select w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm mb-2 text-white"
               >
                 <option value="">自定义</option>
                 <option v-for="p in cronPresets" :key="p.value" :value="p.value">{{ p.label }}</option>
@@ -911,19 +912,19 @@ onUnmounted(() => {
                 v-model="config.push_cron"
                 type="text"
                 placeholder="分 时 日 月 周  (如 0 */4 * * *)"
-                class="w-full px-3 py-2 border rounded-lg text-sm font-mono"
+                class="glass-input w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm font-mono text-white placeholder:text-slate-400"
               >
-              <div class="text-xs text-gray-400 mt-1">cron 表达式：自动按设定规则推送</div>
+              <div class="text-xs text-slate-400 mt-1">cron 表达式：自动按设定规则推送</div>
             </div>
 
-            <div v-if="lastPushTime" class="text-xs text-gray-400 text-center">
+            <div v-if="lastPushTime" class="text-xs text-slate-400 text-center">
               上次推送：{{ new Date(lastPushTime).toLocaleString('zh-CN') }}
             </div>
             
             <button 
               @click="pushNews" 
               :disabled="pushLoading"
-              class="w-full py-2 bg-green-500 text-white rounded-lg text-sm"
+              class="w-full py-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/14 text-emerald-100 text-sm backdrop-blur-xl"
             >
               {{ pushLoading ? '推送中...' : '📤 立即推送测试' }}
             </button>
@@ -934,13 +935,96 @@ onUnmounted(() => {
           </div>
         </div>
         
-        <button @click="saveConfig" class="w-full py-3 bg-indigo-500 text-white rounded-xl mb-2">
+        <button @click="saveConfig" class="w-full py-3 rounded-2xl border border-white/20 bg-white/14 text-white mb-2">
           保存
         </button>
-        <button @click="showAccount = false" class="w-full py-2 text-gray-400 text-sm">
+        <button @click="showAccount = false" class="w-full py-2 text-slate-400 text-sm">
           取消
         </button>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.glass-input,
+.glass-select,
+.glass-checkbox {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.glass-input:focus,
+.glass-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.glass-select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(226, 232, 240, 0.9) 50%), linear-gradient(135deg, rgba(226, 232, 240, 0.9) 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 2.75rem;
+}
+
+.glass-select option {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.glass-checkbox {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.glass-checkbox:checked {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(168, 85, 247, 0.95));
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.glass-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.glass-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+}
+
+.glass-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(226, 232, 240, 0.28) transparent;
+}
+
+.glass-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.glass-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-scroll::-webkit-scrollbar-thumb {
+  background: rgba(226, 232, 240, 0.22);
+  border-radius: 9999px;
+}
+
+.glass-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(226, 232, 240, 0.34);
+}
+</style>
