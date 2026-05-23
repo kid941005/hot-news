@@ -481,31 +481,32 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-700 relative overflow-hidden">
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.9),_transparent_20%),radial-gradient(circle_at_top_right,_rgba(219,234,254,0.75),_transparent_24%),radial-gradient(circle_at_bottom,_rgba(243,244,246,0.7),_transparent_30%)]"></div>
+  <div class="min-h-screen bg-[linear-gradient(180deg,_#f3f7fc_0%,_#e9f0f8_44%,_#dee8f2_100%)] text-slate-700 relative overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.92),_transparent_18%),radial-gradient(circle_at_top_right,_rgba(186,230,253,0.5),_transparent_24%),radial-gradient(circle_at_50%_38%,_rgba(255,255,255,0.28),_transparent_28%),radial-gradient(circle_at_bottom,_rgba(203,213,225,0.62),_transparent_34%)]"></div>
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0))]"></div>
     <!-- 头部 -->
-    <header class="sticky top-0 z-50 safe-area-top border-b border-white/55 bg-white/58 px-4 py-4 text-slate-700 backdrop-blur-2xl shadow-[0_10px_30px_rgba(148,163,184,0.10)]">
+    <header class="sticky top-0 z-50 safe-area-top border-b border-white/55 bg-[linear-gradient(180deg,_rgba(255,255,255,0.76),_rgba(255,255,255,0.48))] px-4 py-4 text-slate-700 backdrop-blur-2xl shadow-[0_8px_18px_rgba(255,255,255,0.32),0_14px_34px_rgba(148,163,184,0.12)]">
       <div class="max-w-2xl mx-auto flex justify-between items-center">
         <h1 class="text-lg font-semibold">热点资讯</h1>
         <div class="flex gap-2">
           <button 
             v-if="currentUser" 
             @click="showAccount = true"
-            class="px-3 py-1.5 rounded-full text-sm border border-white/60 bg-white/80 backdrop-blur-xl shadow-[0_8px_24px_rgba(148,163,184,0.10)] text-slate-700"
+            class="px-3 py-1.5 rounded-full text-sm border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(255,255,255,0.72))] backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.45),0_10px_24px_rgba(148,163,184,0.12)] text-slate-700"
           >
             {{ currentUser }}
           </button>
           <button 
             v-if="currentUser" 
             @click="logout"
-            class="px-3 py-1.5 rounded-full text-sm border border-white/10 bg-red-400/25 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.18)]"
+            class="px-3 py-1.5 rounded-full text-sm border border-red-200/70 bg-[linear-gradient(180deg,_rgba(254,226,226,0.92),_rgba(252,165,165,0.55))] text-red-700 backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.35),0_10px_28px_rgba(248,113,113,0.18)]"
           >
             退出
           </button>
           <button 
             v-if="!currentUser" 
             @click="showLogin = true"
-            class="px-3 py-1.5 rounded-full text-sm border border-white/60 bg-white/80 backdrop-blur-xl shadow-[0_8px_24px_rgba(148,163,184,0.10)] text-slate-700"
+            class="px-3 py-1.5 rounded-full text-sm border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(255,255,255,0.72))] backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.45),0_10px_24px_rgba(148,163,184,0.12)] text-slate-700"
           >
             登录
           </button>
@@ -514,12 +515,12 @@ onUnmounted(() => {
     </header>
 
     <!-- 标签筛选 -->
-    <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/10 bg-white/8 backdrop-blur-2xl" style="top: max(3.5rem, env(safe-area-inset-top))">
+    <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/30 bg-[linear-gradient(180deg,_rgba(255,255,255,0.4),_rgba(255,255,255,0.18))] backdrop-blur-2xl" style="top: max(3.5rem, env(safe-area-inset-top))">
       <div class="glass-scroll max-w-2xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
         <button 
           @click="selectTag(null)"
-            class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_6px_18px_rgba(148,163,184,0.10)]"
-          :class="currentTag === null ? 'bg-white/70 text-slate-800 border-white/80 shadow-[0_8px_24px_rgba(99,102,241,0.14)]' : 'bg-white/45 text-slate-600 border-white/60 hover:bg-white/60'"
+            class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
+          :class="currentTag === null ? 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.92),_rgba(239,246,255,0.74))] text-slate-800 border-white/85 shadow-[0_2px_10px_rgba(255,255,255,0.45),0_10px_26px_rgba(99,102,241,0.16)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0.38))] text-slate-600 border-white/65 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.78),_rgba(255,255,255,0.48))]'"
         >
           全部
         </button>
@@ -527,8 +528,8 @@ onUnmounted(() => {
           v-for="tag in tags" 
           :key="tag"
           @click="selectTag(tag)"
-            class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_6px_18px_rgba(148,163,184,0.10)]"
-          :class="currentTag === tag ? 'bg-white/70 text-slate-800 border-white/80 shadow-[0_8px_24px_rgba(99,102,241,0.14)]' : 'bg-white/45 text-slate-600 border-white/60 hover:bg-white/60'"
+            class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
+          :class="currentTag === tag ? 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.92),_rgba(239,246,255,0.74))] text-slate-800 border-white/85 shadow-[0_2px_10px_rgba(255,255,255,0.45),0_10px_26px_rgba(99,102,241,0.16)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0.38))] text-slate-600 border-white/65 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.78),_rgba(255,255,255,0.48))]'"
         >
           {{ tag }}
         </button>
@@ -538,7 +539,7 @@ onUnmounted(() => {
     <!-- 内容 -->
     <main class="relative max-w-2xl mx-auto p-4">
       <!-- 操作栏 -->
-      <div class="mb-5 flex items-center justify-between rounded-2xl border border-white/70 bg-white/55 px-4 py-3 shadow-[0_12px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl">
+      <div class="mb-5 flex items-center justify-between rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.72),_rgba(255,255,255,0.42))] px-4 py-3 shadow-[0_1px_6px_rgba(255,255,255,0.28),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl">
         <div class="flex items-center gap-2">
           <span class="text-slate-700 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
           <span v-if="lastRefresh" class="text-xs text-slate-500">上次刷新: {{ lastRefresh }}</span>
@@ -546,7 +547,7 @@ onUnmounted(() => {
         <button 
           @click="refresh(true)" 
           :disabled="loading"
-            class="px-4 py-2 rounded-xl text-sm border border-white/60 bg-white/90 text-slate-700 backdrop-blur-xl shadow-[0_12px_32px_rgba(148,163,184,0.12)] disabled:opacity-50"
+            class="px-4 py-2 rounded-xl text-sm border border-white/75 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(255,255,255,0.74))] text-slate-700 backdrop-blur-xl shadow-[0_2px_10px_rgba(255,255,255,0.4),0_12px_28px_rgba(148,163,184,0.14)] disabled:opacity-50"
         >
           {{ loading ? '刷新中...' : '刷新' }}
         </button>
@@ -558,10 +559,10 @@ onUnmounted(() => {
         <div 
           v-for="(platformNews, platform) in newsByPlatform" 
           :key="platform"
-          class="overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl"
+          class="overflow-hidden rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.9),_rgba(244,248,252,0.78))] shadow-[0_1px_8px_rgba(255,255,255,0.26),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl"
         >
           <!-- 平台标题 -->
-          <div class="px-4 py-3 bg-white/45 border-b border-white/60 flex justify-between items-center">
+          <div class="px-4 py-3 bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0.38))] border-b border-white/60 flex justify-between items-center">
             <span class="font-medium text-slate-800">{{ platform }}</span>
             <span class="text-xs text-slate-500">{{ platformNews.length }}条</span>
           </div>
@@ -570,7 +571,7 @@ onUnmounted(() => {
             <div 
               v-for="(item, index) in platformNews" 
               :key="index"
-              class="group p-4 transition-all duration-300 hover:bg-white/6"
+              class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
               <a 
                 :href="item.url" 
@@ -603,9 +604,9 @@ onUnmounted(() => {
         <div 
           v-for="(keywordNews, keyword) in newsByKeyword" 
           :key="keyword"
-          class="overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl"
+          class="overflow-hidden rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.9),_rgba(244,248,252,0.78))] shadow-[0_1px_8px_rgba(255,255,255,0.26),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl"
         >
-          <div class="px-4 py-3 bg-white/45 border-b border-white/60 flex justify-between items-center">
+          <div class="px-4 py-3 bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0.38))] border-b border-white/60 flex justify-between items-center">
             <span class="font-medium text-slate-800">{{ keyword }}</span>
             <span class="text-xs text-slate-500">{{ keywordNews.length }}条</span>
           </div>
@@ -613,7 +614,7 @@ onUnmounted(() => {
             <div 
               v-for="(item, index) in keywordNews" 
               :key="index"
-              class="group p-4 transition-all duration-300 hover:bg-white/6"
+              class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
               <div class="flex justify-between items-start">
                 <a 
@@ -663,7 +664,7 @@ onUnmounted(() => {
         <div 
           v-for="(item, index) in news" 
           :key="index"
-          class="group rounded-2xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/95 hover:shadow-[0_20px_48px_rgba(148,163,184,0.18)]"
+          class="group rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.9),_rgba(244,248,252,0.78))] p-4 shadow-[0_1px_8px_rgba(255,255,255,0.26),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(238,244,249,0.86))] hover:shadow-[0_2px_10px_rgba(255,255,255,0.3),0_20px_44px_rgba(148,163,184,0.18)]"
         >
           <div class="flex justify-between items-start">
             <a 
