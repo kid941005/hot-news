@@ -69,6 +69,21 @@ class UserConfig(Base):
     user = relationship("User", back_populates="config")
 
 
+def ensure_user_config_schema():
+    db = engine.connect()
+    try:
+        if 'mysql' in DB_URL:
+            cols = [r[0] for r in db.execute("SHOW COLUMNS FROM user_configs").fetchall()]
+            if 'push_cron' not in cols:
+                db.execute("ALTER TABLE user_configs ADD COLUMN push_cron VARCHAR(50) NOT NULL DEFAULT '0 */4 * * *'")
+                db.commit()
+    finally:
+        db.close()
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    user = relationship("User", back_populates="config")
+
+
 class CacheRecord(Base):
     """缓存记录"""
     __tablename__ = 'cache_records'

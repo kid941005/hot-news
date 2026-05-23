@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from backend.models.models import init_db, get_db, UserConfig
+from backend.models.models import init_db, get_db, UserConfig, ensure_user_config_schema
 from backend.db import database
 from backend.db.database import PLATFORM_MAP
 from backend.spiders import spiders
@@ -590,6 +590,7 @@ def get_refresh_time():
 @app.on_event("startup")
 def startup():
     init_db()
+    ensure_user_config_schema()
     # 挂载静态文件
     if os.path.exists(STATIC_DIR):
         app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

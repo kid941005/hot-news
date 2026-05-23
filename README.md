@@ -163,6 +163,10 @@ docker compose up -d
 
 ## 📝 更新日志
 
+### v2.5.1 (2026-05-23)
+- 修复：MySQL 旧库缺少 push_cron 列导致定时推送和新闻接口 500
+- 修复：启动时自动补齐 user_configs.push_cron 兼容旧数据库
+
 ### v2.5.0 (2026-06-10)
 - 新增：定时推送调度器（APScheduler），按 cron 表达式自动推送
 - 新增：Web 界面支持自定义推送规则（预设 7 种 + 自定义 cron）
