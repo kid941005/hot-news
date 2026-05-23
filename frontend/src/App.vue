@@ -519,7 +519,7 @@ onUnmounted(() => {
         <button 
           @click="selectTag(null)"
             class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_6px_18px_rgba(148,163,184,0.10)]"
-          :class="currentTag === null ? 'bg-white/20 text-white border-white/30 shadow-[0_8px_24px_rgba(99,102,241,0.25)]' : 'bg-white/8 text-slate-300 border-white/10 hover:bg-white/12'"
+          :class="currentTag === null ? 'bg-white/70 text-slate-800 border-white/80 shadow-[0_8px_24px_rgba(99,102,241,0.14)]' : 'bg-white/45 text-slate-600 border-white/60 hover:bg-white/60'"
         >
           全部
         </button>
@@ -528,7 +528,7 @@ onUnmounted(() => {
           :key="tag"
           @click="selectTag(tag)"
             class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_6px_18px_rgba(148,163,184,0.10)]"
-          :class="currentTag === tag ? 'bg-white/20 text-white border-white/30 shadow-[0_8px_24px_rgba(99,102,241,0.25)]' : 'bg-white/8 text-slate-300 border-white/10 hover:bg-white/12'"
+          :class="currentTag === tag ? 'bg-white/70 text-slate-800 border-white/80 shadow-[0_8px_24px_rgba(99,102,241,0.14)]' : 'bg-white/45 text-slate-600 border-white/60 hover:bg-white/60'"
         >
           {{ tag }}
         </button>
@@ -538,10 +538,10 @@ onUnmounted(() => {
     <!-- 内容 -->
     <main class="relative max-w-2xl mx-auto p-4">
       <!-- 操作栏 -->
-      <div class="mb-5 flex items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-4 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.16)] backdrop-blur-2xl">
+      <div class="mb-5 flex items-center justify-between rounded-2xl border border-white/70 bg-white/55 px-4 py-3 shadow-[0_12px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl">
         <div class="flex items-center gap-2">
-          <span class="text-slate-200 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
-          <span v-if="lastRefresh" class="text-xs text-slate-400">上次刷新: {{ lastRefresh }}</span>
+          <span class="text-slate-700 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
+          <span v-if="lastRefresh" class="text-xs text-slate-500">上次刷新: {{ lastRefresh }}</span>
         </div>
         <button 
           @click="refresh(true)" 
@@ -561,9 +561,9 @@ onUnmounted(() => {
           class="overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl"
         >
           <!-- 平台标题 -->
-          <div class="px-4 py-3 bg-white/8 border-b border-white/10 flex justify-between items-center">
-            <span class="font-medium text-slate-100">{{ platform }}</span>
-            <span class="text-xs text-slate-400">{{ platformNews.length }}条</span>
+          <div class="px-4 py-3 bg-white/45 border-b border-white/60 flex justify-between items-center">
+            <span class="font-medium text-slate-800">{{ platform }}</span>
+            <span class="text-xs text-slate-500">{{ platformNews.length }}条</span>
           </div>
           <!-- 平台新闻列表 -->
           <div class="divide-y divide-white/10">
@@ -575,7 +575,7 @@ onUnmounted(() => {
               <a 
                 :href="item.url" 
                 target="_blank"
-                class="text-base font-medium text-slate-100 transition-colors group-hover:text-indigo-200"
+                class="text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600" 
               >
                 {{ item.title }}
               </a>
@@ -605,9 +605,9 @@ onUnmounted(() => {
           :key="keyword"
           class="overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl"
         >
-          <div class="px-4 py-3 bg-white/8 border-b border-white/10 flex justify-between items-center">
-            <span class="font-medium text-slate-100">{{ keyword }}</span>
-            <span class="text-xs text-slate-400">{{ keywordNews.length }}条</span>
+          <div class="px-4 py-3 bg-white/45 border-b border-white/60 flex justify-between items-center">
+            <span class="font-medium text-slate-800">{{ keyword }}</span>
+            <span class="text-xs text-slate-500">{{ keywordNews.length }}条</span>
           </div>
           <div class="divide-y divide-white/10">
             <div 
@@ -624,7 +624,18 @@ onUnmounted(() => {
                   {{ item.title }}
                 </a>
                 <span 
-                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0 bg-slate-100/80 text-slate-700 border border-slate-200"
+                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
+                  :class="{
+                    'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
+                    'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
+                    'bg-pink-100/85 text-pink-600 border border-pink-200': item.platform === 'B站',
+                    'bg-orange-100/85 text-orange-600 border border-orange-200': item.platform === '抖音',
+                    'bg-green-100/85 text-green-600 border border-green-200': item.platform === '36kr',
+                    'bg-cyan-100/85 text-cyan-600 border border-cyan-200': item.platform === 'IT之家',
+                    'bg-indigo-100/85 text-indigo-600 border border-indigo-200': item.platform === '知乎',
+                    'bg-yellow-100/85 text-yellow-700 border border-yellow-200': item.platform === '头条',
+                    'bg-slate-100/85 text-slate-700 border border-slate-200': !['微博','百度','B站','抖音','36kr','IT之家','知乎','头条'].includes(item.platform)
+                  }"
                 >
                   {{ item.platform }}
                 </span>
@@ -665,14 +676,15 @@ onUnmounted(() => {
             <span 
               class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
               :class="{
-                'bg-red-400/15 text-red-200 border border-red-300/20': item.platform === '微博',
-                'bg-blue-400/15 text-blue-200 border border-blue-300/20': item.platform === '百度',
-                'bg-pink-400/15 text-pink-200 border border-pink-300/20': item.platform === 'B站',
-                'bg-orange-400/15 text-orange-200 border border-orange-300/20': item.platform === '抖音',
-                'bg-green-400/15 text-green-200 border border-green-300/20': item.platform === '36Kr',
-                'bg-cyan-400/15 text-cyan-200 border border-cyan-300/20': item.platform === 'IT之家',
-                'bg-indigo-400/15 text-indigo-200 border border-indigo-300/20': item.platform === '知乎',
-                'bg-yellow-400/15 text-yellow-200 border border-yellow-300/20': item.platform === '头条',
+                'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
+                'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
+                'bg-pink-100/85 text-pink-600 border border-pink-200': item.platform === 'B站',
+                'bg-orange-100/85 text-orange-600 border border-orange-200': item.platform === '抖音',
+                'bg-green-100/85 text-green-600 border border-green-200': item.platform === '36kr',
+                'bg-cyan-100/85 text-cyan-600 border border-cyan-200': item.platform === 'IT之家',
+                'bg-indigo-100/85 text-indigo-600 border border-indigo-200': item.platform === '知乎',
+                'bg-yellow-100/85 text-yellow-700 border border-yellow-200': item.platform === '头条',
+                'bg-slate-100/85 text-slate-700 border border-slate-200': !['微博','百度','B站','抖音','36kr','IT之家','知乎','头条'].includes(item.platform)
               }"
             >
               {{ item.platform }}
@@ -712,19 +724,19 @@ onUnmounted(() => {
         <input 
           v-model="username" 
           placeholder="用户名" 
-          class="glass-input w-full px-4 py-3 border border-white/10 bg-white/10 rounded-2xl mb-3 text-white placeholder:text-slate-400"
+          class="glass-input w-full px-4 py-3 border border-white/60 bg-white/70 rounded-2xl mb-3 text-slate-800 placeholder:text-slate-400" 
         />
         <input 
           v-model="password" 
           type="password" 
           placeholder="密码" 
-          class="glass-input w-full px-4 py-3 border border-white/10 bg-white/10 rounded-2xl mb-4 text-white placeholder:text-slate-400"
+          class="glass-input w-full px-4 py-3 border border-white/60 bg-white/70 rounded-2xl mb-4 text-slate-800 placeholder:text-slate-400" 
           @keyup.enter="login"
         />
-        <button @click="login" class="w-full py-3 rounded-2xl border border-white/20 bg-white/14 text-white backdrop-blur-xl mb-2">
+        <button @click="login" class="w-full py-3 rounded-2xl border border-white/70 bg-white/75 text-slate-800 backdrop-blur-xl mb-2">
           登录
         </button>
-        <button @click="register" class="w-full py-3 rounded-2xl border border-white/10 bg-white/8 text-slate-200">
+        <button @click="register" class="w-full py-3 rounded-2xl border border-white/60 bg-white/55 text-slate-700">
           注册
         </button>
         <button @click="showLogin = false" class="w-full py-2 mt-2 text-slate-400 text-sm">
@@ -739,7 +751,7 @@ onUnmounted(() => {
         <h2 class="text-lg font-semibold mb-4">账号管理</h2>
         
         <!-- 切换账号按钮 -->
-        <button @click="switchAccount" class="w-full py-2 mb-4 rounded-2xl border border-white/10 bg-white/8 text-slate-200 text-sm">
+        <button @click="switchAccount" class="w-full py-2 mb-4 rounded-2xl border border-white/60 bg-white/55 text-slate-700 text-sm">
           切换账号
         </button>
         
