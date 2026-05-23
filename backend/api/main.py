@@ -563,8 +563,9 @@ from datetime import datetime, timezone
 
 LAST_REFRESH_TIME = None
 
-def refresh_news_data(db: Session):
-    results = awaitable_fetch_all_spiders()
+def refresh_news_data(db: Session, results: dict = None):
+    if results is None:
+        results = awaitable_fetch_all_spiders()
     saved_count = 0
     for platform, news in results.items():
         if news:
@@ -586,7 +587,8 @@ def awaitable_fetch_all_spiders():
 async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     global LAST_REFRESH_TIME
     try:
-        saved_count = refresh_news_data(db)
+        results = await spiders.fetch_all_spiders()
+        saved_count = refresh_news_data(db, results)
         print(f"📊 共保存 {saved_count} 条新闻")
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
         return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count}

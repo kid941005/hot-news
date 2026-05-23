@@ -70,7 +70,7 @@ function formatDisplayTime(item) {
     return `发布时间 ${item.pub_time}`
   }
   if (item.created_at) {
-    return `获取时间 ${new Date(item.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })}`
+    return `抓取时间 ${new Date(item.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })}`
   }
   return ''
 }
@@ -583,13 +583,31 @@ onUnmounted(() => {
               :key="index"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
-              <a 
-                :href="item.url" 
-                target="_blank"
-                class="text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600" 
-              >
-                {{ item.title }}
-              </a>
+              <div class="flex justify-between items-start">
+                <a 
+                  :href="item.url" 
+                  target="_blank"
+                  class="text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600 flex-1" 
+                >
+                  {{ item.title }}
+                </a>
+                <span 
+                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
+                  :class="{
+                    'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
+                    'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
+                    'bg-pink-100/85 text-pink-600 border border-pink-200': item.platform === 'B站',
+                    'bg-orange-100/85 text-orange-600 border border-orange-200': item.platform === '抖音',
+                    'bg-green-100/85 text-green-600 border border-green-200': item.platform === '36kr',
+                    'bg-cyan-100/85 text-cyan-600 border border-cyan-200': item.platform === 'IT之家',
+                    'bg-indigo-100/85 text-indigo-600 border border-indigo-200': item.platform === '知乎',
+                    'bg-yellow-100/85 text-yellow-700 border border-yellow-200': item.platform === '头条',
+                    'bg-slate-100/85 text-slate-700 border border-slate-200': !['微博','百度','B站','抖音','36kr','IT之家','知乎','头条'].includes(item.platform)
+                  }"
+                >
+                  {{ item.platform }}
+                </span>
+              </div>
               <div class="flex justify-between items-center mt-2">
                 <div class="flex gap-1 flex-wrap">
                   <span 
@@ -600,7 +618,7 @@ onUnmounted(() => {
                     {{ kw }}
                   </span>
                 </div>
-                <span class="text-xs text-slate-400">
+                <span class="rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-500">
                   {{ formatDisplayTime(item) }}
                 </span>
               </div>
@@ -661,7 +679,7 @@ onUnmounted(() => {
                     {{ kw }}
                   </span>
                 </div>
-                <span class="text-xs text-slate-400">
+                <span class="rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-500">
                   {{ formatDisplayTime(item) }}
                 </span>
               </div>

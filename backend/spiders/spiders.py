@@ -46,7 +46,6 @@ class WeiboSpider(BaseSpider):
                     continue
                 title = link.get_text(strip=True)
                 if title:
-                    # 微博页面没有稳定的原始发布时间字段，使用抓取入库时间由前端按本地时区显示
                     items.append({
                         "platform": "微博",
                         "title": title,
@@ -81,7 +80,6 @@ class BaiduSpider(BaseSpider):
                 # 使用百度热搜详情页URL
                 hot_id = item.get("hotScore", "")
                 word = item.get("word", "")
-                # 生成百度搜索URL（改为直接搜索该关键词）
                 search_url = f"https://www.baidu.com/s?wd={word}"
                 # 百度热搜列表没有稳定的原始发布时间字段，使用抓取入库时间由前端按本地时区显示
                 items.append({

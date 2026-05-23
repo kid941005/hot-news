@@ -70,16 +70,21 @@ class UserConfig(Base):
 
 
 def ensure_user_config_schema():
-    if 'mysql' not in DB_URL:
-        return
     conn = engine.raw_connection()
     try:
         cur = conn.cursor()
-        cur.execute("SHOW COLUMNS FROM user_configs")
-        cols = [r[0] for r in cur.fetchall()]
-        if 'push_cron' not in cols:
-            cur.execute("ALTER TABLE user_configs ADD COLUMN push_cron VARCHAR(50) NOT NULL DEFAULT '0 */4 * * *'")
-            conn.commit()
+        if 'mysql' in DB_URL:
+            cur.execute("SHOW COLUMNS FROM user_configs")
+            cols = [r[0] for r in cur.fetchall()]
+            if 'push_cron' not in cols:
+                cur.execute("ALTER TABLE user_configs ADD COLUMN push_cron VARCHAR(50) NOT NULL DEFAULT '0 */4 * * *'")
+                conn.commit()
+        elif 'sqlite' in DB_URL:
+            cur.execute("PRAGMA table_info(user_configs)")
+            cols = [r[1] for r in cur.fetchall()]
+            if 'push_cron' not in cols:
+                cur.execute("ALTER TABLE user_configs ADD COLUMN push_cron VARCHAR(50) NOT NULL DEFAULT '0 */4 * * *'")
+                conn.commit()
     finally:
         conn.close()
 
