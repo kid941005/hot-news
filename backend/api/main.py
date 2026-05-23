@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from backend.models.models import init_db, get_db, UserConfig, ensure_user_config_schema
+from backend.models.models import init_db, get_db, UserConfig, ensure_user_config_schema, SessionLocal
 from backend.db import database
 from backend.db.database import PLATFORM_MAP
 from backend.spiders import spiders
@@ -416,6 +416,7 @@ def scheduled_push():
                 next_time = trigger.get_next_fire_time(last, now)
                 should_push = next_time is not None and next_time <= now
             if should_push:
+                refresh_news_data(db)
                 success, message = _push_for_user(db, config)
                 print(f"📬 定时推送 [用户{config.user_id}] {message}")
                 if success:
@@ -456,6 +457,7 @@ def push_news(
     if not config.push_webhook:
         return {"success": False, "error": "未配置Webhook"}
     
+    refresh_news_data(db)
     success, message = _push_for_user(db, config)
     if success:
         return {"success": True, "message": message}
@@ -561,20 +563,30 @@ from datetime import datetime, timezone
 
 LAST_REFRESH_TIME = None
 
+def refresh_news_data(db: Session):
+    results = awaitable_fetch_all_spiders()
+    saved_count = 0
+    for platform, news in results.items():
+        if news:
+            try:
+                database.save_news(db, news)
+                saved_count += len(news)
+                print(f"✅ 保存 {platform}: {len(news)} 条")
+            except Exception as e:
+                print(f"❌ 保存失败 {platform}: {e}")
+    return saved_count
+
+
+def awaitable_fetch_all_spiders():
+    import asyncio
+    return asyncio.run(spiders.fetch_all_spiders())
+
+
 @app.post("/api/news/refresh")
 async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     global LAST_REFRESH_TIME
     try:
-        results = await spiders.fetch_all_spiders()
-        saved_count = 0
-        for platform, news in results.items():
-            if news:
-                try:
-                    database.save_news(db, news)
-                    saved_count += len(news)
-                    print(f"✅ 保存 {platform}: {len(news)} 条")
-                except Exception as e:
-                    print(f"❌ 保存失败 {platform}: {e}")
+        saved_count = refresh_news_data(db)
         print(f"📊 共保存 {saved_count} 条新闻")
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
         return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count}

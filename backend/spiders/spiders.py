@@ -623,9 +623,7 @@ SPIDERS = {
     "thepaper": ThepaperSpider,
     "ifeng": IfengSpider,
     "sspai": SspaiSpider,
-    "v2ex": V2exSpider,
     "github": GitHubSpider,
-    "jin10": Jin10Spider,
     "ithome": IthomeSpider,
     "36kr": Kr36Spider,
 }

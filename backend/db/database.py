@@ -24,9 +24,7 @@ PLATFORM_MAP = {
     "thepaper": "澎湃",
     "ifeng": "凤凰",
     "sspai": "少数派",
-    "v2ex": "V2EX",
     "github": "GitHub",
-    "jin10": "金十数据",
     "ithome": "IT之家",
     "36kr": "36Kr",
 }
