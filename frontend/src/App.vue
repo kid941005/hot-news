@@ -759,34 +759,38 @@ onUnmounted(() => {
     <!-- 账号管理弹窗 -->
     <div v-if="showAccount" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
       <div class="glass-scroll relative w-80 mx-4 max-h-[80vh] overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80">
-        <h2 class="text-lg font-semibold mb-4">账号管理</h2>
+        <div class="mb-4">
+          <div class="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">Workspace Settings</div>
+          <h2 class="mt-1 text-lg font-semibold text-slate-800">账号管理</h2>
+          <div class="mt-1 text-sm text-slate-500">统一管理标签、关键词、平台监控和消息推送。</div>
+        </div>
         
         <!-- 切换账号按钮 -->
-        <button @click="switchAccount" class="w-full py-2 mb-4 rounded-2xl border border-white/60 bg-white/55 text-slate-700 text-sm">
+        <button @click="switchAccount" class="w-full py-2 mb-4 rounded-2xl border border-white/60 bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.54))] text-slate-700 text-sm shadow-[0_8px_20px_rgba(148,163,184,0.08)]">
           切换账号
         </button>
         
         <!-- 标签关键词管理 -->
         <div class="mb-4">
-          <label class="text-sm text-slate-300 block mb-2">标签关键词设置</label>
-          <div class="text-xs text-slate-400 mb-2">点击标签设置其关键词</div>
+          <label class="text-sm text-slate-600 block mb-2">标签关键词设置</label>
+          <div class="text-xs text-slate-500 mb-2">点击标签设置其关键词</div>
           
           <!-- 标签列表 -->
           <div class="space-y-2 mb-3">
             <div 
               v-for="tag in tags" 
               :key="tag"
-              class="border border-white/10 bg-white/6 rounded-2xl p-3"
+              class="rounded-2xl border border-white/60 bg-[linear-gradient(180deg,_rgba(255,255,255,0.78),_rgba(255,255,255,0.48))] p-3 shadow-[0_10px_24px_rgba(148,163,184,0.08)]"
             >
               <div class="flex justify-between items-center mb-1">
                 <!-- 显示标签名 -->
-                <span v-if="renamingTag !== tag" class="font-medium text-sm text-slate-100">{{ tag }}</span>
+                <span v-if="renamingTag !== tag" class="font-medium text-sm text-slate-800">{{ tag }}</span>
                 <!-- 重命名输入框 -->
                 <div v-else class="flex items-center gap-1">
                   <input 
                     v-model="tempRenameName"
                     @keyup.enter="confirmRenameTag(tag)"
-                    class="glass-input font-medium text-sm border border-white/10 bg-white/10 rounded px-1 py-0.5 w-20 text-white"
+                    class="glass-input font-medium text-sm border border-white/60 bg-white/80 rounded px-1 py-0.5 w-20 text-slate-800"
                   />
                   <button @click="confirmRenameTag(tag)" class="text-green-500">✓</button>
                   <button @click="cancelRenameTag" class="text-gray-500">✕</button>
@@ -796,20 +800,20 @@ onUnmounted(() => {
                   <button 
                     v-if="renamingTag !== tag"
                     @click="startRenameTag(tag)"
-                    class="text-xs px-2 py-1 rounded-full border border-blue-300/20 bg-blue-400/12 text-blue-200"
+                    class="text-xs px-2 py-1 rounded-full border border-blue-200 bg-blue-50/80 text-blue-600"
                   >
                     重命名
                   </button>
                   <button 
                     @click="editTagKeywords(tag)"
-                    class="text-xs px-2 py-1 rounded-full border border-indigo-300/20 bg-indigo-400/12 text-indigo-200"
+                    class="text-xs px-2 py-1 rounded-full border border-indigo-200 bg-indigo-50/80 text-indigo-600"
                   >
                     {{ (keywordTags[tag] || []).length ? '编辑' : '设置' }}
                   </button>
                   <button 
                     v-if="!['工作', '生活', '科技'].includes(tag)"
                     @click="deleteTag(tag)"
-                    class="text-xs px-2 py-1 rounded-full border border-red-300/20 bg-red-400/12 text-red-200"
+                    class="text-xs px-2 py-1 rounded-full border border-red-200 bg-red-50/80 text-red-600"
                   >
                     删除
                   </button>
@@ -819,25 +823,25 @@ onUnmounted(() => {
                 <textarea 
                   v-model="editingKeywords"
                   :placeholder="`${tag}标签的关键词，用逗号分隔`"
-                  class="glass-input w-full px-2 py-1 border border-white/10 bg-white/10 rounded-xl text-sm text-white placeholder:text-slate-400"
+                  class="glass-input w-full px-2 py-1 border border-white/60 bg-white/80 rounded-xl text-sm text-slate-800 placeholder:text-slate-400"
                   rows="2"
                 ></textarea>
                 <div class="flex gap-2 mt-1">
                   <button 
                     @click="saveTagKeywords"
-                    class="text-xs px-2 py-1 rounded-full border border-white/20 bg-white/14 text-white"
+                    class="text-xs px-2 py-1 rounded-full border border-white/60 bg-white/80 text-slate-700"
                   >
                     保存
                   </button>
                   <button 
                     @click="editingTag = null"
-                    class="text-xs px-2 py-1 rounded-full border border-white/10 bg-white/8 text-slate-300"
+                    class="text-xs px-2 py-1 rounded-full border border-white/50 bg-white/65 text-slate-500"
                   >
                     取消
                   </button>
                 </div>
               </div>
-              <div v-else class="text-xs text-slate-400">
+              <div v-else class="text-xs text-slate-500">
                 关键词: {{ (keywordTags[tag] || []).join(', ') || '未设置' }}
               </div>
             </div>
@@ -848,29 +852,29 @@ onUnmounted(() => {
             <input 
               v-model="newTag" 
               placeholder="新增标签"
-              class="glass-input flex-1 px-2 py-1 border border-white/10 bg-white/10 rounded-xl text-sm text-white placeholder:text-slate-400"
+              class="glass-input flex-1 px-2 py-1 border border-white/60 bg-white/80 rounded-xl text-sm text-slate-800 placeholder:text-slate-400"
               @keyup.enter="addCustomTag"
             />
-            <button @click="addCustomTag" class="px-3 py-1 rounded-xl border border-white/20 bg-white/14 text-white text-sm">
+            <button @click="addCustomTag" class="px-3 py-1 rounded-xl border border-white/60 bg-white/78 text-slate-700 text-sm shadow-[0_8px_20px_rgba(148,163,184,0.08)]">
               添加
             </button>
           </div>
         </div>
         
         <div class="mb-4">
-          <label class="text-sm text-slate-300 block mb-1">屏蔽关键词</label>
+          <label class="text-sm text-slate-600 block mb-1">屏蔽关键词</label>
           <textarea 
             v-model="config.blocked_keywords" 
             placeholder="不想看到的内容"
-            class="glass-input w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm text-white placeholder:text-slate-400"
+            class="glass-input w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm text-slate-800 placeholder:text-slate-400"
             rows="2"
           ></textarea>
         </div>
         
         <div class="mb-4">
-          <label class="text-sm text-slate-300 block mb-2">监控平台</label>
+          <label class="text-sm text-slate-600 block mb-2">监控平台</label>
           <div class="flex flex-wrap gap-2">
-            <label v-for="p in platformOptions" :key="p.id" class="flex items-center gap-2 border border-white/10 bg-white/8 px-3 py-1.5 rounded-full text-sm text-slate-200">
+            <label v-for="p in platformOptions" :key="p.id" class="flex items-center gap-2 border border-white/60 bg-white/70 px-3 py-1.5 rounded-full text-sm text-slate-700 shadow-[0_8px_20px_rgba(148,163,184,0.06)]">
               <input type="checkbox" :value="p.id" v-model="config.platforms" class="glass-checkbox">
               {{ p.name }}
             </label>
@@ -878,20 +882,20 @@ onUnmounted(() => {
         </div>
         
         <!-- 推送设置 -->
-        <div class="mb-4 border-t border-white/10 pt-4">
-          <label class="text-sm text-slate-300 block mb-2">📣 推送设置</label>
+        <div class="mb-4 border-t border-white/40 pt-4">
+          <label class="text-sm text-slate-600 block mb-2">📣 推送设置</label>
           
           <div class="mb-3">
             <label class="flex items-center gap-2">
               <input type="checkbox" v-model="config.push_enabled" class="glass-checkbox">
-              <span class="text-sm">启用推送</span>
+              <span class="text-sm text-slate-700">启用推送</span>
             </label>
           </div>
           
           <div v-if="config.push_enabled" class="space-y-3">
             <div>
-              <label class="text-xs text-slate-400 block mb-1">推送渠道</label>
-              <select v-model="config.push_channel" class="glass-select w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm text-white">
+              <label class="text-xs text-slate-500 block mb-1">推送渠道</label>
+              <select v-model="config.push_channel" class="glass-select w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm text-slate-800">
                 <option value="feishu">飞书</option>
                 <option value="dingtalk">钉钉</option>
                 <option value="bark">Bark</option>
@@ -899,24 +903,24 @@ onUnmounted(() => {
             </div>
             
             <div>
-              <label class="text-xs text-slate-400 block mb-1">Webhook地址</label>
+              <label class="text-xs text-slate-500 block mb-1">Webhook地址</label>
               <input 
                 v-model="config.push_webhook" 
                 type="text" 
                 placeholder="Webhook地址"
-                class="glass-input w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm text-white placeholder:text-slate-400"
+                class="glass-input w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm text-slate-800 placeholder:text-slate-400"
               >
-              <div class="text-xs text-slate-400 mt-1">
+              <div class="text-xs text-slate-500 mt-1">
                 如何获取？请查看飞书/钉钉/Bark 的 Webhook 配置文档
               </div>
             </div>
 
             <div>
-              <label class="text-xs text-slate-400 block mb-1">推送规则</label>
+              <label class="text-xs text-slate-500 block mb-1">推送规则</label>
               <select
                 :value="cronPresets.find(p => p.value === config.push_cron)?.value || ''"
                 @change="selectCronPreset"
-                class="glass-select w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm mb-2 text-white"
+                class="glass-select w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm mb-2 text-slate-800"
               >
                 <option value="">自定义</option>
                 <option v-for="p in cronPresets" :key="p.value" :value="p.value">{{ p.label }}</option>
@@ -925,19 +929,19 @@ onUnmounted(() => {
                 v-model="config.push_cron"
                 type="text"
                 placeholder="分 时 日 月 周  (如 0 */4 * * *)"
-                class="glass-input w-full px-3 py-2 border border-white/10 bg-white/10 rounded-2xl text-sm font-mono text-white placeholder:text-slate-400"
+                class="glass-input w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm font-mono text-slate-800 placeholder:text-slate-400"
               >
-              <div class="text-xs text-slate-400 mt-1">cron 表达式：自动按设定规则推送</div>
+              <div class="text-xs text-slate-500 mt-1">cron 表达式：自动按设定规则推送</div>
             </div>
 
-            <div v-if="lastPushTime" class="text-xs text-slate-400 text-center">
+            <div v-if="lastPushTime" class="text-xs text-slate-500 text-center">
               上次推送：{{ new Date(lastPushTime).toLocaleString('zh-CN') }}
             </div>
             
             <button 
               @click="pushNews" 
               :disabled="pushLoading"
-              class="w-full py-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/14 text-emerald-100 text-sm backdrop-blur-xl"
+              class="w-full py-2 rounded-2xl border border-emerald-200 bg-emerald-50/85 text-emerald-700 text-sm backdrop-blur-xl shadow-[0_8px_20px_rgba(16,185,129,0.08)]"
             >
               {{ pushLoading ? '推送中...' : '📤 立即推送测试' }}
             </button>
@@ -948,7 +952,7 @@ onUnmounted(() => {
           </div>
         </div>
         
-        <button @click="saveConfig" class="w-full py-3 rounded-2xl border border-white/20 bg-white/14 text-white mb-2">
+        <button @click="saveConfig" class="w-full py-3 rounded-2xl border border-white/60 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(255,255,255,0.72))] text-slate-800 mb-2 shadow-[0_10px_24px_rgba(148,163,184,0.12)]">
           保存
         </button>
         <button @click="showAccount = false" class="w-full py-2 text-slate-400 text-sm">
