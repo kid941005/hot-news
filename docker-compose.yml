@@ -3,6 +3,7 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
+    container_name: hotnews-mysql
     environment:
       MYSQL_ROOT_PASSWORD: hotnews123
       MYSQL_DATABASE: hot_news
@@ -13,9 +14,11 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
     command: --default-authentication-plugin=mysql_native_password
+    restart: always
 
   hotnews:
     image: kid941005/hot-news:latest
+    container_name: hotnews
     ports:
       - "16888:16888"
     environment:
@@ -24,5 +27,5 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    restart: unless-stopped
+    restart: always
 
