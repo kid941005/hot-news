@@ -481,17 +481,17 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden">
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.35),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.28),_transparent_32%),radial-gradient(circle_at_bottom,_rgba(56,189,248,0.2),_transparent_30%)]"></div>
+  <div class="min-h-screen bg-slate-50 text-slate-700 relative overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.9),_transparent_20%),radial-gradient(circle_at_top_right,_rgba(219,234,254,0.75),_transparent_24%),radial-gradient(circle_at_bottom,_rgba(243,244,246,0.7),_transparent_30%)]"></div>
     <!-- 头部 -->
-    <header class="sticky top-0 z-50 safe-area-top border-b border-white/10 bg-white/10 px-4 py-4 text-white backdrop-blur-2xl">
+    <header class="sticky top-0 z-50 safe-area-top border-b border-white/55 bg-white/58 px-4 py-4 text-slate-700 backdrop-blur-2xl shadow-[0_10px_30px_rgba(148,163,184,0.10)]">
       <div class="max-w-2xl mx-auto flex justify-between items-center">
         <h1 class="text-lg font-semibold">热点资讯</h1>
         <div class="flex gap-2">
           <button 
             v-if="currentUser" 
             @click="showAccount = true"
-            class="px-3 py-1.5 rounded-full text-sm border border-white/20 bg-white/12 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.18)]"
+            class="px-3 py-1.5 rounded-full text-sm border border-white/60 bg-white/80 backdrop-blur-xl shadow-[0_8px_24px_rgba(148,163,184,0.10)] text-slate-700"
           >
             {{ currentUser }}
           </button>
@@ -505,7 +505,7 @@ onUnmounted(() => {
           <button 
             v-if="!currentUser" 
             @click="showLogin = true"
-            class="px-3 py-1.5 rounded-full text-sm border border-white/20 bg-white/12 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.18)]"
+            class="px-3 py-1.5 rounded-full text-sm border border-white/60 bg-white/80 backdrop-blur-xl shadow-[0_8px_24px_rgba(148,163,184,0.10)] text-slate-700"
           >
             登录
           </button>
@@ -518,7 +518,7 @@ onUnmounted(() => {
       <div class="glass-scroll max-w-2xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
         <button 
           @click="selectTag(null)"
-          class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all border backdrop-blur-xl"
+            class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_6px_18px_rgba(148,163,184,0.10)]"
           :class="currentTag === null ? 'bg-white/20 text-white border-white/30 shadow-[0_8px_24px_rgba(99,102,241,0.25)]' : 'bg-white/8 text-slate-300 border-white/10 hover:bg-white/12'"
         >
           全部
@@ -527,7 +527,7 @@ onUnmounted(() => {
           v-for="tag in tags" 
           :key="tag"
           @click="selectTag(tag)"
-          class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all border backdrop-blur-xl"
+            class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_6px_18px_rgba(148,163,184,0.10)]"
           :class="currentTag === tag ? 'bg-white/20 text-white border-white/30 shadow-[0_8px_24px_rgba(99,102,241,0.25)]' : 'bg-white/8 text-slate-300 border-white/10 hover:bg-white/12'"
         >
           {{ tag }}
@@ -546,7 +546,7 @@ onUnmounted(() => {
         <button 
           @click="refresh(true)" 
           :disabled="loading"
-          class="px-4 py-2 rounded-xl text-sm border border-white/20 bg-white/12 text-white backdrop-blur-xl shadow-[0_12px_32px_rgba(99,102,241,0.22)] disabled:opacity-50"
+            class="px-4 py-2 rounded-xl text-sm border border-white/60 bg-white/90 text-slate-700 backdrop-blur-xl shadow-[0_12px_32px_rgba(148,163,184,0.12)] disabled:opacity-50"
         >
           {{ loading ? '刷新中...' : '刷新' }}
         </button>
@@ -558,7 +558,7 @@ onUnmounted(() => {
         <div 
           v-for="(platformNews, platform) in newsByPlatform" 
           :key="platform"
-          class="overflow-hidden rounded-2xl border border-white/12 bg-white/10 shadow-[0_16px_40px_rgba(15,23,42,0.22)] backdrop-blur-2xl"
+          class="overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl"
         >
           <!-- 平台标题 -->
           <div class="px-4 py-3 bg-white/8 border-b border-white/10 flex justify-between items-center">
@@ -584,7 +584,7 @@ onUnmounted(() => {
                   <span 
                     v-for="kw in item.matched_keywords" 
                     :key="kw"
-                    class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/12 text-fuchsia-200"
+                    class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-100/80 text-fuchsia-700"
                   >
                     {{ kw }}
                   </span>
@@ -603,7 +603,7 @@ onUnmounted(() => {
         <div 
           v-for="(keywordNews, keyword) in newsByKeyword" 
           :key="keyword"
-          class="overflow-hidden rounded-2xl border border-white/12 bg-white/10 shadow-[0_16px_40px_rgba(15,23,42,0.22)] backdrop-blur-2xl"
+          class="overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl"
         >
           <div class="px-4 py-3 bg-white/8 border-b border-white/10 flex justify-between items-center">
             <span class="font-medium text-slate-100">{{ keyword }}</span>
@@ -619,22 +619,12 @@ onUnmounted(() => {
                 <a 
                   :href="item.url" 
                   target="_blank"
-                  class="text-base font-medium text-slate-100 transition-colors group-hover:text-indigo-200 flex-1"
+                  class="text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600 flex-1"
                 >
                   {{ item.title }}
                 </a>
                 <span 
-                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
-                  :class="{
-                    'bg-red-400/15 text-red-200 border border-red-300/20': item.platform === '微博',
-                    'bg-blue-400/15 text-blue-200 border border-blue-300/20': item.platform === '百度',
-                    'bg-pink-400/15 text-pink-200 border border-pink-300/20': item.platform === 'B站',
-                    'bg-orange-400/15 text-orange-200 border border-orange-300/20': item.platform === '抖音',
-                    'bg-green-400/15 text-green-200 border border-green-300/20': item.platform === '36Kr',
-                    'bg-cyan-400/15 text-cyan-200 border border-cyan-300/20': item.platform === 'IT之家',
-                    'bg-indigo-400/15 text-indigo-200 border border-indigo-300/20': item.platform === '知乎',
-                    'bg-yellow-400/15 text-yellow-200 border border-yellow-300/20': item.platform === '头条',
-                  }"
+                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0 bg-slate-100/80 text-slate-700 border border-slate-200"
                 >
                   {{ item.platform }}
                 </span>
@@ -644,7 +634,7 @@ onUnmounted(() => {
                   <span 
                     v-for="kw in item.matched_keywords" 
                     :key="kw"
-                    class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/12 text-fuchsia-200"
+                    class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-100/80 text-fuchsia-700"
                   >
                     {{ kw }}
                   </span>
@@ -662,13 +652,13 @@ onUnmounted(() => {
         <div 
           v-for="(item, index) in news" 
           :key="index"
-          class="group rounded-2xl border border-white/12 bg-white/10 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.22)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/12 hover:shadow-[0_20px_48px_rgba(15,23,42,0.28)]"
+          class="group rounded-2xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_40px_rgba(148,163,184,0.12)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/95 hover:shadow-[0_20px_48px_rgba(148,163,184,0.18)]"
         >
           <div class="flex justify-between items-start">
             <a 
               :href="item.url" 
               target="_blank"
-              class="text-base font-medium text-slate-100 transition-colors group-hover:text-indigo-200 flex-1"
+              class="text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600 flex-1"
             >
               {{ item.title }}
             </a>
@@ -717,7 +707,7 @@ onUnmounted(() => {
 
     <!-- 登录弹窗 -->
     <div v-if="showLogin" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
-      <div class="glass-scroll relative w-80 mx-4 rounded-[28px] border border-white/15 bg-white/12 p-6 text-slate-100 shadow-[0_24px_80px_rgba(15,23,42,0.45)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/30">
+      <div class="glass-scroll relative w-80 mx-4 rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80">
         <h2 class="text-lg font-semibold mb-4">登录/注册</h2>
         <input 
           v-model="username" 
@@ -745,7 +735,7 @@ onUnmounted(() => {
 
     <!-- 账号管理弹窗 -->
     <div v-if="showAccount" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
-      <div class="glass-scroll relative w-80 mx-4 max-h-[80vh] overflow-y-auto rounded-[28px] border border-white/15 bg-white/12 p-6 text-slate-100 shadow-[0_24px_80px_rgba(15,23,42,0.45)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/30">
+      <div class="glass-scroll relative w-80 mx-4 max-h-[80vh] overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80">
         <h2 class="text-lg font-semibold mb-4">账号管理</h2>
         
         <!-- 切换账号按钮 -->
@@ -947,84 +937,180 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.glass-input,
-.glass-select,
-.glass-checkbox {
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+:global(body) {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 55%),
+    radial-gradient(circle at 88% 12%, rgba(219, 234, 254, 0.92) 0%, rgba(219, 234, 254, 0.05) 24%, transparent 48%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+  color: #0f172a;
+  min-height: 100vh;
 }
 
-.glass-input:focus,
-.glass-select:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
-  background-color: rgba(255, 255, 255, 0.14);
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.55) 0, transparent 22%),
+    radial-gradient(circle at 80% 28%, rgba(191, 219, 254, 0.35) 0, transparent 20%),
+    radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.4) 0, transparent 24%);
+  filter: blur(14px);
+  opacity: 0.9;
 }
 
-.glass-select {
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, rgba(226, 232, 240, 0.9) 50%), linear-gradient(135deg, rgba(226, 232, 240, 0.9) 50%, transparent 50%);
-  background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-  padding-right: 2.75rem;
-}
-
-.glass-select option {
-  background: #0f172a;
-  color: #e2e8f0;
-}
-
-.glass-checkbox {
-  appearance: none;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+#app {
   position: relative;
-  flex: 0 0 auto;
+  z-index: 1;
 }
 
-.glass-checkbox:checked {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(168, 85, 247, 0.95));
-  border-color: rgba(255, 255, 255, 0.3);
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.glass-checkbox:checked::after {
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 18px 56px rgba(148, 163, 184, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.84), 0 1px 0 rgba(255, 255, 255, 0.45);
+  position: relative;
+}
+
+.header::after,
+.account-section::after,
+.login-modal::after,
+.news-item::after,
+.tag-item::after,
+.tag-card::after,
+.config-panel::after,
+.push-panel::after,
+.modal-content::after {
   content: '';
   position: absolute;
-  inset: 3px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.92);
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), transparent 38%, rgba(255, 255, 255, 0.08));
 }
 
-.glass-checkbox:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+.header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #0f172a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
-.glass-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(226, 232, 240, 0.28) transparent;
+.user-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
-.glass-scroll::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.user-info button,
+.refresh-btn,
+.logout-btn,
+.login-btn,
+.action-btn,
+.save-btn,
+.push-btn {
+  border: 1px solid rgba(191, 219, 254, 0.72);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.68));
+  color: #0f172a;
+  box-shadow: 0 10px 24px rgba(148, 163, 184, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
-.glass-scroll::-webkit-scrollbar-track {
-  background: transparent;
+.user-info button:hover,
+.refresh-btn:hover,
+.logout-btn:hover,
+.login-btn:hover,
+.action-btn:hover,
+.save-btn:hover,
+.push-btn:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.82));
+  border-color: rgba(147, 197, 253, 0.92);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(148, 163, 184, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
 
-.glass-scroll::-webkit-scrollbar-thumb {
-  background: rgba(226, 232, 240, 0.22);
-  border-radius: 9999px;
+.account-section,
+.login-modal,
+.news-item,
+.empty-state,
+.tag-item,
+.tag-card,
+.config-panel,
+.push-panel,
+.modal-content {
+  border: 1px solid rgba(255, 255, 255, 0.84);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.62));
+  backdrop-filter: blur(26px) saturate(185%);
+  -webkit-backdrop-filter: blur(26px) saturate(185%);
+  box-shadow: 0 20px 52px rgba(148, 163, 184, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(255, 255, 255, 0.32);
 }
 
-.glass-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(226, 232, 240, 0.34);
+.news-item:hover,
+.tag-item:hover,
+.tag-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 56px rgba(148, 163, 184, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.94), inset 0 -1px 0 rgba(255, 255, 255, 0.34);
+}
+
+.news-meta,
+.news-source,
+.news-time,
+.last-refresh,
+.login-info,
+.tag-meta,
+.empty-state {
+  color: #475569;
+}
+
+.tag,
+.platform-tag,
+.keyword-badge {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.7));
+  color: #334155;
+  border: 1px solid rgba(191, 219, 254, 0.78);
+  box-shadow: 0 8px 20px rgba(148, 163, 184, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.tag.active {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.98), rgba(224, 242, 254, 0.98));
+  color: #1d4ed8;
+  border-color: rgba(96, 165, 250, 0.92);
+  box-shadow: 0 10px 24px rgba(96, 165, 250, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select,
+.config-panel input,
+.config-panel textarea,
+.config-panel select {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(191, 219, 254, 0.78);
+  color: #0f172a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus,
+.config-panel input:focus,
+.config-panel textarea:focus,
+.config-panel select:focus {
+  border-color: rgba(96, 165, 250, 0.98);
+  box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 </style>
