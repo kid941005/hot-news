@@ -46,12 +46,13 @@ class WeiboSpider(BaseSpider):
                     continue
                 title = link.get_text(strip=True)
                 if title:
+                    # 微博页面没有稳定的原始发布时间字段，使用抓取入库时间由前端按本地时区显示
                     items.append({
                         "platform": "微博",
                         "title": title,
                         "url": f"https://s.weibo.com{href}",
                         "hot": "",
-                        "time": datetime.now().strftime("%H:%M")
+                        "time": ""
                     })
             return items
         except Exception as e:
@@ -82,12 +83,13 @@ class BaiduSpider(BaseSpider):
                 word = item.get("word", "")
                 # 生成百度搜索URL（改为直接搜索该关键词）
                 search_url = f"https://www.baidu.com/s?wd={word}"
+                # 百度热搜列表没有稳定的原始发布时间字段，使用抓取入库时间由前端按本地时区显示
                 items.append({
                     "platform": "百度",
                     "title": word,
                     "url": search_url,
                     "hot": "",
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": ""
                 })
             return items
         except Exception as e:
@@ -110,12 +112,12 @@ class BilibiliSpider(BaseSpider):
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("list", [])[:30]:
-                # 使用pubdate作为发布时间
+                # 使用北京时间解释 B 站返回的 Unix 秒级时间戳，避免服务器时区影响显示
                 pubdate = item.get("pubdate", 0)
                 if pubdate:
-                    pub_time = datetime.fromtimestamp(pubdate).strftime("%H:%M")
+                    pub_time = datetime.utcfromtimestamp(pubdate + 8 * 3600).strftime("%H:%M")
                 else:
-                    pub_time = datetime.now().strftime("%H:%M")
+                    pub_time = ""
                 
                 items.append({
                     "platform": "B站",
@@ -162,12 +164,12 @@ class ZhihuSpider(BaseSpider):
                 else:
                     web_url = zhihu_url
                 
-                # 获取文章实际发布时间
+                # 获取文章实际发布时间（按北京时间解释 Unix 秒级时间戳，避免服务器时区影响）
                 created = target.get("created")
                 if created:
-                    pub_time = datetime.fromtimestamp(created).strftime("%H:%M")
+                    pub_time = datetime.utcfromtimestamp(created + 8 * 3600).strftime("%H:%M")
                 else:
-                    pub_time = datetime.now().strftime("%H:%M")
+                    pub_time = ""
                 
                 items.append({
                     "platform": "知乎",
@@ -203,12 +205,12 @@ class ToutiaoSpider(BaseSpider):
                     if article_url and not article_url.startswith("http"):
                         article_url = "https://www.toutiao.com" + article_url
                     
-                    # 获取文章发布时间
+                    # 获取文章发布时间（按北京时间解释 Unix 秒级时间戳，避免服务器时区影响）
                     behot_time = item.get("behot_time", 0)
                     if behot_time:
-                        pub_time = datetime.fromtimestamp(behot_time).strftime("%H:%M")
+                        pub_time = datetime.utcfromtimestamp(behot_time + 8 * 3600).strftime("%H:%M")
                     else:
-                        pub_time = datetime.now().strftime("%H:%M")
+                        pub_time = ""
                     
                     items.append({
                         "platform": "头条",
@@ -244,7 +246,7 @@ class WallstreetcnSpider(BaseSpider):
                     "title": item.get("title", ""),
                     "url": f"https://wallstreetcn.com/articles/{item.get('id', '')}",
                     "hot": str(item.get("read_count", "")),
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": ""
                 })
             return items
         except Exception as e:
@@ -277,7 +279,7 @@ class ThepaperSpider(BaseSpider):
                         "title": title,
                         "url": "https://m.thepaper.cn" + item.get("href", ""),
                         "hot": "",
-                        "time": datetime.now().strftime("%H:%M")
+                        "time": ""
                     })
             
             # 如果没有提取到，尝试备用方法
@@ -295,7 +297,7 @@ class ThepaperSpider(BaseSpider):
                             "title": title,
                             "url": "https://www.thepaper.cn" + item.get("href", ""),
                             "hot": "",
-                            "time": datetime.now().strftime("%H:%M")
+                            "time": ""
                         })
             
             return items
@@ -327,7 +329,7 @@ class IfengSpider(BaseSpider):
                         "title": title,
                         "url": href if href.startswith("http") else f"https://news.ifeng.com{href}",
                         "hot": "",
-                        "time": datetime.now().strftime("%H:%M")
+                        "time": ""
                     })
             
             # 去重
@@ -364,7 +366,7 @@ class SspaiSpider(BaseSpider):
                     "title": item.get("title", ""),
                     "url": f"https://sspai.com/post/{item.get('id', '')}",
                     "hot": "",
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": ""
                 })
             return items
         except Exception as e:
@@ -400,7 +402,7 @@ class V2exSpider(BaseSpider):
                                 "title": title,
                                 "url": f"https://www.v2ex.com{href}",
                                 "hot": "",
-                                "time": datetime.now().strftime("%H:%M")
+                                "time": ""
                             })
             
             # 去重
@@ -434,7 +436,7 @@ class GitHubSpider(BaseSpider):
                     "title": item.get("name", ""),
                     "url": item.get("html_url", ""),
                     "hot": str(item.get("stargazers_count", 0)),
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": ""
                 })
             return items
         except Exception as e:
@@ -482,7 +484,7 @@ class Jin10Spider(BaseSpider):
                             "title": item.get("name", ""),
                             "url": f"https://quote.eastmoney.com/{item.get('c', '')}.html",
                             "hot": str(item.get("pct", "")),
-                            "time": datetime.now().strftime("%H:%M")
+                            "time": ""
                         })
                     return items
                     
@@ -502,7 +504,7 @@ class Jin10Spider(BaseSpider):
                     "title": item.get("name", ""),
                     "url": f"https://quote.eastmoney.com/{item.get('c', '')}.html",
                     "hot": f"{item.get('pct', 0)}%",
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": ""
                 })
             return items
         except Exception as e:
@@ -536,16 +538,15 @@ class IthomeSpider(BaseSpider):
                 link = item.find('link').text if item.find('link') is not None else ''
                 pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ''
                 
-                # 解析时间
+                # 解析时间（RSS pubDate 是 GMT，统一转为北京时间显示）
                 if pub_date:
-                    # 格式: Sat, 07 Mar 2026 12:47:36 GMT
                     try:
                         dt = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %Z")
-                        pub_time = dt.strftime("%H:%M")
+                        pub_time = datetime.utcfromtimestamp(dt.timestamp() + 8 * 3600).strftime("%H:%M")
                     except:
-                        pub_time = datetime.now().strftime("%H:%M")
+                        pub_time = ""
                 else:
-                    pub_time = datetime.now().strftime("%H:%M")
+                    pub_time = ""
                 
                 if title and link:
                     results.append({
@@ -583,7 +584,7 @@ class Kr36Spider(BaseSpider):
                     "title": item.get("title", ""),
                     "url": f"https://36kr.com{item.get('url', '')}",
                     "hot": str(item.get("published_at", "")),
-                    "time": datetime.now().strftime("%H:%M")
+                    "time": datetime.utcfromtimestamp(item.get("published_at", 0) + 8 * 3600).strftime("%H:%M") if item.get("published_at") else ""
                 })
             return items
         except Exception as e:
@@ -603,7 +604,7 @@ class Kr36Spider(BaseSpider):
                             "title": title,
                             "url": f"https://36kr.com{href}" if href.startswith("/") else href,
                             "hot": "",
-                            "time": datetime.now().strftime("%H:%M")
+                            "time": ""
                         })
                 return items
             except Exception as e2:

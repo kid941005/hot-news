@@ -65,6 +65,16 @@ const cronPresets = [
   { label: '每天 1 次 (9:00)', value: '0 9 * * *' },
 ]
 
+function formatDisplayTime(item) {
+  if (item.pub_time) {
+    return `发布时间 ${item.pub_time}`
+  }
+  if (item.created_at) {
+    return `获取时间 ${new Date(item.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })}`
+  }
+  return ''
+}
+
 function selectCronPreset(event) {
   config.value.push_cron = event.target.value
 }
@@ -591,7 +601,7 @@ onUnmounted(() => {
                   </span>
                 </div>
                 <span class="text-xs text-slate-400">
-                  {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
+                  {{ formatDisplayTime(item) }}
                 </span>
               </div>
             </div>
@@ -652,7 +662,7 @@ onUnmounted(() => {
                   </span>
                 </div>
                 <span class="text-xs text-slate-400">
-                  {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
+                  {{ formatDisplayTime(item) }}
                 </span>
               </div>
             </div>
@@ -704,7 +714,7 @@ onUnmounted(() => {
             </div>
             <!-- 发布时间 -->
             <span class="text-xs text-slate-400">
-              {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
+              {{ formatDisplayTime(item) }}
             </span>
           </div>
         </div>
