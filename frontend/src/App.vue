@@ -8,6 +8,7 @@ const API_URL = ''  // 通过代理访问
 const currentUser = ref(localStorage.getItem('username') || null)
 const token = ref(localStorage.getItem('token') || null)
 const news = ref([])
+const newsByKeyword = ref({})  // 按关键词分组的新闻
 const newsByPlatform = ref({})  // 按平台分组的新闻
 const platformOptions = ref([])
 const loading = ref(false)
@@ -67,10 +68,12 @@ const cronPresets = [
 function selectCronPreset(event) {
   config.value.push_cron = event.target.value
 }
-const newsCount = computed(() => currentTag.value === null
-  ? Object.values(newsByPlatform.value).reduce((sum, items) => sum + items.length, 0)
-  : news.value.length
-)
+const newsCount = computed(() => {
+  if (currentTag.value === null) {
+    return Object.values(newsByPlatform.value).reduce((sum, items) => sum + items.length, 0)
+  }
+  return Object.values(newsByKeyword.value).reduce((sum, items) => sum + items.length, 0)
+})
 
 // 请求头
 function getAuthHeader() {
@@ -135,11 +138,13 @@ async function loadNews() {
       const res = await axios.get(`${API_URL}/api/news/by_platform`, getAuthHeader())
       if (res.data.success) {
         newsByPlatform.value = res.data.platforms || {}
+        newsByKeyword.value = {}
         news.value = []  // 清空普通列表
       }
     } else {
       // 其他标签：按关键词筛选（需要认证）
       newsByPlatform.value = {}  // 清空分组数据
+      newsByKeyword.value = {}
       const authHeader = getAuthHeader()
       if (token.value) {
         const res = await axios.get(`${API_URL}/api/news`, { 
@@ -147,7 +152,8 @@ async function loadNews() {
           params: { tag: currentTag.value }
         })
         if (res.data.success) {
-          news.value = res.data.news
+          news.value = res.data.news || []
+          newsByKeyword.value = res.data.keyword_groups || {}
         }
       } else {
         // 未登录时获取所有数据
@@ -592,6 +598,65 @@ onUnmounted(() => {
       </div>
 
       <!-- 普通列表（筛选标签） -->
+      <div v-else-if="Object.keys(newsByKeyword).length > 0" class="space-y-4">
+        <div 
+          v-for="(keywordNews, keyword) in newsByKeyword" 
+          :key="keyword"
+          class="bg-white rounded-xl shadow-sm overflow-hidden"
+        >
+          <div class="px-4 py-2 bg-purple-50 border-b flex justify-between items-center">
+            <span class="font-medium text-gray-700">{{ keyword }}</span>
+            <span class="text-xs text-gray-400">{{ keywordNews.length }}条</span>
+          </div>
+          <div class="divide-y">
+            <div 
+              v-for="(item, index) in keywordNews" 
+              :key="index"
+              class="p-4"
+            >
+              <div class="flex justify-between items-start">
+                <a 
+                  :href="item.url" 
+                  target="_blank"
+                  class="text-base font-medium text-gray-800 hover:text-indigo-600 flex-1"
+                >
+                  {{ item.title }}
+                </a>
+                <span 
+                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
+                  :class="{
+                    'bg-red-100 text-red-600': item.platform === '微博',
+                    'bg-blue-100 text-blue-600': item.platform === '百度',
+                    'bg-pink-100 text-pink-600': item.platform === 'B站',
+                    'bg-orange-100 text-orange-600': item.platform === '抖音',
+                    'bg-green-100 text-green-600': item.platform === '36Kr',
+                    'bg-cyan-100 text-cyan-600': item.platform === 'IT之家',
+                    'bg-indigo-100 text-indigo-600': item.platform === '知乎',
+                    'bg-yellow-100 text-yellow-600': item.platform === '头条',
+                  }"
+                >
+                  {{ item.platform }}
+                </span>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <div class="flex gap-1 flex-wrap">
+                  <span 
+                    v-for="kw in item.matched_keywords" 
+                    :key="kw"
+                    class="text-xs px-2 py-0.5 bg-purple-100 text-purple-600 rounded"
+                  >
+                    {{ kw }}
+                  </span>
+                </div>
+                <span class="text-xs text-gray-400">
+                  {{ item.pub_time || (item.created_at ? new Date(item.created_at).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}) : '') }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div v-else class="space-y-3">
         <div 
           v-for="(item, index) in news" 
@@ -641,7 +706,10 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div v-if="news.length === 0 && !loading" class="text-center py-12 text-gray-400">
+      <div v-if="currentTag !== null && Object.keys(newsByKeyword).length === 0 && !loading" class="text-center py-12 text-gray-400">
+        暂无匹配的热点资讯
+      </div>
+      <div v-else-if="currentTag === null && news.length === 0 && Object.keys(newsByPlatform).length === 0 && !loading" class="text-center py-12 text-gray-400">
         暂无匹配的热点资讯
       </div>
     </main>

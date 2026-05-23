@@ -507,10 +507,18 @@ def get_news(
     
     # 按时间倒序排列
     news_data.sort(key=lambda x: x.get('pub_time', ''), reverse=True)
+
+    keyword_groups = {}
+    if tag and config and config.keyword_tags is not None:
+        for item in news_data:
+            item_keywords = item.get('matched_keywords', []) or []
+            for kw in item_keywords:
+                keyword_groups.setdefault(kw, []).append(item)
     
     return {
         "success": True,
         "news": news_data,
+        "keyword_groups": keyword_groups,
         "total": len(news_data),
         "current_tag": tag
     }
