@@ -9,12 +9,12 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
     command: --default-authentication-plugin=mysql_native_password
 
-  backend:
+  hotnews:
     image: kid941005/hot-news:latest
     ports:
       - "16888:16888"
@@ -26,5 +26,3 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-volumes:
-  mysql_data:
