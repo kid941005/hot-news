@@ -49,12 +49,17 @@ npm install
 ### 2. 启动服务
 
 ```bash
-# 方式一: 直接运行
+# 先构建前端（会自动同步到 backend/api/static）
+cd frontend
+npm install
+npm run build
+cd ..
+
+# 启动后端
 python -m uvicorn backend.api.main:app --host 0.0.0.0 --port 16888
 
 # Docker
-
-docker compose up -d
+# docker compose up -d
 ```
 
 ### 3. 验证平台配置
@@ -173,6 +178,11 @@ docker compose up -d
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.15 (2026-05-24)
+- 修复：本地前端构建后自动同步静态资源到 `backend/api/static`，避免首页引用旧 hash 资源导致空白页
+- 修复：补齐本地启动文档，明确先构建前端再启动后端，避免静态资源与首页不一致
+- 发布：同步新的 `backend/api/static` 构建产物，清理旧版静态资源文件
 
 ### v2.5.14 (2026-05-24)
 - 修复：消息推送按用户关键词配置筛选，兼容数据库中 JSON 字符串形式的 `keywords`、`blocked_keywords`、`keyword_tags`
