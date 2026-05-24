@@ -7,7 +7,26 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
+
+
+def format_beijing_timestamp(timestamp) -> str:
+    if not timestamp:
+        return ""
+    try:
+        return datetime.fromtimestamp(timestamp, tz=timezone.utc).astimezone().strftime("%H:%M")
+    except Exception:
+        return ""
+
+
+def format_rfc822_to_beijing(pub_date: str) -> str:
+    if not pub_date:
+        return ""
+    try:
+        dt = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %Z").replace(tzinfo=timezone.utc)
+        return dt.astimezone().strftime("%H:%M")
+    except Exception:
+        return ""
 
 
 class BaseSpider:
@@ -110,12 +129,9 @@ class BilibiliSpider(BaseSpider):
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("list", [])[:30]:
-                # 使用北京时间解释 B 站返回的 Unix 秒级时间戳，避免服务器时区影响显示
+                # Unix 时间戳统一按 UTC 解释，再转换到服务器本地时区显示
                 pubdate = item.get("pubdate", 0)
-                if pubdate:
-                    pub_time = datetime.utcfromtimestamp(pubdate + 8 * 3600).strftime("%H:%M")
-                else:
-                    pub_time = ""
+                pub_time = format_beijing_timestamp(pubdate)
                 
                 items.append({
                     "platform": "B站",
@@ -162,12 +178,9 @@ class ZhihuSpider(BaseSpider):
                 else:
                     web_url = zhihu_url
                 
-                # 获取文章实际发布时间（按北京时间解释 Unix 秒级时间戳，避免服务器时区影响）
+                # Unix 时间戳统一按 UTC 解释，再转换到服务器本地时区显示
                 created = target.get("created")
-                if created:
-                    pub_time = datetime.utcfromtimestamp(created + 8 * 3600).strftime("%H:%M")
-                else:
-                    pub_time = ""
+                pub_time = format_beijing_timestamp(created)
                 
                 items.append({
                     "platform": "知乎",
@@ -203,12 +216,9 @@ class ToutiaoSpider(BaseSpider):
                     if article_url and not article_url.startswith("http"):
                         article_url = "https://www.toutiao.com" + article_url
                     
-                    # 获取文章发布时间（按北京时间解释 Unix 秒级时间戳，避免服务器时区影响）
+                    # Unix 时间戳统一按 UTC 解释，再转换到服务器本地时区显示
                     behot_time = item.get("behot_time", 0)
-                    if behot_time:
-                        pub_time = datetime.utcfromtimestamp(behot_time + 8 * 3600).strftime("%H:%M")
-                    else:
-                        pub_time = ""
+                    pub_time = format_beijing_timestamp(behot_time)
                     
                     items.append({
                         "platform": "头条",
@@ -536,15 +546,8 @@ class IthomeSpider(BaseSpider):
                 link = item.find('link').text if item.find('link') is not None else ''
                 pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ''
                 
-                # 解析时间（RSS pubDate 是 GMT，统一转为北京时间显示）
-                if pub_date:
-                    try:
-                        dt = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %Z")
-                        pub_time = datetime.utcfromtimestamp(dt.timestamp() + 8 * 3600).strftime("%H:%M")
-                    except:
-                        pub_time = ""
-                else:
-                    pub_time = ""
+                # RSS pubDate 是 GMT/UTC，按带时区时间解析后再转换显示
+                pub_time = format_rfc822_to_beijing(pub_date)
                 
                 if title and link:
                     results.append({
@@ -582,7 +585,7 @@ class Kr36Spider(BaseSpider):
                     "title": item.get("title", ""),
                     "url": f"https://36kr.com{item.get('url', '')}",
                     "hot": str(item.get("published_at", "")),
-                    "time": datetime.utcfromtimestamp(item.get("published_at", 0) + 8 * 3600).strftime("%H:%M") if item.get("published_at") else ""
+                    "time": format_beijing_timestamp(item.get("published_at", 0))
                 })
             return items
         except Exception as e:

@@ -491,14 +491,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[linear-gradient(180deg,_#f3f7fc_0%,_#e9f0f8_44%,_#dee8f2_100%)] text-slate-700 relative overflow-hidden">
+  <div class="min-h-screen bg-[linear-gradient(180deg,_#f3f7fc_0%,_#e9f0f8_44%,_#dee8f2_100%)] text-slate-700 relative overflow-hidden pb-[max(1rem,env(safe-area-inset-bottom))]">
     <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.92),_transparent_18%),radial-gradient(circle_at_top_right,_rgba(186,230,253,0.5),_transparent_24%),radial-gradient(circle_at_50%_38%,_rgba(255,255,255,0.28),_transparent_28%),radial-gradient(circle_at_bottom,_rgba(203,213,225,0.62),_transparent_34%)]"></div>
     <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0))]"></div>
     <!-- 头部 -->
-    <header class="sticky top-0 z-50 safe-area-top border-b border-white/55 bg-[linear-gradient(180deg,_rgba(255,255,255,0.76),_rgba(255,255,255,0.48))] px-4 py-4 text-slate-700 backdrop-blur-2xl shadow-[0_8px_18px_rgba(255,255,255,0.32),0_14px_34px_rgba(148,163,184,0.12)]">
-      <div class="max-w-2xl mx-auto flex justify-between items-center">
-        <h1 class="text-lg font-semibold">热点资讯</h1>
-        <div class="flex gap-2">
+    <header class="sticky top-0 z-50 safe-area-top border-b border-white/55 bg-[linear-gradient(180deg,_rgba(255,255,255,0.76),_rgba(255,255,255,0.48))] px-4 py-3 text-slate-700 backdrop-blur-2xl shadow-[0_8px_18px_rgba(255,255,255,0.32),0_14px_34px_rgba(148,163,184,0.12)] sm:py-4">
+      <div class="max-w-2xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
+        <h1 class="min-w-0 flex-1 text-base font-semibold sm:text-lg">热点资讯</h1>
+        <div class="flex shrink-0 flex-wrap justify-end gap-2">
           <button 
             v-if="currentUser" 
             @click="showAccount = true"
@@ -525,8 +525,8 @@ onUnmounted(() => {
     </header>
 
     <!-- 标签筛选 -->
-    <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/30 bg-[linear-gradient(180deg,_rgba(255,255,255,0.4),_rgba(255,255,255,0.18))] backdrop-blur-2xl" style="top: max(3.5rem, env(safe-area-inset-top))">
-      <div class="glass-scroll max-w-2xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
+    <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/30 bg-[linear-gradient(180deg,_rgba(255,255,255,0.4),_rgba(255,255,255,0.18))] backdrop-blur-2xl" style="top: max(3rem, env(safe-area-inset-top))">
+      <div class="glass-scroll max-w-2xl mx-auto px-4 py-1.5 flex gap-2 overflow-x-auto whitespace-nowrap sm:py-2">
         <button 
           @click="selectTag(null)"
             class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
@@ -547,10 +547,10 @@ onUnmounted(() => {
     </div>
 
     <!-- 内容 -->
-    <main class="relative max-w-2xl mx-auto p-4">
+    <main class="relative max-w-2xl mx-auto px-4 py-4 sm:py-5">
       <!-- 操作栏 -->
-      <div class="mb-5 flex items-center justify-between rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.72),_rgba(255,255,255,0.42))] px-4 py-3 shadow-[0_1px_6px_rgba(255,255,255,0.28),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl">
-        <div class="flex items-center gap-2">
+      <div class="mb-5 flex flex-col gap-3 rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.72),_rgba(255,255,255,0.42))] px-4 py-3 shadow-[0_1px_6px_rgba(255,255,255,0.28),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-wrap items-center gap-2">
           <span class="text-slate-700 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
           <span v-if="lastRefresh" class="text-xs text-slate-500">上次刷新: {{ lastRefresh }}</span>
         </div>
@@ -583,16 +583,16 @@ onUnmounted(() => {
               :key="index"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
-              <div class="flex justify-between items-start">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <a 
                   :href="item.url" 
                   target="_blank"
-                  class="text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600 flex-1" 
+                  class="min-w-0 flex-1 text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600" 
                 >
                   {{ item.title }}
                 </a>
                 <span 
-                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
+                  class="w-fit shrink-0 text-xs px-2 py-0.5 rounded sm:ml-2"
                   :class="{
                     'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
                     'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
@@ -608,8 +608,8 @@ onUnmounted(() => {
                   {{ item.platform }}
                 </span>
               </div>
-              <div class="flex justify-between items-center mt-2">
-                <div class="flex gap-1 flex-wrap">
+              <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-wrap gap-1">
                   <span 
                     v-for="kw in item.matched_keywords" 
                     :key="kw"
@@ -618,7 +618,7 @@ onUnmounted(() => {
                     {{ kw }}
                   </span>
                 </div>
-                <span class="rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-500">
+                <span class="w-fit rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-500 sm:ml-2">
                   {{ formatDisplayTime(item) }}
                 </span>
               </div>
@@ -644,16 +644,16 @@ onUnmounted(() => {
               :key="index"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
-              <div class="flex justify-between items-start">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <a 
                   :href="item.url" 
                   target="_blank"
-                  class="text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600 flex-1"
+                  class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
                 >
                   {{ item.title }}
                 </a>
                 <span 
-                  class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
+                  class="w-fit shrink-0 text-xs px-2 py-0.5 rounded sm:ml-2"
                   :class="{
                     'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
                     'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
@@ -669,8 +669,8 @@ onUnmounted(() => {
                   {{ item.platform }}
                 </span>
               </div>
-              <div class="flex justify-between items-center mt-2">
-                <div class="flex gap-1 flex-wrap">
+              <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-wrap gap-1">
                   <span 
                     v-for="kw in item.matched_keywords" 
                     :key="kw"
@@ -679,7 +679,7 @@ onUnmounted(() => {
                     {{ kw }}
                   </span>
                 </div>
-                <span class="rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-500">
+                <span class="w-fit rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-500 sm:ml-2">
                   {{ formatDisplayTime(item) }}
                 </span>
               </div>
@@ -694,16 +694,16 @@ onUnmounted(() => {
           :key="index"
           class="group rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.9),_rgba(244,248,252,0.78))] p-4 shadow-[0_1px_8px_rgba(255,255,255,0.26),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(238,244,249,0.86))] hover:shadow-[0_2px_10px_rgba(255,255,255,0.3),0_20px_44px_rgba(148,163,184,0.18)]"
         >
-          <div class="flex justify-between items-start">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <a 
               :href="item.url" 
               target="_blank"
-              class="text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600 flex-1"
+              class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
             >
               {{ item.title }}
             </a>
             <span 
-              class="text-xs px-2 py-0.5 rounded ml-2 shrink-0"
+              class="w-fit shrink-0 text-xs px-2 py-0.5 rounded sm:ml-2"
               :class="{
                 'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
                 'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
@@ -719,9 +719,9 @@ onUnmounted(() => {
               {{ item.platform }}
             </span>
           </div>
-          <div class="flex justify-between items-center mt-2">
+          <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <!-- 匹配关键词标签 -->
-            <div class="flex gap-1 flex-wrap">
+            <div class="flex flex-wrap gap-1">
               <span 
                 v-for="kw in item.matched_keywords" 
                 :key="kw"
@@ -731,7 +731,7 @@ onUnmounted(() => {
               </span>
             </div>
             <!-- 发布时间 -->
-            <span class="text-xs text-slate-400">
+            <span class="w-fit text-xs text-slate-400 sm:ml-2">
               {{ formatDisplayTime(item) }}
             </span>
           </div>
@@ -747,8 +747,8 @@ onUnmounted(() => {
     </main>
 
     <!-- 登录弹窗 -->
-    <div v-if="showLogin" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
-      <div class="glass-scroll relative w-80 mx-4 rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80">
+      <div v-if="showLogin" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">
+      <div class="glass-scroll relative max-h-[calc(100vh-max(2rem,env(safe-area-inset-top)+env(safe-area-inset-bottom)))] w-full max-w-sm overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-5 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl sm:p-6 before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80">
         <h2 class="text-lg font-semibold mb-4">登录/注册</h2>
         <input 
           v-model="username" 
@@ -775,8 +775,8 @@ onUnmounted(() => {
     </div>
 
     <!-- 账号管理弹窗 -->
-    <div v-if="showAccount" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md flex items-center justify-center z-50">
-      <div class="glass-scroll relative w-80 mx-4 max-h-[80vh] overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/40 after:pointer-events-none after:absolute after:inset-x-6 after:bottom-0 after:h-px after:bg-white/25">
+    <div v-if="showAccount" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">
+      <div class="glass-scroll relative max-h-[calc(100vh-max(2rem,env(safe-area-inset-top)+env(safe-area-inset-bottom)))] w-full max-w-sm overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-5 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl sm:p-6 before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/40 after:pointer-events-none after:absolute after:inset-x-6 after:bottom-0 after:h-px after:bg-white/25">
         <div class="mb-4">
           <div class="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">Workspace Settings</div>
           <h2 class="mt-1 text-lg font-semibold text-slate-800">账号管理</h2>
@@ -1110,6 +1110,27 @@ body::before {
 
 .glass-scroll::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, rgba(100, 116, 139, 0.56), rgba(148, 163, 184, 0.74));
+}
+
+@media (max-width: 640px) {
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .safe-area-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+
+  .glass-scroll {
+    max-height: calc(100vh - max(1rem, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+  }
+
+  header.safe-area-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-bottom: 0.5rem;
+  }
 }
 
 .account-section,
