@@ -313,15 +313,26 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
 
     user_id = config.user_id
 
+    import json
+
+    keywords = config.keywords or []
+    if isinstance(keywords, str):
+        keywords = json.loads(keywords) if keywords else []
+
+    blocked_keywords = config.blocked_keywords or []
+    if isinstance(blocked_keywords, str):
+        blocked_keywords = json.loads(blocked_keywords) if blocked_keywords else []
+
+    keyword_tags = config.keyword_tags or {}
+    if isinstance(keyword_tags, str):
+        keyword_tags = json.loads(keyword_tags) if keyword_tags else {}
+
     # 获取筛选后的新闻
-    news_list, matched_keywords = database.get_user_filtered_news(db, user_id, config.keywords or [])
+    news_list, matched_keywords = database.get_user_filtered_news(db, user_id, keywords)
 
     # 过滤屏蔽词
-    if config.blocked_keywords:
-        news_list = [n for n in news_list if not any(kw in n.title for kw in config.blocked_keywords)]
-
-    # 取最新10条
-    news_list = news_list[:10]
+    if blocked_keywords:
+        news_list = [n for n in news_list if not any(kw in n.title for kw in blocked_keywords)]
 
     if not news_list:
         return (False, "没有可推送的新闻")
@@ -330,7 +341,6 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
     time_str = datetime.now().strftime('%H:%M')
 
     # 按标签分组
-    keyword_tags = config.keyword_tags or {}
     keyword_to_tag = {}
     for tag, kws in keyword_tags.items():
         for kw in (kws or []):
