@@ -173,11 +173,19 @@ hot-news/
 docker compose up -d
 ```
 
+当前仓库只保留这一份主 `docker-compose.yml`。
+`JWT_SECRET` 已直接写在 compose 配置中，因此无需额外再准备 `.env`。
+
 ### 生产环境
 
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.16 (2026-05-25)
+- 优化：主界面从窄栏扩展为更适合桌面的多列平台卡片布局，降低信息拥挤感
+- 优化：平台卡片与新闻条目补充平台标识、序号层级与更新时间展示，提升可读性
+- 运维：Compose 部署收口为单一 `docker-compose.yml`，移除过时 `version` 字段，并同步 README 部署说明
 
 ### v2.5.15 (2026-05-24)
 - 修复：本地前端构建后自动同步静态资源到 `backend/api/static`，避免首页引用旧 hash 资源导致空白页
