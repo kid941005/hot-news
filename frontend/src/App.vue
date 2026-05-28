@@ -13,6 +13,8 @@ const news = ref([])
 const newsByKeyword = ref({})  // 按关键词分组的新闻
 const newsByPlatform = ref({})  // 按平台分组的新闻
 const platformOptions = ref([])
+const platformOrder = ref(JSON.parse(localStorage.getItem('platformOrder') || '[]'))
+const draggingPlatform = ref(null)
 const loading = ref(false)
 const showLogin = ref(false)
 const showAccount = ref(false)
@@ -104,11 +106,11 @@ const platformLogoUrls = {
   '澎湃': 'https://www.google.com/s2/favicons?sz=64&domain=thepaper.cn',
   '凤凰': 'https://www.google.com/s2/favicons?sz=64&domain=ifeng.com',
   '少数派': 'https://www.google.com/s2/favicons?sz=64&domain=sspai.com',
-  '腾讯新闻': 'https://www.google.com/s2/favicons?sz=64&domain=news.qq.com',
-  '靠谱新闻': 'https://www.google.com/s2/favicons?sz=64&domain=kaopunews.com',
-  '参考消息': 'https://www.google.com/s2/favicons?sz=64&domain=cankaoxiaoxi.com',
-  '虎扑': 'https://www.google.com/s2/favicons?sz=64&domain=hupu.com',
-  '百度贴吧': 'https://www.google.com/s2/favicons?sz=64&domain=tieba.baidu.com'
+  '腾讯新闻': '/icons/tencent.png',
+  '靠谱新闻': '/icons/kaopu.png',
+  '参考消息': '/icons/cankaoxiaoxi.png',
+  '虎扑': '/icons/hupu.png',
+  '百度贴吧': '/icons/tieba.png'
 }
 
 function getPlatformLogo(platform) {
@@ -138,6 +140,30 @@ const newsCount = computed(() => {
   }
   return Object.values(newsByKeyword.value).reduce((sum, items) => sum + items.length, 0)
 })
+
+const orderedPlatformEntries = computed(() => {
+  const entries = Object.entries(newsByPlatform.value)
+  const order = platformOrder.value
+  return entries.sort(([a], [b]) => {
+    const ai = order.indexOf(a)
+    const bi = order.indexOf(b)
+    if (ai === -1 && bi === -1) return 0
+    if (ai === -1) return 1
+    if (bi === -1) return -1
+    return ai - bi
+  })
+})
+
+function movePlatform(targetPlatform) {
+  if (!draggingPlatform.value || draggingPlatform.value === targetPlatform) return
+  const current = orderedPlatformEntries.value.map(([platform]) => platform)
+  const from = current.indexOf(draggingPlatform.value)
+  const to = current.indexOf(targetPlatform)
+  if (from === -1 || to === -1) return
+  current.splice(to, 0, current.splice(from, 1)[0])
+  platformOrder.value = current
+  localStorage.setItem('platformOrder', JSON.stringify(current))
+}
 
 // 请求头
 function getAuthHeader() {
@@ -619,11 +645,18 @@ onUnmounted(() => {
 
       <!-- 新闻列表 -->
       <!-- 按平台分组显示（全部标签） -->
-      <div v-if="Object.keys(newsByPlatform).length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-        <div 
-          v-for="(platformNews, platform) in newsByPlatform" 
+      <div v-if="orderedPlatformEntries.length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <div
+          v-for="[platform, platformNews] in orderedPlatformEntries"
           :key="platform"
+          draggable="true"
+          @dragstart="draggingPlatform = platform"
+          @dragover.prevent
+          @dragenter.prevent="movePlatform(platform)"
+          @drop.prevent="movePlatform(platform); draggingPlatform = null"
+          @dragend="draggingPlatform = null"
           class="flex h-full flex-col overflow-hidden rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.9),_rgba(244,248,252,0.78))] shadow-[0_1px_8px_rgba(255,255,255,0.26),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl lg:min-h-[34rem]"
+          :class="draggingPlatform === platform ? 'opacity-60' : ''"
         >
           <!-- 平台标题 -->
           <div class="px-4 py-3 bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0.38))] border-b border-white/60 flex justify-between items-center">
@@ -637,7 +670,7 @@ onUnmounted(() => {
                 <div v-if="lastRefresh" class="text-[11px] text-slate-400">更新于 {{ lastRefresh }}</div>
               </div>
             </div>
-            <span class="text-xs text-slate-500">{{ platformNews.length }}条</span>
+            <span class="text-xs text-slate-500">拖拽排序 · {{ platformNews.length }}条</span>
           </div>
           <!-- 平台新闻列表 -->
           <div class="glass-scroll flex-1 divide-y divide-white/10 lg:max-h-[28rem] lg:overflow-y-auto">
