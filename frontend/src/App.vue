@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
+import packageInfo from '../package.json'
 
 const API_URL = ''  // 通过代理访问
+const appVersion = packageInfo.version
 
 // 状态
 const currentUser = ref(localStorage.getItem('username') || null)
@@ -617,7 +619,7 @@ onUnmounted(() => {
 
       <!-- 新闻列表 -->
       <!-- 按平台分组显示（全部标签） -->
-      <div v-if="Object.keys(newsByPlatform).length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+      <div v-if="Object.keys(newsByPlatform).length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <div 
           v-for="(platformNews, platform) in newsByPlatform" 
           :key="platform"
@@ -811,6 +813,10 @@ onUnmounted(() => {
         暂无匹配的热点资讯
       </div>
     </main>
+
+    <footer class="relative max-w-6xl mx-auto px-4 pb-6 text-center text-xs text-slate-400">
+      v{{ appVersion }}
+    </footer>
 
     <!-- 登录弹窗 -->
       <div v-if="showLogin" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">

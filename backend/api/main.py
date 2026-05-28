@@ -579,7 +579,7 @@ def get_news_by_platform(
         news_items = db.query(News).filter(News.platform == platform).order_by(News.id.desc()).all()
         items = [n.to_dict() for n in news_items]
         if items:
-            platform_news[platform] = items[:10]  # 每个平台最多10条
+            platform_news[platform] = items
     
     return {
         "success": True,
