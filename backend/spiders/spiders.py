@@ -382,51 +382,6 @@ class SspaiSpider(BaseSpider):
             return []
 
 
-class V2exSpider(BaseSpider):
-    """V2EX - 使用HTML解析"""
-    name = "v2ex"
-    
-    def fetch(self) -> List[dict]:
-        # 使用V2EX热榜HTML页面
-        items = []
-        
-        try:
-            # 尝试多个标签页
-            tabs = ["", "tech", "creative", "play", "money"]
-            
-            for tab in tabs[:2]:  # 只尝试前2个，减少超时
-                url = f"https://www.v2ex.com/{'/?tab=' + tab if tab else ''}"
-                resp = requests.get(url, timeout=15)
-                soup = BeautifulSoup(resp.text, 'html.parser')
-                
-                for item in soup.select(".cell.item")[:15]:
-                    title_elem = item.select_one(".item_title a")
-                    if title_elem:
-                        title = title_elem.get_text(strip=True)
-                        href = title_elem.get("href", "")
-                        if title:
-                            items.append({
-                                "platform": "V2EX",
-                                "title": title,
-                                "url": f"https://www.v2ex.com{href}",
-                                "hot": "",
-                                "time": ""
-                            })
-            
-            # 去重
-            seen = set()
-            unique_items = []
-            for item in items:
-                if item["title"] not in seen:
-                    seen.add(item["title"])
-                    unique_items.append(item)
-            
-            return unique_items[:30]
-        except Exception as e:
-            print(f"❌ V2EX: {e}")
-            return []
-
-
 class GitHubSpider(BaseSpider):
     """GitHubTrending"""
     name = "github"
@@ -449,74 +404,6 @@ class GitHubSpider(BaseSpider):
             return items
         except Exception as e:
             print(f"❌ GitHub: {e}")
-            return []
-
-
-class Jin10Spider(BaseSpider):
-    """金十数据 - 使用备用API"""
-    name = "jin10"
-    
-    def fetch(self) -> List[dict]:
-        # 尝试不同的API端点
-        urls = [
-            "https://flash-api.jin10.com/get_flash_list?channel=-8200",
-            "https://push2.eastmoney.com/api/qt/ulist.np/get",
-        ]
-        
-        for url in urls:
-            try:
-                resp = requests.get(url, timeout=10, headers={
-                    "x-app-id": "b593066b2fcf4506b4e5",
-                    "x-version": "1.0.0",
-                    "User-Agent": "Mozilla/5.0"
-                })
-                
-                if "jin10" in url:
-                    data = resp.json()
-                    items = []
-                    for item in data.get("data", [])[:20]:
-                        items.append({
-                            "platform": "金十数据",
-                            "title": item.get("title", ""),
-                            "url": item.get("url", ""),
-                            "hot": str(item.get("time", "")),
-                            "time": item.get("time", "")[:5] if item.get("time") else datetime.now().strftime("%H:%M")
-                        })
-                    return items
-                elif "eastmoney" in url:
-                    data = resp.json()
-                    items = []
-                    for item in data.get("data", {}).get("diff", [])[:20]:
-                        items.append({
-                            "platform": "金十数据",
-                            "title": item.get("name", ""),
-                            "url": f"https://quote.eastmoney.com/{item.get('c', '')}.html",
-                            "hot": str(item.get("pct", "")),
-                            "time": ""
-                        })
-                    return items
-                    
-            except Exception as e:
-                print(f"尝试 {url} 失败: {e}")
-                continue
-        
-        # 如果都失败，使用东方财富作为替代
-        try:
-            url = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f28,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f104,f105,f106"
-            resp = requests.get(url, timeout=10)
-            data = resp.json()
-            items = []
-            for item in data.get("data", {}).get("diff", [])[:20]:
-                items.append({
-                    "platform": "金十数据",
-                    "title": item.get("name", ""),
-                    "url": f"https://quote.eastmoney.com/{item.get('c', '')}.html",
-                    "hot": f"{item.get('pct', 0)}%",
-                    "time": ""
-                })
-            return items
-        except Exception as e:
-            print(f"❌ 金十数据: {e}")
             return []
 
 
@@ -804,16 +691,3 @@ async def fetch_all_spiders(platforms: List[str] = None) -> dict:
             results[platform] = []
     
     return results
-
-
-async def fetch_all_spiders_with_status(platforms: List[str] = None) -> tuple:
-    """获取所有平台热点，并返回每个平台的抓取状态"""
-    results = await fetch_all_spiders(platforms)
-    status = {
-        platform: {
-            "status": "success" if news else "empty",
-            "count": len(news),
-        }
-        for platform, news in results.items()
-    }
-    return results, status
