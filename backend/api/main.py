@@ -405,7 +405,7 @@ def scheduled_refresh():
     from backend.models.models import SessionLocal
     db = SessionLocal()
     try:
-        saved_count = refresh_news_data(db)
+        saved_count, _ = refresh_news_data(db)
         global LAST_REFRESH_TIME
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
         print(f"🔄 定时刷新完成，共保存 {saved_count} 条新闻")
@@ -595,15 +595,20 @@ def refresh_news_data(db: Session, results: dict = None):
     if results is None:
         results = awaitable_fetch_all_spiders()
     saved_count = 0
+    sources = {}
     for platform, news in results.items():
         if news:
             try:
                 database.save_news(db, news)
                 saved_count += len(news)
+                sources[platform] = {"status": "success", "count": len(news)}
                 print(f"✅ 保存 {platform}: {len(news)} 条")
             except Exception as e:
+                sources[platform] = {"status": "error", "count": 0, "error": str(e)}
                 print(f"❌ 保存失败 {platform}: {e}")
-    return saved_count
+        else:
+            sources[platform] = {"status": "empty", "count": 0}
+    return saved_count, sources
 
 
 def awaitable_fetch_all_spiders():
@@ -616,23 +621,30 @@ async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session 
     global LAST_REFRESH_TIME
     try:
         results = await spiders.fetch_all_spiders()
-        saved_count = refresh_news_data(db, results)
+        saved_count, sources = refresh_news_data(db, results)
         print(f"📊 共保存 {saved_count} 条新闻")
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
-        return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count}
+        return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count, "sources": sources}
     except Exception as e:
         print(f"❌ 刷新失败: {e}")
         return {"success": False, "error": str(e)}
 
 
 @app.get("/api/news/refresh")
-def get_refresh_time():
+def get_refresh_time(db: Session = Depends(get_db)):
     global LAST_REFRESH_TIME
     if LAST_REFRESH_TIME:
         return {
             "success": True,
             "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"),
             "display": LAST_REFRESH_TIME.strftime("%H:%M")
+        }
+    latest = db.query(News).order_by(News.updated_at.desc()).first()
+    if latest and latest.updated_at:
+        return {
+            "success": True,
+            "last_refresh": latest.updated_at.isoformat() + "Z",
+            "display": latest.updated_at.strftime("%H:%M")
         }
     return {"success": True, "last_refresh": None}
 

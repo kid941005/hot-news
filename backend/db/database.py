@@ -27,6 +27,11 @@ PLATFORM_MAP = {
     "github": "GitHub",
     "ithome": "IT之家",
     "36kr": "36Kr",
+    "tencent": "腾讯新闻",
+    "kaopu": "靠谱新闻",
+    "cankaoxiaoxi": "参考消息",
+    "hupu": "虎扑",
+    "tieba": "百度贴吧",
 }
 
 def save_news(db: Session, news_list: List[dict]):

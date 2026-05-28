@@ -79,7 +79,12 @@ const platformLogos = {
   '华尔街见闻': '华',
   '澎湃': '澎',
   '凤凰': '凤',
-  '少数派': '少'
+  '少数派': '少',
+  '腾讯新闻': '腾',
+  '靠谱新闻': '靠',
+  '参考消息': '参',
+  '虎扑': '虎',
+  '百度贴吧': '吧'
 }
 
 const platformLogoUrls = {
@@ -96,7 +101,12 @@ const platformLogoUrls = {
   '华尔街见闻': 'https://www.google.com/s2/favicons?sz=64&domain=wallstreetcn.com',
   '澎湃': 'https://www.google.com/s2/favicons?sz=64&domain=thepaper.cn',
   '凤凰': 'https://www.google.com/s2/favicons?sz=64&domain=ifeng.com',
-  '少数派': 'https://www.google.com/s2/favicons?sz=64&domain=sspai.com'
+  '少数派': 'https://www.google.com/s2/favicons?sz=64&domain=sspai.com',
+  '腾讯新闻': 'https://www.google.com/s2/favicons?sz=64&domain=news.qq.com',
+  '靠谱新闻': 'https://www.google.com/s2/favicons?sz=64&domain=kaopunews.com',
+  '参考消息': 'https://www.google.com/s2/favicons?sz=64&domain=cankaoxiaoxi.com',
+  '虎扑': 'https://www.google.com/s2/favicons?sz=64&domain=hupu.com',
+  '百度贴吧': 'https://www.google.com/s2/favicons?sz=64&domain=tieba.baidu.com'
 }
 
 function getPlatformLogo(platform) {
@@ -656,26 +666,6 @@ onUnmounted(() => {
                     >
                       {{ item.title }}
                     </a>
-                    <span 
-                      class="inline-flex w-fit shrink-0 items-center gap-1.5 text-xs px-2 py-1 rounded-full sm:ml-2"
-                      :class="{
-                        'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
-                        'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
-                        'bg-pink-100/85 text-pink-600 border border-pink-200': item.platform === 'B站',
-                        'bg-orange-100/85 text-orange-600 border border-orange-200': item.platform === '抖音',
-                        'bg-green-100/85 text-green-600 border border-green-200': item.platform === '36kr',
-                        'bg-cyan-100/85 text-cyan-600 border border-cyan-200': item.platform === 'IT之家',
-                        'bg-indigo-100/85 text-indigo-600 border border-indigo-200': item.platform === '知乎',
-                        'bg-yellow-100/85 text-yellow-700 border border-yellow-200': item.platform === '头条',
-                        'bg-slate-100/85 text-slate-700 border border-slate-200': !['微博','百度','B站','抖音','36kr','IT之家','知乎','头条'].includes(item.platform)
-                      }"
-                    >
-                      <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center overflow-hidden rounded-full bg-white/70 px-1 text-[10px] font-semibold leading-none">
-                        <img v-if="getPlatformLogoUrl(item.platform)" :src="getPlatformLogoUrl(item.platform)" :alt="item.platform" class="h-3.5 w-3.5 object-contain" referrerpolicy="no-referrer" />
-                        <span v-else>{{ getPlatformLogo(item.platform) }}</span>
-                      </span>
-                      <span>{{ item.platform }}</span>
-                    </span>
                   </div>
                   <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex flex-wrap gap-1">

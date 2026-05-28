@@ -520,6 +520,151 @@ class Jin10Spider(BaseSpider):
             return []
 
 
+class TencentSpider(BaseSpider):
+    """腾讯新闻"""
+    name = "tencent"
+
+    def fetch(self) -> List[dict]:
+        url = "https://i.news.qq.com/web_backend/v2/getTagInfo?tagId=aEWqxLtdgmQ%3D"
+        try:
+            resp = requests.get(url, timeout=10, headers={
+                "User-Agent": "Mozilla/5.0",
+                "Referer": "https://news.qq.com/",
+            })
+            data = resp.json()
+            articles = data.get("data", {}).get("tabs", [{}])[0].get("articleList", [])
+            items = []
+            for item in articles[:20]:
+                link_info = item.get("link_info", {})
+                title = item.get("title", "")
+                url = link_info.get("url", "")
+                if title and url:
+                    items.append({
+                        "platform": "腾讯新闻",
+                        "title": title,
+                        "url": url,
+                        "hot": "",
+                        "time": "",
+                    })
+            return items
+        except Exception as e:
+            print(f"❌ 腾讯新闻: {e}")
+            return []
+
+
+class KaopuSpider(BaseSpider):
+    """靠谱新闻"""
+    name = "kaopu"
+
+    def fetch(self) -> List[dict]:
+        url = "https://kaopustorage.blob.core.windows.net/news-prod/news_list_hans_0.json"
+        try:
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            data = resp.json()
+            items = []
+            for item in data[:20]:
+                publisher = item.get("publisher", "")
+                if publisher in {"财新", "公视"}:
+                    continue
+                title = item.get("title", "")
+                link = item.get("link", "")
+                if title and link:
+                    items.append({
+                        "platform": "靠谱新闻",
+                        "title": title,
+                        "url": link,
+                        "hot": publisher,
+                        "time": "",
+                    })
+            return items
+        except Exception as e:
+            print(f"❌ 靠谱新闻: {e}")
+            return []
+
+
+class CankaoXiaoxiSpider(BaseSpider):
+    """参考消息"""
+    name = "cankaoxiaoxi"
+
+    def fetch(self) -> List[dict]:
+        channels = ["zhongguo", "guandian", "gj"]
+        items = []
+        try:
+            for channel in channels:
+                url = f"https://china.cankaoxiaoxi.com/json/channel/{channel}/list.json"
+                resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+                data = resp.json()
+                for row in data.get("list", [])[:10]:
+                    item = row.get("data", {})
+                    title = item.get("title", "")
+                    link = item.get("url", "")
+                    if title and link:
+                        items.append({
+                            "platform": "参考消息",
+                            "title": title,
+                            "url": link,
+                            "hot": "",
+                            "time": "",
+                        })
+            return items[:20]
+        except Exception as e:
+            print(f"❌ 参考消息: {e}")
+            return []
+
+
+class HupuSpider(BaseSpider):
+    """虎扑"""
+    name = "hupu"
+
+    def fetch(self) -> List[dict]:
+        url = "https://bbs.hupu.com/topic-daily-hot"
+        try:
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            matches = re.findall(r'<a href="(/[^"]+?\.html)"[^>]*?class="p-title"[^>]*>([^<]+)</a>', resp.text)
+            items = []
+            for path, title in matches[:20]:
+                title = BeautifulSoup(title, "html.parser").get_text(strip=True)
+                if title:
+                    items.append({
+                        "platform": "虎扑",
+                        "title": title,
+                        "url": f"https://bbs.hupu.com{path}",
+                        "hot": "",
+                        "time": "",
+                    })
+            return items
+        except Exception as e:
+            print(f"❌ 虎扑: {e}")
+            return []
+
+
+class TiebaSpider(BaseSpider):
+    """百度贴吧"""
+    name = "tieba"
+
+    def fetch(self) -> List[dict]:
+        url = "https://tieba.baidu.com/hottopic/browse/topicList"
+        try:
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            data = resp.json()
+            items = []
+            for item in data.get("data", {}).get("bang_topic", {}).get("topic_list", [])[:20]:
+                title = item.get("topic_name", "")
+                link = item.get("topic_url", "")
+                if title and link:
+                    items.append({
+                        "platform": "百度贴吧",
+                        "title": title,
+                        "url": link,
+                        "hot": "",
+                        "time": "",
+                    })
+            return items
+        except Exception as e:
+            print(f"❌ 百度贴吧: {e}")
+            return []
+
+
 class IthomeSpider(BaseSpider):
     """IT之家"""
     name = "ithome"
@@ -628,6 +773,11 @@ SPIDERS = {
     "github": GitHubSpider,
     "ithome": IthomeSpider,
     "36kr": Kr36Spider,
+    "tencent": TencentSpider,
+    "kaopu": KaopuSpider,
+    "cankaoxiaoxi": CankaoXiaoxiSpider,
+    "hupu": HupuSpider,
+    "tieba": TiebaSpider,
 }
 
 
@@ -654,3 +804,16 @@ async def fetch_all_spiders(platforms: List[str] = None) -> dict:
             results[platform] = []
     
     return results
+
+
+async def fetch_all_spiders_with_status(platforms: List[str] = None) -> tuple:
+    """获取所有平台热点，并返回每个平台的抓取状态"""
+    results = await fetch_all_spiders(platforms)
+    status = {
+        platform: {
+            "status": "success" if news else "empty",
+            "count": len(news),
+        }
+        for platform, news in results.items()
+    }
+    return results, status
