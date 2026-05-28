@@ -123,7 +123,46 @@ curl http://localhost:16888/api/news \
 # 手动刷新热点（需认证）
 curl -X POST http://localhost:16888/api/news/refresh \
   -H "Authorization: Bearer YOUR_TOKEN"
+
+
+### MCP 服务
+
+其他 Agent 可通过 MCP 调用热点数据。
+
+stdio 启动：
+
+```bash
+python -m backend.mcp_server
 ```
+
+Streamable HTTP 启动：
+
+```bash
+MCP_HOST=0.0.0.0 MCP_PORT=8000 python -m backend.mcp_server --transport streamable-http
+```
+
+HTTP MCP 地址：`http://localhost:8000/mcp`。
+
+Hermes Agent stdio 示例：
+
+```yaml
+mcp_servers:
+  hot_news:
+    command: "python"
+    args: ["-m", "backend.mcp_server"]
+    env:
+      DATABASE_URL: "sqlite:////app/backend/hot_news.db"
+```
+
+Hermes Agent HTTP 示例：
+
+```yaml
+mcp_servers:
+  hot_news:
+    url: "http://127.0.0.1:8000/mcp"
+```
+
+提供工具：`list_platforms`、`get_latest_news`、`search_news`、`get_news_by_platform`。
 
 ## 📁 项目结构
 
@@ -139,6 +178,7 @@ hot-news/
 │   │   └── models.py     # 数据模型
 │   ├── spiders/
 │   │   └── spiders.py    # 爬虫模块
+│   ├── mcp_server.py     # MCP stdio 服务入口
 │   └── requirements.txt  # 后端依赖
 ├── frontend/             # Vue3 前端源码
 │   ├── src/
@@ -162,6 +202,10 @@ hot-news/
 | `DATABASE_URL` | 数据库连接 | `sqlite:///./hot_news.db` |
 | `REFRESH_INTERVAL_MINUTES` | 独立定时刷新新闻的间隔分钟数 | `15` |
 | `PUSH_INTERVAL_HOURS` | 推送间隔小时数（兼容旧配置） | `4` |
+| `MCP_HOST` | Streamable HTTP MCP 监听地址 | `127.0.0.1` |
+| `MCP_PORT` | Streamable HTTP MCP 监听端口 | `8000` |
+| `MCP_PATH` | Streamable HTTP MCP 路径 | `/mcp` |
+| `MCP_TRANSPORT` | MCP 默认传输方式，支持 `stdio` / `streamable-http` | `stdio` |
 
 ### 推送配置
 
@@ -186,6 +230,11 @@ docker compose up -d
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.21 (2026-05-28)
+- 新增：提供 Hot News MCP 服务，支持其他 Agent 读取热点数据
+- 新增：支持 stdio 与 Streamable HTTP 两种 MCP 启动方式
+- 文档：补充 MCP 启动、HTTP 地址和 Hermes Agent 配置示例
 
 ### v2.5.20 (2026-05-28)
 - 优化：底部展示当前版本号，便于确认运行版本
