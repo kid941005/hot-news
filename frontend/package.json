@@ -1,11 +1,11 @@
 {
   "name": "hot-news-frontend",
-  "version": "2.5.16",
+  "version": "2.5.17",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && rm -rf ../backend/api/static/* && cp -r dist/* ../backend/api/static/",
+    "build": "vite build && mkdir -p ../backend/api/static && rm -rf ../backend/api/static/* && cp -r dist/* ../backend/api/static/",
     "preview": "vite preview"
   },
   "dependencies": {
