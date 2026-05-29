@@ -3,6 +3,7 @@
 FastAPI 应用 - 带Vue3前端
 """
 import os
+import logging
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
@@ -11,11 +12,15 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
+from backend.logging_config import setup_logging
 from backend.models.models import init_db, get_db, UserConfig, ensure_user_config_schema, SessionLocal
 from backend.db import database
 from backend.db.database import PLATFORM_MAP
 from backend.spiders import spiders
 from backend.models.models import News
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 from datetime import timezone
 
@@ -254,7 +259,7 @@ def push_to_feishu(webhook: str, content: str) -> bool:
             return result.get("code", 0) == 0
         return False
     except Exception as e:
-        print(f"飞书推送失败: {e}")
+        logger.exception("飞书推送失败")
         return False
 
 
@@ -278,7 +283,7 @@ def push_to_dingtalk(webhook: str, content: str) -> bool:
             return result.get("errcode", 0) == 0
         return False
     except Exception as e:
-        print(f"钉钉推送失败: {e}")
+        logger.exception("钉钉推送失败")
         return False
 
 
@@ -302,7 +307,7 @@ def push_to_bark(webhook: str, content: str) -> bool:
             return result.get("code", 200) == 200
         return False
     except Exception as e:
-        print(f"Bark 推送失败: {e}")
+        logger.exception("Bark 推送失败")
         return False
 
 
@@ -408,9 +413,9 @@ def scheduled_refresh():
         saved_count, _ = refresh_news_data(db)
         global LAST_REFRESH_TIME
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
-        print(f"🔄 定时刷新完成，共保存 {saved_count} 条新闻")
+        logger.info("🔄 定时刷新完成，共保存 %s 条新闻", saved_count)
     except Exception as e:
-        print(f"❌ 定时刷新失败: {e}")
+        logger.exception("❌ 定时刷新失败")
     finally:
         db.close()
 
@@ -432,7 +437,7 @@ def scheduled_push():
             try:
                 trigger = CronTrigger.from_crontab(cron_str, timezone=UTC)
             except (ValueError, KeyError):
-                print(f"⚠️ 用户{config.user_id} cron 表达式无效: {cron_str}")
+                logger.warning("⚠️ 用户%s cron 表达式无效: %s", config.user_id, cron_str)
                 continue
             # 判断是否需要推送
             if config.last_push_at is None:
@@ -444,12 +449,12 @@ def scheduled_push():
             if should_push:
                 refresh_news_data(db)
                 success, message = _push_for_user(db, config)
-                print(f"📬 定时推送 [用户{config.user_id}] {message}")
+                logger.info("📬 定时推送 [用户%s] %s", config.user_id, message)
                 if success:
                     config.last_push_at = now
                     db.commit()
     except Exception as e:
-        print(f"❌ 定时推送失败: {e}")
+        logger.exception("❌ 定时推送失败")
     finally:
         db.close()
 
@@ -460,15 +465,15 @@ def start_scheduler():
     scheduler.add_job(scheduled_refresh, 'interval', minutes=REFRESH_INTERVAL_MINUTES, id='refresh_job')
     scheduler.add_job(scheduled_push, 'interval', minutes=1, id='push_job')
     scheduler.start()
-    print(f"⏰ 定时刷新已启动（每 {REFRESH_INTERVAL_MINUTES} 分钟抓取一次）")
-    print("⏰ 定时推送已启动（每分钟检查 cron 表达式）")
+    logger.info("⏰ 定时刷新已启动（每 %s 分钟抓取一次）", REFRESH_INTERVAL_MINUTES)
+    logger.info("⏰ 定时推送已启动（每分钟检查 cron 表达式）")
 
 
 @app.on_event("shutdown")
 def stop_scheduler():
     """关闭定时推送调度器"""
     scheduler.shutdown(wait=False)
-    print("⏰ 定时推送已关闭")
+    logger.info("⏰ 定时推送已关闭")
 
 
 @app.post("/api/push")
@@ -602,10 +607,10 @@ def refresh_news_data(db: Session, results: dict = None):
                 database.save_news(db, news)
                 saved_count += len(news)
                 sources[platform] = {"status": "success", "count": len(news)}
-                print(f"✅ 保存 {platform}: {len(news)} 条")
+                logger.info("✅ 保存 %s: %s 条", platform, len(news))
             except Exception as e:
                 sources[platform] = {"status": "error", "count": 0, "error": str(e)}
-                print(f"❌ 保存失败 {platform}: {e}")
+                logger.exception("❌ 保存失败 %s", platform)
         else:
             sources[platform] = {"status": "empty", "count": 0}
     return saved_count, sources
@@ -622,11 +627,11 @@ async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session 
     try:
         results = await spiders.fetch_all_spiders()
         saved_count, sources = refresh_news_data(db, results)
-        print(f"📊 共保存 {saved_count} 条新闻")
+        logger.info("📊 共保存 %s 条新闻", saved_count)
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
         return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count, "sources": sources}
     except Exception as e:
-        print(f"❌ 刷新失败: {e}")
+        logger.exception("❌ 刷新失败")
         return {"success": False, "error": str(e)}
 
 

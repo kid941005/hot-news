@@ -2,12 +2,15 @@
 """
 爬虫模块 - 扩展版
 """
+import logging
 import json
 import re
 import requests
 from bs4 import BeautifulSoup
 from typing import List
 from datetime import datetime, timezone
+
+logger = logging.getLogger(__name__)
 
 
 def format_beijing_timestamp(timestamp) -> str:
@@ -74,7 +77,7 @@ class WeiboSpider(BaseSpider):
                     })
             return items
         except Exception as e:
-            print(f"❌ 微博: {e}")
+            logger.exception("❌ 微博")
             return []
 
 
@@ -110,7 +113,7 @@ class BaiduSpider(BaseSpider):
                 })
             return items
         except Exception as e:
-            print(f"❌ 百度: {e}")
+            logger.exception("❌ 百度")
             return []
 
 
@@ -142,7 +145,7 @@ class BilibiliSpider(BaseSpider):
                 })
             return items
         except Exception as e:
-            print(f"❌ B站: {e}")
+            logger.exception("❌ B站")
             return []
 
 
@@ -191,7 +194,7 @@ class ZhihuSpider(BaseSpider):
                 })
             return items
         except Exception as e:
-            print(f"❌ 知乎: {e}")
+            logger.exception("❌ 知乎")
             return []
 
 
@@ -229,7 +232,7 @@ class ToutiaoSpider(BaseSpider):
                     })
             return items[:30]
         except Exception as e:
-            print(f"❌ 头条: {e}")
+            logger.exception("❌ 头条")
             return []
 
 
@@ -258,7 +261,7 @@ class WallstreetcnSpider(BaseSpider):
                 })
             return items
         except Exception as e:
-            print(f"❌ 华尔街见闻: {e}")
+            logger.exception("❌ 华尔街见闻")
             return []
 
 
@@ -310,7 +313,7 @@ class ThepaperSpider(BaseSpider):
             
             return items
         except Exception as e:
-            print(f"❌ 澎湃: {e}")
+            logger.exception("❌ 澎湃")
             return []
 
 
@@ -350,7 +353,7 @@ class IfengSpider(BaseSpider):
             
             return unique_items[:20]
         except Exception as e:
-            print(f"❌ 凤凰: {e}")
+            logger.exception("❌ 凤凰")
             return []
 
 
@@ -378,7 +381,7 @@ class SspaiSpider(BaseSpider):
                 })
             return items
         except Exception as e:
-            print(f"❌ 少数派: {e}")
+            logger.exception("❌ 少数派")
             return []
 
 
@@ -403,7 +406,7 @@ class GitHubSpider(BaseSpider):
                 })
             return items
         except Exception as e:
-            print(f"❌ GitHub: {e}")
+            logger.exception("❌ GitHub")
             return []
 
 
@@ -435,7 +438,7 @@ class TencentSpider(BaseSpider):
                     })
             return items
         except Exception as e:
-            print(f"❌ 腾讯新闻: {e}")
+            logger.exception("❌ 腾讯新闻")
             return []
 
 
@@ -465,7 +468,7 @@ class KaopuSpider(BaseSpider):
                     })
             return items
         except Exception as e:
-            print(f"❌ 靠谱新闻: {e}")
+            logger.exception("❌ 靠谱新闻")
             return []
 
 
@@ -495,7 +498,7 @@ class CankaoXiaoxiSpider(BaseSpider):
                         })
             return items[:20]
         except Exception as e:
-            print(f"❌ 参考消息: {e}")
+            logger.exception("❌ 参考消息")
             return []
 
 
@@ -521,7 +524,7 @@ class HupuSpider(BaseSpider):
                     })
             return items
         except Exception as e:
-            print(f"❌ 虎扑: {e}")
+            logger.exception("❌ 虎扑")
             return []
 
 
@@ -548,7 +551,7 @@ class TiebaSpider(BaseSpider):
                     })
             return items
         except Exception as e:
-            print(f"❌ 百度贴吧: {e}")
+            logger.exception("❌ 百度贴吧")
             return []
 
 
@@ -592,7 +595,7 @@ class IthomeSpider(BaseSpider):
             
             return results
         except Exception as e:
-            print(f"❌ IT之家: {e}")
+            logger.exception("❌ IT之家")
             return []
 
 
@@ -641,7 +644,7 @@ class Kr36Spider(BaseSpider):
                         })
                 return items
             except Exception as e2:
-                print(f"❌ 36Kr: {e2}")
+                logger.exception("❌ 36Kr")
                 return []
 
 
@@ -685,9 +688,9 @@ async def fetch_all_spiders(platforms: List[str] = None) -> dict:
             spider = SPIDERS[platform]()
             news = await asyncio.to_thread(spider.fetch)
             results[platform] = news
-            print(f"✅ {spider.name}: 获取 {len(news)} 条")
+            logger.info("✅ %s: 获取 %s 条", spider.name, len(news))
         except Exception as e:
-            print(f"❌ {platform}: {e}")
+            logger.exception("❌ %s", platform)
             results[platform] = []
     
     return results

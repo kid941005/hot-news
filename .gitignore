@@ -23,3 +23,7 @@ Thumbs.db
 # Logs
 *.log
 nohup.out
+
+# Local analysis indexes
+.codegraph/
+.understand-anything/
