@@ -7,14 +7,9 @@ import os
 import sys
 import json
 import urllib.request
-import ssl
 import re
 from datetime import datetime
 from urllib.parse import quote
-
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -31,7 +26,7 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 
 def fetch(url, timeout=10):
     req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, context=ctx, timeout=timeout) as resp:
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read().decode('utf-8'))
 
 # ============== 缓存管理 ==============
@@ -97,7 +92,7 @@ def fetch_baidu():
     """百度热搜"""
     try:
         req = urllib.request.Request("https://top.baidu.com/board?tab=realtime", headers=HEADERS)
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10) as resp:
             html = resp.read().decode('utf-8')
             matches = re.findall(r'"content_(\d+)":\s*\{[^}]*"title":"([^"]+)"[^}]*"hotScore":(\d+)', html)
             if matches:
@@ -137,7 +132,7 @@ def fetch_douyin():
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15',
             'Referer': 'https://www.douyin.com/'
         })
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8'))
             return [{
                 'platform': '抖音',
@@ -172,7 +167,7 @@ def fetch_toutiao():
             "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc",
             headers={'User-Agent': 'Mozilla/5.0'}
         )
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8'))
             return [{
                 'platform': '头条',
@@ -222,7 +217,7 @@ def fetch_ithome():
             "https://www.ithome.com/list/",
             headers={'User-Agent': 'Mozilla/5.0'}
         )
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10) as resp:
             html = resp.read().decode('utf-8')
             import re
             # 解析标题、链接和时间

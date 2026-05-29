@@ -118,12 +118,12 @@ curl -X POST http://localhost:16888/api/login \
 
 # 获取热点（需认证）
 curl http://localhost:16888/api/news \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-Auth-Token: PLACEHOLDER_TOKEN"
 
 # 手动刷新热点（需认证）
 curl -X POST http://localhost:16888/api/news/refresh \
-  -H "Authorization: Bearer YOUR_TOKEN"
-
+  -H "X-Auth-Token: PLACEHOLDER_TOKEN"
+```
 
 ### MCP 服务
 
@@ -230,6 +230,13 @@ docker compose up -d
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.24 (2026-05-29)
+- 安全：限制推送 Webhook 目标，降低 SSRF 风险，并将微博、头条 Cookie 改为可选环境变量
+- 稳定：爬虫刷新支持有限并发、单平台超时和 HTTP 状态码检查，推送不再触发全量刷新
+- 稳定：数据库保存失败时回滚事务，定时任务启动/停止避免重复注册异常
+- 优化：`/api/news/by_platform` 增加每平台默认上限，前端外链补充 `rel="noopener noreferrer"`
+- 运维：清理旧脚本不安全 TLS 绕过，补充安全与稳定性回归测试
 
 ### v2.5.23 (2026-05-29)
 - 优化：后端切换为标准 logging 日志系统，统一输出时间戳、日志级别和模块名

@@ -45,18 +45,21 @@ def save_news(db: Session, news_list: List[dict]):
     db.query(News).filter(News.platform == platform).delete()
     
     # 写入新数据
-    for item in news_list:
-        news = News(
-            platform=item.get('platform', ''),
-            title=item.get('title', ''),
-            url=item.get('url', ''),
-            hot_value=item.get('hot', ''),
-            pub_time=item.get('time', ''),
-            raw_data=item
-        )
-        db.add(news)
-    
-    db.commit()
+    try:
+        for item in news_list:
+            news = News(
+                platform=item.get('platform', ''),
+                title=item.get('title', ''),
+                url=item.get('url', ''),
+                hot_value=item.get('hot', ''),
+                pub_time=item.get('time', ''),
+                raw_data=item
+            )
+            db.add(news)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
 
 def get_all_news(db: Session, platforms: List[str] = None) -> List[News]:

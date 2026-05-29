@@ -3,6 +3,8 @@
 爬虫模块 - 扩展版
 """
 import logging
+import os
+import asyncio
 import json
 import re
 import requests
@@ -43,18 +45,22 @@ class BaseSpider:
 class WeiboSpider(BaseSpider):
     """微博热搜"""
     name = "weibo"
-    COOKIE = "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7"
+    COOKIE_ENV = "WEIBO_COOKIE"
     
     def fetch(self) -> List[dict]:
         url = "https://s.weibo.com/top/summary?cate=realtimehot"
         session = requests.Session()
-        session.headers.update({
+        headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Cookie": self.COOKIE,
-        })
+        }
+        cookie = os.getenv(self.COOKIE_ENV)
+        if cookie:
+            headers["Cookie"] = cookie
+        session.headers.update(headers)
         
         try:
             resp = session.get(url, timeout=10)
+            resp.raise_for_status()
             soup = BeautifulSoup(resp.text, 'html.parser')
             rows = soup.select("#pl_top_realtimehot table tbody tr")
             
@@ -90,6 +96,7 @@ class BaiduSpider(BaseSpider):
         
         try:
             resp = requests.get(url, timeout=10)
+            resp.raise_for_status()
             match = re.search(r'<!--s-data:(.*?)-->', resp.text, re.S)
             if not match:
                 return []
@@ -129,6 +136,7 @@ class BilibiliSpider(BaseSpider):
         
         try:
             resp = requests.get(url, timeout=10, headers=headers)
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("list", [])[:30]:
@@ -168,6 +176,7 @@ class ZhihuSpider(BaseSpider):
             resp = requests.get(url, timeout=10, headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             })
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", [])[:30]:
@@ -206,10 +215,14 @@ class ToutiaoSpider(BaseSpider):
         url = "https://www.toutiao.com/api/pc/feed/?category=news_hot&max_behot_time=0"
         
         try:
-            resp = requests.get(url, timeout=10, headers={
+            headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                "Cookie": "tt_webid=1234567890123456789"
-            })
+            }
+            cookie = os.getenv("TOUTIAO_COOKIE")
+            if cookie:
+                headers["Cookie"] = cookie
+            resp = requests.get(url, timeout=10, headers=headers)
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", []):
@@ -249,6 +262,7 @@ class WallstreetcnSpider(BaseSpider):
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 "Referer": "https://wallstreetcn.com/"
             })
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("items", [])[:20]:
@@ -277,6 +291,7 @@ class ThepaperSpider(BaseSpider):
             resp = requests.get(url, timeout=10, headers={
                 "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15"
             })
+            resp.raise_for_status()
             # 澎湃页面返回HTML，需要解析
             soup = BeautifulSoup(resp.text, 'html.parser')
             items = []
@@ -299,6 +314,7 @@ class ThepaperSpider(BaseSpider):
                 resp2 = requests.get(url2, timeout=10, headers={
                     "User-Agent": "Mozilla/5.0"
                 })
+                resp2.raise_for_status()
                 soup2 = BeautifulSoup(resp2.text, 'html.parser')
                 for item in soup2.select(".newslist li a")[:15]:
                     title = item.get_text(strip=True)
@@ -326,6 +342,7 @@ class IfengSpider(BaseSpider):
         
         try:
             resp = requests.get(url, timeout=10)
+            resp.raise_for_status()
             soup = BeautifulSoup(resp.text, 'html.parser')
             items = []
             
@@ -369,6 +386,7 @@ class SspaiSpider(BaseSpider):
         
         try:
             resp = requests.get(url, timeout=10)
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", []):
@@ -394,6 +412,7 @@ class GitHubSpider(BaseSpider):
         
         try:
             resp = requests.get(url, timeout=10, headers={"Accept": "application/vnd.github.v3+json"})
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("items", [])[:20]:
@@ -421,6 +440,7 @@ class TencentSpider(BaseSpider):
                 "User-Agent": "Mozilla/5.0",
                 "Referer": "https://news.qq.com/",
             })
+            resp.raise_for_status()
             data = resp.json()
             articles = data.get("data", {}).get("tabs", [{}])[0].get("articleList", [])
             items = []
@@ -450,6 +470,7 @@ class KaopuSpider(BaseSpider):
         url = "https://kaopustorage.blob.core.windows.net/news-prod/news_list_hans_0.json"
         try:
             resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data[:20]:
@@ -483,6 +504,7 @@ class CankaoXiaoxiSpider(BaseSpider):
             for channel in channels:
                 url = f"https://china.cankaoxiaoxi.com/json/channel/{channel}/list.json"
                 resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+                resp.raise_for_status()
                 data = resp.json()
                 for row in data.get("list", [])[:10]:
                     item = row.get("data", {})
@@ -510,6 +532,7 @@ class HupuSpider(BaseSpider):
         url = "https://bbs.hupu.com/topic-daily-hot"
         try:
             resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
             matches = re.findall(r'<a href="(/[^"]+?\.html)"[^>]*?class="p-title"[^>]*>([^<]+)</a>', resp.text)
             items = []
             for path, title in matches[:20]:
@@ -536,6 +559,7 @@ class TiebaSpider(BaseSpider):
         url = "https://tieba.baidu.com/hottopic/browse/topicList"
         try:
             resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("bang_topic", {}).get("topic_list", [])[:20]:
@@ -569,6 +593,7 @@ class IthomeSpider(BaseSpider):
         
         try:
             resp = requests.get(url, timeout=10, headers=headers)
+            resp.raise_for_status()
             resp.encoding = 'utf-8'
             
             # 解析RSS
@@ -612,6 +637,7 @@ class Kr36Spider(BaseSpider):
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Referer": "https://36kr.com/"
             })
+            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("items", [])[:20]:
@@ -628,6 +654,7 @@ class Kr36Spider(BaseSpider):
             try:
                 url = "https://36kr.com/information/tech"
                 resp = requests.get(url, timeout=10)
+                resp.raise_for_status()
                 soup = BeautifulSoup(resp.text, 'html.parser')
                 items = []
                 
@@ -671,26 +698,39 @@ SPIDERS = {
 }
 
 
+SPIDER_CONCURRENCY = int(os.getenv("SPIDER_CONCURRENCY", "5"))
+SPIDER_FETCH_TIMEOUT_SECONDS = float(os.getenv("SPIDER_FETCH_TIMEOUT_SECONDS", "15"))
+
+
 async def fetch_all_spiders(platforms: List[str] = None) -> dict:
     """获取所有平台的热点"""
-    import asyncio
     
     if platforms is None:
         platforms = list(SPIDERS.keys())
     
     results = {}
-    
-    for platform in platforms:
+    semaphore = asyncio.Semaphore(max(1, SPIDER_CONCURRENCY))
+
+    async def fetch_one(platform: str):
         if platform not in SPIDERS:
-            continue
-        
-        try:
-            spider = SPIDERS[platform]()
-            news = await asyncio.to_thread(spider.fetch)
+            return None
+        async with semaphore:
+            try:
+                spider = SPIDERS[platform]()
+                news = await asyncio.wait_for(
+                    asyncio.to_thread(spider.fetch),
+                    timeout=max(0.001, SPIDER_FETCH_TIMEOUT_SECONDS),
+                )
+                logger.info("✅ %s: 获取 %s 条", spider.name, len(news))
+                return platform, news
+            except Exception:
+                logger.exception("❌ %s", platform)
+                return platform, []
+
+    fetched = await asyncio.gather(*(fetch_one(platform) for platform in platforms))
+    for item in fetched:
+        if item is not None:
+            platform, news = item
             results[platform] = news
-            logger.info("✅ %s: 获取 %s 条", spider.name, len(news))
-        except Exception as e:
-            logger.exception("❌ %s", platform)
-            results[platform] = []
     
     return results

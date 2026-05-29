@@ -697,6 +697,7 @@ onUnmounted(() => {
                     <a 
                       :href="item.url" 
                       target="_blank"
+                      rel="noopener noreferrer"
                       class="min-w-0 flex-1 text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600" 
                     >
                       {{ item.title }}
@@ -744,6 +745,7 @@ onUnmounted(() => {
                 <a 
                   :href="item.url" 
                   target="_blank"
+                  rel="noopener noreferrer"
                   class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
                 >
                   {{ item.title }}
@@ -798,6 +800,7 @@ onUnmounted(() => {
             <a 
               :href="item.url" 
               target="_blank"
+              rel="noopener noreferrer"
               class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
             >
               {{ item.title }}

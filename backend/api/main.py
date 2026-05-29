@@ -4,7 +4,10 @@ FastAPI 应用 - 带Vue3前端
 """
 import os
 import logging
-from fastapi import FastAPI, Depends, HTTPException, Header
+import ipaddress
+import socket
+from urllib.parse import urlparse
+from fastapi import FastAPI, Depends, HTTPException, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -237,6 +240,38 @@ def update_config(req: ConfigRequest, user_id: int = Depends(get_current_user_id
     return {"success": True}
 
 
+def _is_public_hostname(hostname: str) -> bool:
+    if not hostname:
+        return False
+    lowered = hostname.lower()
+    if lowered in {"localhost", "0.0.0.0"} or lowered.endswith(".local"):
+        return False
+    try:
+        addresses = socket.getaddrinfo(lowered, None)
+    except socket.gaierror:
+        return False
+    for item in addresses:
+        ip = ipaddress.ip_address(item[4][0])
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_reserved:
+            return False
+    return True
+
+
+def is_allowed_webhook(channel: str, webhook: str) -> bool:
+    parsed = urlparse(webhook or "")
+    if parsed.scheme != "https" or not _is_public_hostname(parsed.hostname or ""):
+        return False
+    host = (parsed.hostname or "").lower()
+    if channel == "feishu":
+        return host == "open.feishu.cn" and parsed.path.startswith("/open-apis/bot/v2/hook/")
+    if channel == "dingtalk":
+        return host == "oapi.dingtalk.com" and parsed.path == "/robot/send"
+    if channel == "bark":
+        allowed = {h.strip().lower() for h in os.getenv("BARK_WEBHOOK_HOSTS", "api.day.app").split(",") if h.strip()}
+        return host in allowed
+    return False
+
+
 # ============= 推送功能 =============
 
 def push_to_feishu(webhook: str, content: str) -> bool:
@@ -315,6 +350,8 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
     """为单个用户执行推送。返回 (success: bool, message: str)"""
     if not config or not config.push_enabled or not config.push_webhook:
         return (False, "推送未启用或未配置Webhook")
+    if not is_allowed_webhook(config.push_channel, config.push_webhook):
+        return (False, "Webhook 地址不允许")
 
     user_id = config.user_id
 
@@ -447,7 +484,6 @@ def scheduled_push():
                 next_time = trigger.get_next_fire_time(last, now)
                 should_push = next_time is not None and next_time <= now
             if should_push:
-                refresh_news_data(db)
                 success, message = _push_for_user(db, config)
                 logger.info("📬 定时推送 [用户%s] %s", config.user_id, message)
                 if success:
@@ -462,8 +498,11 @@ def scheduled_push():
 @app.on_event("startup")
 def start_scheduler():
     """启动定时任务调度器"""
-    scheduler.add_job(scheduled_refresh, 'interval', minutes=REFRESH_INTERVAL_MINUTES, id='refresh_job')
-    scheduler.add_job(scheduled_push, 'interval', minutes=1, id='push_job')
+    if scheduler.running:
+        logger.info("⏰ 定时任务调度器已启动，跳过重复启动")
+        return
+    scheduler.add_job(scheduled_refresh, 'interval', minutes=REFRESH_INTERVAL_MINUTES, id='refresh_job', replace_existing=True)
+    scheduler.add_job(scheduled_push, 'interval', minutes=1, id='push_job', replace_existing=True)
     scheduler.start()
     logger.info("⏰ 定时刷新已启动（每 %s 分钟抓取一次）", REFRESH_INTERVAL_MINUTES)
     logger.info("⏰ 定时推送已启动（每分钟检查 cron 表达式）")
@@ -472,8 +511,9 @@ def start_scheduler():
 @app.on_event("shutdown")
 def stop_scheduler():
     """关闭定时推送调度器"""
-    scheduler.shutdown(wait=False)
-    logger.info("⏰ 定时推送已关闭")
+    if scheduler.running:
+        scheduler.shutdown(wait=False)
+        logger.info("⏰ 定时推送已关闭")
 
 
 @app.post("/api/push")
@@ -490,7 +530,6 @@ def push_news(
     if not config.push_webhook:
         return {"success": False, "error": "未配置Webhook"}
     
-    refresh_news_data(db)
     success, message = _push_for_user(db, config)
     if success:
         return {"success": True, "message": message}
@@ -562,7 +601,8 @@ def get_news(
 @app.get("/api/news/by_platform")
 def get_news_by_platform(
     user_id: Optional[int] = Depends(get_optional_user_id),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    limit_per_platform: int = Query(50, ge=1, le=100)
 ):
     """按平台分组获取新闻；未登录时返回公共全平台数据"""
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first() if user_id else None
@@ -581,7 +621,7 @@ def get_news_by_platform(
     # 按平台分组获取新闻
     platform_news = {}
     for platform in chinese_platforms:
-        news_items = db.query(News).filter(News.platform == platform).order_by(News.id.desc()).all()
+        news_items = db.query(News).filter(News.platform == platform).order_by(News.id.desc()).limit(limit_per_platform).all()
         items = [n.to_dict() for n in news_items]
         if items:
             platform_news[platform] = items
