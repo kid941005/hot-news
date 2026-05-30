@@ -206,6 +206,12 @@ hot-news/
 | `PUSH_INTERVAL_HOURS` | 推送间隔小时数（兼容旧配置） | `4` |
 | `REFRESH_COOLDOWN_SECONDS` | 手动刷新最小间隔秒数 | `300` |
 | `CORS_ORIGINS` | 允许跨域来源，多个用逗号分隔 | `*` |
+| `SPIDER_CONCURRENCY` | 爬虫并发数 | `5` |
+| `SPIDER_FETCH_TIMEOUT_SECONDS` | 单平台爬虫超时秒数 | `15` |
+| `WEIBO_COOKIE` | 微博爬虫可选 Cookie | 空 |
+| `TOUTIAO_COOKIE` | 头条爬虫可选 Cookie | 空 |
+| `BARK_WEBHOOK_HOSTS` | Bark Webhook 允许域名，多个用逗号分隔 | `api.day.app` |
+| `LOG_LEVEL` | 后端日志级别 | `INFO` |
 | `MCP_HOST` | Streamable HTTP MCP 监听地址 | `127.0.0.1` |
 | `MCP_PORT` | Streamable HTTP MCP 监听端口 | `8000` |
 | `MCP_PATH` | Streamable HTTP MCP 路径 | `/mcp` |
