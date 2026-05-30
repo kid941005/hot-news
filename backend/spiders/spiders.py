@@ -11,6 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 from typing import List
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
 
@@ -106,10 +107,9 @@ class BaiduSpider(BaseSpider):
             for item in data.get("data", {}).get("cards", [{}])[0].get("content", []):
                 if item.get("isTop"):
                     continue
-                # 使用百度热搜详情页URL
-                hot_id = item.get("hotScore", "")
+                # 使用百度搜索页URL
                 word = item.get("word", "")
-                search_url = f"https://www.baidu.com/s?wd={word}"
+                search_url = f"https://www.baidu.com/s?{urlencode({'wd': word})}"
                 # 百度热搜列表没有稳定的原始发布时间字段，使用抓取入库时间由前端按本地时区显示
                 items.append({
                     "platform": "百度",
@@ -404,7 +404,7 @@ class SspaiSpider(BaseSpider):
 
 
 class GitHubSpider(BaseSpider):
-    """GitHubTrending"""
+    """GitHub 热门仓库（按 2024 年以来仓库 star 数排序）"""
     name = "github"
     
     def fetch(self) -> List[dict]:

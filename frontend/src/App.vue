@@ -6,6 +6,35 @@ import packageInfo from '../package.json'
 const API_URL = ''  // 通过代理访问
 const appVersion = packageInfo.version
 
+function readJsonStorage(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback))
+  } catch (e) {
+    localStorage.removeItem(key)
+    return fallback
+  }
+}
+
+function clearLoginState() {
+  currentUser.value = null
+  token.value = null
+  currentTag.value = null
+  localStorage.removeItem('username')
+  localStorage.removeItem('token')
+  showAccount.value = false
+  showLogin.value = true
+  username.value = ''
+  password.value = ''
+  news.value = []
+}
+
+function handleRequestError(e) {
+  if (e.response?.status === 401) {
+    clearLoginState()
+  }
+  console.error(e)
+}
+
 // 状态
 const currentUser = ref(localStorage.getItem('username') || null)
 const token = ref(localStorage.getItem('token') || null)
@@ -13,7 +42,7 @@ const news = ref([])
 const newsByKeyword = ref({})  // 按关键词分组的新闻
 const newsByPlatform = ref({})  // 按平台分组的新闻
 const platformOptions = ref([])
-const platformOrder = ref(JSON.parse(localStorage.getItem('platformOrder') || '[]'))
+const platformOrder = ref(readJsonStorage('platformOrder', []))
 const draggingPlatform = ref(null)
 const loading = ref(false)
 const showLogin = ref(false)
@@ -69,56 +98,39 @@ const cronPresets = [
   { label: '每天 1 次 (9:00)', value: '0 9 * * *' },
 ]
 
-const platformLogos = {
-  '微博': '微',
-  '百度': '百',
-  'B站': 'B',
-  '抖音': '抖',
-  '知乎': '知',
-  '头条': '头',
-  'IT之家': 'IT',
-  '36Kr': '36',
-  '36kr': '36',
-  'GitHub': 'GH',
-  '华尔街见闻': '华',
-  '澎湃': '澎',
-  '凤凰': '凤',
-  '少数派': '少',
-  '腾讯新闻': '腾',
-  '靠谱新闻': '靠',
-  '参考消息': '参',
-  '虎扑': '虎',
-  '百度贴吧': '吧'
+const defaultPlatformClass = 'bg-slate-100/85 text-slate-700 border border-slate-200'
+const platformMeta = {
+  '微博': { logo: '微', icon: 'https://www.google.com/s2/favicons?sz=64&domain=weibo.com', class: 'bg-red-100/85 text-red-600 border border-red-200' },
+  '百度': { logo: '百', icon: 'https://www.google.com/s2/favicons?sz=64&domain=baidu.com', class: 'bg-blue-100/85 text-blue-600 border border-blue-200' },
+  'B站': { logo: 'B', icon: 'https://www.google.com/s2/favicons?sz=64&domain=bilibili.com', class: 'bg-pink-100/85 text-pink-600 border border-pink-200' },
+  '抖音': { logo: '抖', icon: 'https://www.google.com/s2/favicons?sz=64&domain=douyin.com', class: 'bg-orange-100/85 text-orange-600 border border-orange-200' },
+  '知乎': { logo: '知', icon: 'https://www.google.com/s2/favicons?sz=64&domain=zhihu.com', class: 'bg-indigo-100/85 text-indigo-600 border border-indigo-200' },
+  '头条': { logo: '头', icon: 'https://www.google.com/s2/favicons?sz=64&domain=toutiao.com', class: 'bg-yellow-100/85 text-yellow-700 border border-yellow-200' },
+  'IT之家': { logo: 'IT', icon: 'https://www.google.com/s2/favicons?sz=64&domain=ithome.com', class: 'bg-cyan-100/85 text-cyan-600 border border-cyan-200' },
+  '36Kr': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com' },
+  '36kr': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com', class: 'bg-green-100/85 text-green-600 border border-green-200' },
+  'GitHub': { logo: 'GH', icon: 'https://www.google.com/s2/favicons?sz=64&domain=github.com' },
+  '华尔街见闻': { logo: '华', icon: 'https://www.google.com/s2/favicons?sz=64&domain=wallstreetcn.com' },
+  '澎湃': { logo: '澎', icon: 'https://www.google.com/s2/favicons?sz=64&domain=thepaper.cn' },
+  '凤凰': { logo: '凤', icon: 'https://www.google.com/s2/favicons?sz=64&domain=ifeng.com' },
+  '少数派': { logo: '少', icon: 'https://www.google.com/s2/favicons?sz=64&domain=sspai.com' },
+  '腾讯新闻': { logo: '腾', icon: '/icons/tencent.png' },
+  '靠谱新闻': { logo: '靠', icon: '/icons/kaopu.png' },
+  '参考消息': { logo: '参', icon: '/icons/cankaoxiaoxi.png' },
+  '虎扑': { logo: '虎', icon: '/icons/hupu.png' },
+  '百度贴吧': { logo: '吧', icon: '/icons/tieba.png' }
 }
 
-const platformLogoUrls = {
-  '微博': 'https://www.google.com/s2/favicons?sz=64&domain=weibo.com',
-  '百度': 'https://www.google.com/s2/favicons?sz=64&domain=baidu.com',
-  'B站': 'https://www.google.com/s2/favicons?sz=64&domain=bilibili.com',
-  '抖音': 'https://www.google.com/s2/favicons?sz=64&domain=douyin.com',
-  '知乎': 'https://www.google.com/s2/favicons?sz=64&domain=zhihu.com',
-  '头条': 'https://www.google.com/s2/favicons?sz=64&domain=toutiao.com',
-  'IT之家': 'https://www.google.com/s2/favicons?sz=64&domain=ithome.com',
-  '36Kr': 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com',
-  '36kr': 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com',
-  'GitHub': 'https://www.google.com/s2/favicons?sz=64&domain=github.com',
-  '华尔街见闻': 'https://www.google.com/s2/favicons?sz=64&domain=wallstreetcn.com',
-  '澎湃': 'https://www.google.com/s2/favicons?sz=64&domain=thepaper.cn',
-  '凤凰': 'https://www.google.com/s2/favicons?sz=64&domain=ifeng.com',
-  '少数派': 'https://www.google.com/s2/favicons?sz=64&domain=sspai.com',
-  '腾讯新闻': '/icons/tencent.png',
-  '靠谱新闻': '/icons/kaopu.png',
-  '参考消息': '/icons/cankaoxiaoxi.png',
-  '虎扑': '/icons/hupu.png',
-  '百度贴吧': '/icons/tieba.png'
+function getPlatformClass(platform) {
+  return platformMeta[platform]?.class || defaultPlatformClass
 }
 
 function getPlatformLogo(platform) {
-  return platformLogos[platform] || platform?.slice(0, 2) || '站'
+  return platformMeta[platform]?.logo || platform?.slice(0, 2) || '站'
 }
 
 function getPlatformLogoUrl(platform) {
-  return platformLogoUrls[platform] || ''
+  return platformMeta[platform]?.icon || ''
 }
 
 function formatDisplayTime(item) {
@@ -191,7 +203,7 @@ async function loadTags() {
       keywordTags.value = res.data.keyword_tags || {}
     }
   } catch (e) {
-    console.error(e)
+    handleRequestError(e)
   }
 }
 
@@ -214,7 +226,7 @@ async function loadConfig() {
       lastPushTime.value = res.data.config.last_push_at || null
     }
   } catch (e) {
-    console.error(e)
+    handleRequestError(e)
   }
 }
 
@@ -246,17 +258,20 @@ async function loadNews() {
           newsByKeyword.value = res.data.keyword_groups || {}
         }
       } else {
-        // 未登录时获取所有数据
-        const res = await axios.get(`${API_URL}/api/news?all=true`)
+        // 未登录时回到公开的按平台数据
+        currentTag.value = null
+        const res = await axios.get(`${API_URL}/api/news/by_platform`)
         if (res.data.success) {
-          news.value = res.data.news || []
+          newsByPlatform.value = res.data.platforms || {}
+          news.value = []
         }
       }
     }
   } catch (e) {
-    console.error(e)
+    handleRequestError(e)
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 
 // 选择标签
@@ -401,16 +416,12 @@ async function register() {
 
 // 退出登录
 async function logout() {
-  currentUser.value = null
-  token.value = null
-  currentTag.value = null
-  localStorage.removeItem('username')
-  localStorage.removeItem('token')
-  showAccount.value = false
-  showLogin.value = true
-  username.value = ''
-  password.value = ''
-  news.value = []
+  try {
+    await axios.post(`${API_URL}/api/logout`, {}, getAuthHeader())
+  } catch (e) {
+    console.error(e)
+  }
+  clearLoginState()
 }
 
 // 切换账号
@@ -676,7 +687,7 @@ onUnmounted(() => {
           <div class="glass-scroll flex-1 divide-y divide-white/10 lg:max-h-[28rem] lg:overflow-y-auto">
             <div 
               v-for="(item, index) in platformNews" 
-              :key="index"
+              :key="item.id || item.url || index"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
               <div class="flex items-start gap-3">
@@ -706,7 +717,7 @@ onUnmounted(() => {
                   <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex flex-wrap gap-1">
                       <span 
-                        v-for="kw in item.matched_keywords" 
+                        v-for="kw in (item.matched_keywords || [])"
                         :key="kw"
                         class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-100/80 text-fuchsia-700"
                       >
@@ -738,7 +749,7 @@ onUnmounted(() => {
           <div class="divide-y divide-white/10">
             <div 
               v-for="(item, index) in keywordNews" 
-              :key="index"
+              :key="item.id || item.url || index"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
               <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -752,17 +763,7 @@ onUnmounted(() => {
                 </a>
                 <span 
                   class="inline-flex w-fit shrink-0 items-center gap-1.5 text-xs px-2 py-1 rounded-full sm:ml-2"
-                  :class="{
-                    'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
-                    'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
-                    'bg-pink-100/85 text-pink-600 border border-pink-200': item.platform === 'B站',
-                    'bg-orange-100/85 text-orange-600 border border-orange-200': item.platform === '抖音',
-                    'bg-green-100/85 text-green-600 border border-green-200': item.platform === '36kr',
-                    'bg-cyan-100/85 text-cyan-600 border border-cyan-200': item.platform === 'IT之家',
-                    'bg-indigo-100/85 text-indigo-600 border border-indigo-200': item.platform === '知乎',
-                    'bg-yellow-100/85 text-yellow-700 border border-yellow-200': item.platform === '头条',
-                    'bg-slate-100/85 text-slate-700 border border-slate-200': !['微博','百度','B站','抖音','36kr','IT之家','知乎','头条'].includes(item.platform)
-                  }"
+                  :class="getPlatformClass(item.platform)"
                 >
                   <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center overflow-hidden rounded-full bg-white/70 px-1 text-[10px] font-semibold leading-none">
                     <img v-if="getPlatformLogoUrl(item.platform)" :src="getPlatformLogoUrl(item.platform)" :alt="item.platform" class="h-3.5 w-3.5 object-contain" referrerpolicy="no-referrer" />
@@ -774,7 +775,7 @@ onUnmounted(() => {
               <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex flex-wrap gap-1">
                   <span 
-                    v-for="kw in item.matched_keywords" 
+                    v-for="kw in (item.matched_keywords || [])"
                     :key="kw"
                     class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-100/80 text-fuchsia-700"
                   >
@@ -793,7 +794,7 @@ onUnmounted(() => {
       <div v-else class="space-y-3">
         <div 
           v-for="(item, index) in news" 
-          :key="index"
+          :key="item.id || item.url || index"
           class="group rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.9),_rgba(244,248,252,0.78))] p-4 shadow-[0_1px_8px_rgba(255,255,255,0.26),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(238,244,249,0.86))] hover:shadow-[0_2px_10px_rgba(255,255,255,0.3),0_20px_44px_rgba(148,163,184,0.18)]"
         >
           <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -827,7 +828,7 @@ onUnmounted(() => {
             <!-- 匹配关键词标签 -->
             <div class="flex flex-wrap gap-1">
               <span 
-                v-for="kw in item.matched_keywords" 
+                v-for="kw in (item.matched_keywords || [])"
                 :key="kw"
                 class="text-xs px-2 py-0.5 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/12 text-fuchsia-200"
               >

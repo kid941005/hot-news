@@ -5,6 +5,7 @@
 import os
 import base64
 import hashlib
+import hmac
 from datetime import datetime
 from typing import List, Optional
 from sqlalchemy.orm import Session
@@ -157,8 +158,9 @@ def verify_password(password: str, stored_hash: str) -> bool:
         salt = base64.b64decode(salt_b64)
         expected = base64.b64decode(digest_b64)
         actual = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, int(iterations))
-        return actual == expected
-    return hashlib.sha256(password.encode()).hexdigest() == stored_hash
+        return hmac.compare_digest(actual, expected)
+    actual_hash = hashlib.sha256(password.encode()).hexdigest()
+    return hmac.compare_digest(actual_hash, stored_hash)
 
 
 def create_user(db: Session, username: str, password: str) -> User:

@@ -21,7 +21,7 @@ class News(Base):
     url = Column(String(1000), nullable=False)
     hot_value = Column(String(100), default="")
     pub_time = Column(String(50), default="")
-    raw_data = Column(JSON, default={})
+    raw_data = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -55,10 +55,10 @@ class UserConfig(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), unique=True)
-    keywords = Column(JSON, default=[])
-    blocked_keywords = Column(JSON, default=[])
-    keyword_tags = Column(JSON, default={})  # 标签关键词映射 {tag: [keywords]}
-    platforms = Column(JSON, default=[])
+    keywords = Column(JSON, default=list)
+    blocked_keywords = Column(JSON, default=list)
+    keyword_tags = Column(JSON, default=dict)  # 标签关键词映射 {tag: [keywords]}
+    platforms = Column(JSON, default=list)
     push_enabled = Column(Boolean, default=False)
     push_channel = Column(String(50), default="")
     push_webhook = Column(String(500), default="")

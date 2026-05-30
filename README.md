@@ -27,7 +27,7 @@
 | 澎湃 | ✅ |
 | 凤凰 | ✅ |
 | 少数派 | ✅ |
-| GitHub | ⚠️ |
+| GitHub | ✅ 热门仓库 |
 | IT之家 | ✅ |
 | 36Kr | ✅ |
 | 腾讯新闻 | ✅ |
@@ -36,7 +36,7 @@
 | 虎扑 | ✅ |
 | 百度贴吧 | ✅ |
 
-> ⚠️ 部分平台因网络原因可能暂时不可用
+> ⚠️ 部分平台因网络原因可能暂时不可用；GitHub 当前展示热门仓库搜索结果，不等同官方 Trending。
 
 ## 🚀 快速开始
 
@@ -118,11 +118,11 @@ curl -X POST http://localhost:16888/api/login \
 
 # 获取热点（需认证）
 curl http://localhost:16888/api/news \
-  -H "X-Auth-Token: PLACEHOLDER_TOKEN"
+  -H "Authorization: Bearer PLACEH...KEN"
 
 # 手动刷新热点（需认证）
 curl -X POST http://localhost:16888/api/news/refresh \
-  -H "X-Auth-Token: PLACEHOLDER_TOKEN"
+  -H "Authorization: Bearer PLACEH...KEN"
 ```
 
 ### MCP 服务
@@ -138,10 +138,10 @@ python -m backend.mcp_server
 Streamable HTTP 启动：
 
 ```bash
-MCP_HOST=0.0.0.0 MCP_PORT=8000 python -m backend.mcp_server --transport streamable-http
+MCP_HOST=127.0.0.1 MCP_PORT=8000 python -m backend.mcp_server --transport streamable-http
 ```
 
-HTTP MCP 地址：`http://localhost:8000/mcp`。
+HTTP MCP 地址：`http://localhost:8000/mcp`。如需绑定 `0.0.0.0` 给其他设备访问，请放在可信内网或反向代理认证后面。
 
 Hermes Agent stdio 示例：
 
@@ -185,13 +185,15 @@ hot-news/
 │   │   ├── App.vue       # 主组件
 │   │   └── main.js       # 入口文件
 │   └── vite.config.js
-├── web/                  # Flask 旧版 Web（兼容）
+├── web/                  # Flask 旧版 Web（legacy，非主运行入口）
 ├── scripts/              # 工具脚本
 │   └── check_platform_consistency.py  # 平台一致性校验
-├── hot_news.py           # 旧版脚本入口
+├── hot_news.py           # 旧版脚本入口（legacy，主逻辑见 backend/）
 ├── Dockerfile            # Docker 镜像构建配置
 ├── docker-compose.yml    # Docker 编排配置
 ```
+
+> 当前主运行入口是 `backend/api/main.py`，主爬虫实现是 `backend/spiders/spiders.py`。`web/`、`hot_news.py` 和 `scripts/hot_news.py` 仅作为 legacy 参考/兼容脚本保留，新功能和修复优先改 `backend/` 主链路。
 
 ## ⚙️ 配置
 
@@ -202,6 +204,8 @@ hot-news/
 | `DATABASE_URL` | 数据库连接 | `sqlite:///./hot_news.db` |
 | `REFRESH_INTERVAL_MINUTES` | 独立定时刷新新闻的间隔分钟数 | `15` |
 | `PUSH_INTERVAL_HOURS` | 推送间隔小时数（兼容旧配置） | `4` |
+| `REFRESH_COOLDOWN_SECONDS` | 手动刷新最小间隔秒数 | `300` |
+| `CORS_ORIGINS` | 允许跨域来源，多个用逗号分隔 | `*` |
 | `MCP_HOST` | Streamable HTTP MCP 监听地址 | `127.0.0.1` |
 | `MCP_PORT` | Streamable HTTP MCP 监听端口 | `8000` |
 | `MCP_PATH` | Streamable HTTP MCP 路径 | `/mcp` |
@@ -223,13 +227,19 @@ docker compose up -d
 ```
 
 当前仓库只保留这一份主 `docker-compose.yml`。
-`JWT_SECRET` 已直接写在 compose 配置中，因此无需额外再准备 `.env`。
+认证 Token 当前保存在后端进程内存中，服务重启后需要重新登录。内置 APScheduler 适合单进程/单副本运行；多 worker 或多容器部署时应只保留一个调度实例，避免重复刷新和重复推送。
 
 ### 生产环境
 
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.25 (2026-05-31)
+- 安全：完善认证注销、配置输入校验、注册异常脱敏、密码常量时间比较和手动刷新冷却
+- 稳定：环境变量非法值自动回退默认值，前端统一处理 401、损坏缓存和加载状态
+- 修复：修正未登录全部页请求契约、百度搜索链接编码和 SQLAlchemy JSON 默认值
+- 文档：更新认证头示例、MCP 监听建议、legacy 边界和 GitHub 热门仓库说明
 
 ### v2.5.24 (2026-05-29)
 - 安全：限制推送 Webhook 目标，降低 SSRF 风险，并将微博、头条 Cookie 改为可选环境变量

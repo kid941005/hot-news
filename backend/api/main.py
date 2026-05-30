@@ -6,14 +6,16 @@ import os
 import logging
 import ipaddress
 import socket
+import asyncio
 from urllib.parse import urlparse
 from fastapi import FastAPI, Depends, HTTPException, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from backend.logging_config import setup_logging
 from backend.models.models import init_db, get_db, UserConfig, ensure_user_config_schema, SessionLocal
@@ -30,10 +32,26 @@ from datetime import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+def get_env_int(name: str, default: int, min_value: int = 1, max_value: int = None) -> int:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        logging.getLogger(__name__).warning("%s=%r 无效，使用默认值 %s", name, raw, default)
+        return default
+    if value < min_value or (max_value is not None and value > max_value):
+        logging.getLogger(__name__).warning("%s=%r 超出范围，使用默认值 %s", name, raw, default)
+        return default
+    return value
+
+
 scheduler = BackgroundScheduler()
 UTC = timezone.utc
-REFRESH_INTERVAL_MINUTES = int(os.environ.get("REFRESH_INTERVAL_MINUTES", "15"))
-PUSH_INTERVAL_HOURS = int(os.getenv("PUSH_INTERVAL_HOURS", "4"))
+REFRESH_INTERVAL_MINUTES = get_env_int("REFRESH_INTERVAL_MINUTES", 15, min_value=1, max_value=1440)
+PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_value=168)
+REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 
 app = FastAPI(title="热点资讯", version="2.0")
 
@@ -41,10 +59,11 @@ app = FastAPI(title="热点资讯", version="2.0")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 # CORS
+CORS_ORIGINS = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "*").split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials="*" not in CORS_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -57,6 +76,32 @@ class LoginRequest(BaseModel):
     password: str
 
 
+MAX_KEYWORDS = 100
+MAX_KEYWORD_LENGTH = 50
+MAX_TAGS = 30
+MAX_TAG_LENGTH = 30
+MAX_WEBHOOK_LENGTH = 500
+ALLOWED_PUSH_CHANNELS = {"feishu", "dingtalk", "bark"}
+
+
+def _clean_string_list(values, field_name, max_items=MAX_KEYWORDS, max_length=MAX_KEYWORD_LENGTH):
+    if values is None:
+        return values
+    if len(values) > max_items:
+        raise ValueError(f"{field_name} 最多支持 {max_items} 项")
+    cleaned = []
+    for value in values:
+        if not isinstance(value, str):
+            raise ValueError(f"{field_name} 必须是字符串列表")
+        item = value.strip()
+        if not item:
+            continue
+        if len(item) > max_length:
+            raise ValueError(f"{field_name} 单项最多 {max_length} 个字符")
+        cleaned.append(item)
+    return cleaned
+
+
 class ConfigRequest(BaseModel):
     keywords: Optional[List[str]] = None
     blocked_keywords: Optional[List[str]] = None
@@ -66,6 +111,86 @@ class ConfigRequest(BaseModel):
     push_channel: Optional[str] = None
     push_webhook: Optional[str] = None
     push_cron: Optional[str] = None  # cron 表达式，如 "0 */4 * * *"
+
+    @field_validator("keywords")
+    @classmethod
+    def validate_keywords(cls, values):
+        return _clean_string_list(values, "keywords")
+
+    @field_validator("blocked_keywords")
+    @classmethod
+    def validate_blocked_keywords(cls, values):
+        return _clean_string_list(values, "blocked_keywords")
+
+    @field_validator("platforms")
+    @classmethod
+    def validate_platforms(cls, values):
+        values = _clean_string_list(values, "platforms", max_items=len(PLATFORM_MAP), max_length=30)
+        if values is None:
+            return values
+        unknown = [value for value in values if value not in PLATFORM_MAP]
+        if unknown:
+            raise ValueError(f"不支持的平台: {', '.join(unknown)}")
+        return values
+
+    @field_validator("keyword_tags")
+    @classmethod
+    def validate_keyword_tags(cls, values):
+        if values is None:
+            return values
+        if not isinstance(values, dict):
+            raise ValueError("keyword_tags 必须是对象")
+        if len(values) > MAX_TAGS:
+            raise ValueError(f"标签最多支持 {MAX_TAGS} 个")
+        cleaned = {}
+        total_keywords = 0
+        for tag, keywords in values.items():
+            if not isinstance(tag, str):
+                raise ValueError("标签名必须是字符串")
+            tag_name = tag.strip()
+            if not tag_name:
+                continue
+            if len(tag_name) > MAX_TAG_LENGTH:
+                raise ValueError(f"标签名最多 {MAX_TAG_LENGTH} 个字符")
+            tag_keywords = _clean_string_list(keywords or [], "keyword_tags", max_items=MAX_KEYWORDS)
+            total_keywords += len(tag_keywords)
+            if total_keywords > MAX_KEYWORDS:
+                raise ValueError(f"标签关键词总数最多支持 {MAX_KEYWORDS} 项")
+            cleaned[tag_name] = tag_keywords
+        return cleaned
+
+    @field_validator("push_channel")
+    @classmethod
+    def validate_push_channel(cls, value):
+        if value is None:
+            return value
+        if value not in ALLOWED_PUSH_CHANNELS:
+            raise ValueError("不支持的推送渠道")
+        return value
+
+    @field_validator("push_webhook")
+    @classmethod
+    def validate_push_webhook(cls, value):
+        if value is None:
+            return value
+        value = value.strip()
+        if len(value) > MAX_WEBHOOK_LENGTH:
+            raise ValueError(f"Webhook 最多 {MAX_WEBHOOK_LENGTH} 个字符")
+        return value
+
+    @field_validator("push_cron")
+    @classmethod
+    def validate_push_cron(cls, value):
+        if value is None:
+            return value
+        value = value.strip()
+        if len(value) > 100:
+            raise ValueError("cron 表达式过长")
+        try:
+            CronTrigger.from_crontab(value, timezone=UTC)
+        except ValueError as exc:
+            raise ValueError("cron 表达式无效") from exc
+        return value
 
 
 # ============= 依赖 =============
@@ -146,8 +271,13 @@ def register(req: LoginRequest, db: Session = Depends(get_db)):
         user = database.create_user(db, req.username, req.password)
         token = generate_token(user.id)
         return {"success": True, "username": user.username, "user_id": user.id, "token": token}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+    except IntegrityError:
+        db.rollback()
+        return {"success": False, "error": "用户名已存在"}
+    except Exception:
+        db.rollback()
+        logger.exception("注册失败")
+        return {"success": False, "error": "注册失败"}
 
 
 @app.post("/api/login")
@@ -635,6 +765,7 @@ def get_news_by_platform(
 from datetime import datetime, timezone
 
 LAST_REFRESH_TIME = None
+REFRESH_LOCK = asyncio.Lock()
 
 def refresh_news_data(db: Session, results: dict = None):
     if results is None:
@@ -664,15 +795,27 @@ def awaitable_fetch_all_spiders():
 @app.post("/api/news/refresh")
 async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     global LAST_REFRESH_TIME
-    try:
-        results = await spiders.fetch_all_spiders()
-        saved_count, sources = refresh_news_data(db, results)
-        logger.info("📊 共保存 %s 条新闻", saved_count)
-        LAST_REFRESH_TIME = datetime.now(timezone.utc)
-        return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count, "sources": sources}
-    except Exception as e:
-        logger.exception("❌ 刷新失败")
-        return {"success": False, "error": str(e)}
+    now = datetime.now(timezone.utc)
+    if REFRESH_LOCK.locked():
+        return {"success": False, "error": "刷新正在进行中"}
+    if LAST_REFRESH_TIME and REFRESH_COOLDOWN_SECONDS > 0:
+        elapsed = (now - LAST_REFRESH_TIME).total_seconds()
+        if elapsed < REFRESH_COOLDOWN_SECONDS:
+            return {
+                "success": False,
+                "error": f"刷新太频繁，请等待 {int(REFRESH_COOLDOWN_SECONDS - elapsed)} 秒",
+                "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"),
+            }
+    async with REFRESH_LOCK:
+        try:
+            results = await spiders.fetch_all_spiders()
+            saved_count, sources = refresh_news_data(db, results)
+            logger.info("📊 共保存 %s 条新闻", saved_count)
+            LAST_REFRESH_TIME = datetime.now(timezone.utc)
+            return {"success": True, "last_refresh": LAST_REFRESH_TIME.isoformat().replace("+00:00", "Z"), "count": saved_count, "sources": sources}
+        except Exception as e:
+            logger.exception("❌ 刷新失败")
+            return {"success": False, "error": str(e)}
 
 
 @app.get("/api/news/refresh")
