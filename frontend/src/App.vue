@@ -808,17 +808,7 @@ onUnmounted(() => {
             </a>
             <span 
               class="inline-flex w-fit shrink-0 items-center gap-1.5 text-xs px-2 py-1 rounded-full sm:ml-2"
-              :class="{
-                'bg-red-100/85 text-red-600 border border-red-200': item.platform === '微博',
-                'bg-blue-100/85 text-blue-600 border border-blue-200': item.platform === '百度',
-                'bg-pink-100/85 text-pink-600 border border-pink-200': item.platform === 'B站',
-                'bg-orange-100/85 text-orange-600 border border-orange-200': item.platform === '抖音',
-                'bg-green-100/85 text-green-600 border border-green-200': item.platform === '36kr',
-                'bg-cyan-100/85 text-cyan-600 border border-cyan-200': item.platform === 'IT之家',
-                'bg-indigo-100/85 text-indigo-600 border border-indigo-200': item.platform === '知乎',
-                'bg-yellow-100/85 text-yellow-700 border border-yellow-200': item.platform === '头条',
-                'bg-slate-100/85 text-slate-700 border border-slate-200': !['微博','百度','B站','抖音','36kr','IT之家','知乎','头条'].includes(item.platform)
-              }"
+              :class="getPlatformClass(item.platform)"
             >
               <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white/70 px-1 text-[10px] font-semibold leading-none">{{ getPlatformLogo(item.platform) }}</span>
               <span>{{ item.platform }}</span>

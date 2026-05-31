@@ -698,8 +698,23 @@ SPIDERS = {
 }
 
 
-SPIDER_CONCURRENCY = int(os.getenv("SPIDER_CONCURRENCY", "5"))
-SPIDER_FETCH_TIMEOUT_SECONDS = float(os.getenv("SPIDER_FETCH_TIMEOUT_SECONDS", "15"))
+def get_env_number(name: str, default, cast, min_value, max_value):
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = cast(raw)
+    except ValueError:
+        logger.warning("%s=%r 无效，使用默认值 %s", name, raw, default)
+        return default
+    if value < min_value or value > max_value:
+        logger.warning("%s=%r 超出范围，使用默认值 %s", name, raw, default)
+        return default
+    return value
+
+
+SPIDER_CONCURRENCY = get_env_number("SPIDER_CONCURRENCY", 5, int, 1, 20)
+SPIDER_FETCH_TIMEOUT_SECONDS = get_env_number("SPIDER_FETCH_TIMEOUT_SECONDS", 15.0, float, 1.0, 60.0)
 
 
 async def fetch_all_spiders(platforms: List[str] = None) -> dict:

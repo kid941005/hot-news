@@ -9,10 +9,24 @@ from mcp.server.fastmcp import FastMCP
 from backend.db.database import PLATFORM_MAP
 from backend.models.models import News, SessionLocal, init_db
 
+
+def get_env_int(name: str, default: int, min_value: int = 1, max_value: int = 65535) -> int:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    if value < min_value or value > max_value:
+        return default
+    return value
+
+
 mcp = FastMCP(
     "hot-news",
     host=os.getenv("MCP_HOST", "127.0.0.1"),
-    port=int(os.getenv("MCP_PORT", "8000")),
+    port=get_env_int("MCP_PORT", 8000),
     streamable_http_path=os.getenv("MCP_PATH", "/mcp"),
 )
 

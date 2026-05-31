@@ -6,7 +6,7 @@
 
 ## ✨ 特性
 
-- **多平台聚合**: 实时抓取 13 个主流平台热搜榜
+- **多平台聚合**: 实时抓取 18 个资讯来源
 - **智能过滤**: 支持按关键词精准过滤感兴趣的内容
 - **标签管理**: 自定义多标签，每个标签独立配置关键词
 - **用户系统**: 独立账号，数据按用户隔离
@@ -118,11 +118,11 @@ curl -X POST http://localhost:16888/api/login \
 
 # 获取热点（需认证）
 curl http://localhost:16888/api/news \
-  -H "Authorization: Bearer PLACEH...KEN"
+  -H "Authorization: Bearer YOUR_TOKEN"
 
 # 手动刷新热点（需认证）
 curl -X POST http://localhost:16888/api/news/refresh \
-  -H "Authorization: Bearer PLACEH...KEN"
+  -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 ### MCP 服务
@@ -232,7 +232,7 @@ hot-news/
 docker compose up -d
 ```
 
-当前仓库只保留这一份主 `docker-compose.yml`。
+当前仓库只保留这一份主 `docker-compose.yml`。默认 compose 偏本地/内网部署：会暴露 MySQL `3306`，且使用示例数据库密码；公网生产环境请改用强密码并移除宿主机 `3306` 映射。
 认证 Token 当前保存在后端进程内存中，服务重启后需要重新登录。内置 APScheduler 适合单进程/单副本运行；多 worker 或多容器部署时应只保留一个调度实例，避免重复刷新和重复推送。
 
 ### 生产环境
@@ -240,6 +240,11 @@ docker compose up -d
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.26 (2026-05-31)
+- 安全：为 MCP 端口、爬虫并发和爬虫超时增加边界校验，非法环境变量自动回退默认值
+- 文档：修正认证头示例和部署说明，明确 compose 暴露 MySQL 与示例密码风险
+- 优化：复用前端平台徽标样式逻辑，减少重复模板代码
 
 ### v2.5.25 (2026-05-31)
 - 安全：完善认证注销、配置输入校验、注册异常脱敏、密码常量时间比较和手动刷新冷却
