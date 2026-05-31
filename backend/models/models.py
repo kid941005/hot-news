@@ -4,8 +4,8 @@
 """
 import os
 from datetime import datetime
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean, JSON, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean, JSON, ForeignKey, Index
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 Base = declarative_base()
@@ -14,6 +14,7 @@ Base = declarative_base()
 class News(Base):
     """热点资讯"""
     __tablename__ = 'news'
+    __table_args__ = (Index('ix_news_platform_id', 'platform', 'id'),)
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     platform = Column(String(50), nullable=False)
@@ -54,7 +55,7 @@ class UserConfig(Base):
     __tablename__ = 'user_configs'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), unique=True)
+    user_id = Column(Integer, ForeignKey('users.id'), unique=True, index=True)
     keywords = Column(JSON, default=list)
     blocked_keywords = Column(JSON, default=list)
     keyword_tags = Column(JSON, default=dict)  # 标签关键词映射 {tag: [keywords]}
@@ -97,7 +98,7 @@ class CacheRecord(Base):
     __tablename__ = 'cache_records'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    platform = Column(String(50), nullable=False)
+    platform = Column(String(50), nullable=False, index=True)
     last_fetch = Column(DateTime, default=datetime.now)
     status = Column(String(20), default="success")
     error_msg = Column(Text, default="")

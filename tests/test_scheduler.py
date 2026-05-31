@@ -37,7 +37,7 @@ def test_start_scheduler_registers_jobs_with_replace_existing(monkeypatch):
     main.start_scheduler()
 
     assert scheduler.started == 1
-    assert len(scheduler.jobs) == 2
+    assert len(scheduler.jobs) == 3
     assert all(job[1]["replace_existing"] is True for job in scheduler.jobs)
 
 

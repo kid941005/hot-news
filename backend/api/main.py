@@ -53,7 +53,7 @@ REFRESH_INTERVAL_MINUTES = get_env_int("REFRESH_INTERVAL_MINUTES", 15, min_value
 PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_value=168)
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 
-app = FastAPI(title="热点资讯", version="2.5.26")
+app = FastAPI(title="热点资讯", version="2.5.27")
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -209,6 +209,14 @@ def generate_token(user_id: int, expires_hours: int = 24 * 7) -> str:
     expires_at = datetime.now() + timedelta(hours=expires_hours)
     _tokens[token] = (user_id, expires_at)
     return token
+
+def cleanup_expired_tokens(now: Optional[datetime] = None) -> int:
+    now = now or datetime.now()
+    expired = [token for token, (_, expires_at) in _tokens.items() if now > expires_at]
+    for token in expired:
+        del _tokens[token]
+    return len(expired)
+
 
 def verify_token(token: str) -> Optional[int]:
     """验证 token，返回 user_id"""
@@ -633,6 +641,7 @@ def start_scheduler():
         return
     scheduler.add_job(scheduled_refresh, 'interval', minutes=REFRESH_INTERVAL_MINUTES, id='refresh_job', replace_existing=True)
     scheduler.add_job(scheduled_push, 'interval', minutes=1, id='push_job', replace_existing=True)
+    scheduler.add_job(cleanup_expired_tokens, 'interval', hours=1, id='token_cleanup_job', replace_existing=True)
     scheduler.start()
     logger.info("⏰ 定时刷新已启动（每 %s 分钟抓取一次）", REFRESH_INTERVAL_MINUTES)
     logger.info("⏰ 定时推送已启动（每分钟检查 cron 表达式）")

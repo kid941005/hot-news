@@ -687,7 +687,7 @@ onUnmounted(() => {
           <div class="glass-scroll flex-1 divide-y divide-white/10 lg:max-h-[28rem] lg:overflow-y-auto">
             <div 
               v-for="(item, index) in platformNews" 
-              :key="item.id || item.url || index"
+              :key="item.id || item.url"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
               <div class="flex items-start gap-3">
@@ -749,7 +749,7 @@ onUnmounted(() => {
           <div class="divide-y divide-white/10">
             <div 
               v-for="(item, index) in keywordNews" 
-              :key="item.id || item.url || index"
+              :key="item.id || item.url"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.38),_rgba(255,255,255,0.14))]"
             >
               <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -794,7 +794,7 @@ onUnmounted(() => {
       <div v-else class="space-y-3">
         <div 
           v-for="(item, index) in news" 
-          :key="item.id || item.url || index"
+          :key="item.id || item.url"
           class="group rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.9),_rgba(244,248,252,0.78))] p-4 shadow-[0_1px_8px_rgba(255,255,255,0.26),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(238,244,249,0.86))] hover:shadow-[0_2px_10px_rgba(255,255,255,0.3),0_20px_44px_rgba(148,163,184,0.18)]"
         >
           <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
