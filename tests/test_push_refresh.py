@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from types import SimpleNamespace
 import sys
 from pathlib import Path
 
@@ -6,7 +7,7 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api.main import app, get_current_user_id, get_db, scheduled_push, is_allowed_webhook
+from backend.api.main import app, get_current_user_id, get_db, scheduled_push, is_allowed_webhook, _push_for_user
 
 
 class DummyConfig:
@@ -91,6 +92,22 @@ def test_scheduled_push_does_not_refresh_before_push():
     assert calls[0][2] is db.config
     assert db.commits == 1
     assert db.closed is True
+
+
+def test_push_content_deduplicates_same_news_in_multiple_tags():
+    config = DummyConfig()
+    config.keyword_tags = {"工作": ["AI"], "科技": ["模型"]}
+    db = DummyDB(config)
+    news = SimpleNamespace(id=1, title="AI 模型发布", url="https://example.com/news")
+
+    with patch("backend.api.main.database.get_user_filtered_news", return_value=([news], {1: ["AI", "模型"]})):
+        with patch("backend.api.main.push_to_feishu", return_value=True) as push:
+            success, message = _push_for_user(db, config)
+
+    assert success is True
+    assert message == "成功推送1条新闻"
+    content = push.call_args.args[1]
+    assert content.count("AI 模型发布") == 1
 
 
 def test_webhook_allowlist_rejects_internal_hosts():

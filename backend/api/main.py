@@ -53,7 +53,7 @@ REFRESH_INTERVAL_MINUTES = get_env_int("REFRESH_INTERVAL_MINUTES", 15, min_value
 PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_value=168)
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 
-app = FastAPI(title="热点资讯", version="2.5.27")
+app = FastAPI(title="热点资讯", version="2.5.28")
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -530,14 +530,14 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
     untagged = []
     for n in news_list:
         m_kws = matched_keywords.get(n.id, [])
-        tags_found = set()
+        tag_found = None
         for kw in m_kws:
             tag = keyword_to_tag.get(kw.lower())
             if tag:
-                tags_found.add(tag)
-        if tags_found:
-            for tag in tags_found:
-                tag_news.setdefault(tag, []).append((n, m_kws))
+                tag_found = tag
+                break
+        if tag_found:
+            tag_news.setdefault(tag_found, []).append((n, m_kws))
         else:
             untagged.append(n)
 

@@ -586,7 +586,7 @@ onUnmounted(() => {
     <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.92),_transparent_18%),radial-gradient(circle_at_top_right,_rgba(186,230,253,0.5),_transparent_24%),radial-gradient(circle_at_50%_38%,_rgba(255,255,255,0.28),_transparent_28%),radial-gradient(circle_at_bottom,_rgba(203,213,225,0.62),_transparent_34%)]"></div>
     <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,_rgba(255,255,255,0.62),_rgba(255,255,255,0))]"></div>
     <!-- 头部 -->
-    <header class="sticky top-0 z-50 safe-area-top border-b border-white/55 bg-[linear-gradient(180deg,_rgba(255,255,255,0.76),_rgba(255,255,255,0.48))] px-4 py-3 text-slate-700 backdrop-blur-2xl shadow-[0_8px_18px_rgba(255,255,255,0.32),0_14px_34px_rgba(148,163,184,0.12)] sm:py-4">
+    <header class="sticky top-0 z-50 safe-area-top border-b border-white/55 bg-[linear-gradient(180deg,_rgba(255,255,255,0.76),_rgba(255,255,255,0.48))] px-5 py-3 text-slate-700 backdrop-blur-2xl shadow-[0_8px_18px_rgba(255,255,255,0.32),0_14px_34px_rgba(148,163,184,0.12)] sm:px-4 sm:py-4">
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
         <h1 class="min-w-0 flex-1 text-base font-semibold sm:text-lg">热点资讯</h1>
         <div class="flex shrink-0 flex-wrap justify-end gap-2">
@@ -617,7 +617,7 @@ onUnmounted(() => {
 
     <!-- 标签筛选 -->
     <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/30 bg-[linear-gradient(180deg,_rgba(255,255,255,0.4),_rgba(255,255,255,0.18))] backdrop-blur-2xl" style="top: max(3rem, env(safe-area-inset-top))">
-      <div class="glass-scroll max-w-6xl mx-auto px-4 py-1.5 flex gap-2 overflow-x-auto whitespace-nowrap sm:py-2">
+      <div class="glass-scroll max-w-6xl mx-auto px-5 py-1.5 flex gap-2 overflow-x-auto whitespace-nowrap sm:px-4 sm:py-2">
         <button 
           @click="selectTag(null)"
             class="px-3 py-1.5 rounded-full text-sm border backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
@@ -638,7 +638,7 @@ onUnmounted(() => {
     </div>
 
     <!-- 内容 -->
-    <main class="relative max-w-6xl mx-auto px-4 py-4 sm:py-5">
+    <main class="relative max-w-6xl mx-auto px-5 py-4 sm:px-4 sm:py-5">
       <!-- 操作栏 -->
       <div class="mb-5 flex flex-col gap-3 rounded-2xl border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.72),_rgba(255,255,255,0.42))] px-4 py-3 shadow-[0_1px_6px_rgba(255,255,255,0.28),0_16px_38px_rgba(148,163,184,0.14)] backdrop-blur-2xl sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-wrap items-center gap-2">
