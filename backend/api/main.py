@@ -7,6 +7,7 @@ import logging
 import ipaddress
 import socket
 import asyncio
+import re
 from urllib.parse import urlparse
 from fastapi import FastAPI, Depends, HTTPException, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -52,6 +53,7 @@ UTC = timezone.utc
 REFRESH_INTERVAL_MINUTES = get_env_int("REFRESH_INTERVAL_MINUTES", 15, min_value=1, max_value=1440)
 PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_value=168)
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
+AUTO_REFRESH_COOLDOWN_SECONDS = get_env_int("AUTO_REFRESH_COOLDOWN_SECONDS", 30, min_value=5, max_value=3600)
 
 app = FastAPI(title="热点资讯", version="2.5.35")
 
@@ -413,25 +415,56 @@ def is_allowed_webhook(channel: str, webhook: str) -> bool:
 # ============= 推送功能 =============
 
 def push_to_feishu(webhook: str, content: str) -> bool:
-    """推送消息到飞书（支持Markdown格式）"""
+    """推送消息到飞书（使用 post 富文本保留 Markdown 效果）"""
     import requests
-    
-    # 飞书机器人webhook格式: https://open.feishu.cn/open-apis/bot/v2/hook/xxx
+
+    # 飞书机器人 webhook 不能可靠渲染通用 markdown 消息体，
+    # 这里将现有内容按行转换为 post 富文本，保留标题、分组和链接。
     try:
-        # 构建消息体
+        lines = [line.strip() for line in content.splitlines()]
+        title = "热点资讯"
+        body_lines = []
+        link_pattern = re.compile(r"^(\d+)\. \[(.*?)\] \[(.*?)\]\((https?://[^)]+)\)$")
+
+        for line in lines:
+            if not line:
+                continue
+            if line.startswith("📰 "):
+                title = line
+                continue
+            if line.startswith("### "):
+                body_lines.append([{"tag": "text", "text": line[4:]}])
+                continue
+
+            match = link_pattern.match(line)
+            if match:
+                index, platform, text, url = match.groups()
+                body_lines.append([
+                    {"tag": "text", "text": f"{index}. [{platform}] "},
+                    {"tag": "a", "text": text, "href": url},
+                ])
+                continue
+
+            body_lines.append([{"tag": "text", "text": line}])
+
         payload = {
-            "msg_type": "markdown",
+            "msg_type": "post",
             "content": {
-                "text": content
+                "post": {
+                    "zh_cn": {
+                        "title": title,
+                        "content": body_lines,
+                    }
+                }
             }
         }
-        
+
         response = requests.post(webhook, json=payload, timeout=10)
         if response.status_code == 200:
             result = response.json()
             return result.get("code", 0) == 0
         return False
-    except Exception as e:
+    except Exception:
         logger.exception("飞书推送失败")
         return False
 
@@ -684,6 +717,7 @@ def get_news(
     user_id: int = Depends(get_current_user_id), 
     db: Session = Depends(get_db)
 ):
+    _trigger_auto_refresh_if_needed(db)
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
     
     # 如果指定了all=true，获取所有热榜（不按关键词过滤）
@@ -744,6 +778,7 @@ def get_news_by_platform(
     limit_per_platform: int = Query(50, ge=1, le=100)
 ):
     """按平台分组获取新闻；未登录时返回公共全平台数据"""
+    _trigger_auto_refresh_if_needed(db)
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first() if user_id else None
     
     # 获取用户监控的平台
@@ -775,6 +810,54 @@ from datetime import datetime, timezone
 
 LAST_REFRESH_TIME = None
 REFRESH_LOCK = asyncio.Lock()
+_auto_refresh_running = False
+
+def _run_background_refresh():
+    global LAST_REFRESH_TIME, _auto_refresh_running
+    try:
+        db = SessionLocal()
+        try:
+            results = asyncio.run(spiders.fetch_all_spiders())
+            saved_count, sources = refresh_news_data(db, results)
+            LAST_REFRESH_TIME = datetime.now(timezone.utc)
+            logger.info("📊 后台自动刷新: 共保存 %s 条新闻", saved_count)
+        finally:
+            db.close()
+    except Exception as e:
+        logger.exception("❌ 后台自动刷新失败")
+    finally:
+        _auto_refresh_running = False
+
+def _trigger_auto_refresh_if_needed(db: Session):
+    global _auto_refresh_running, LAST_REFRESH_TIME
+    now = datetime.now(timezone.utc)
+    # 如果正在刷新中，跳过
+    if _auto_refresh_running:
+        return
+    # 检查是否在手动刷新冷却期内
+    if LAST_REFRESH_TIME and REFRESH_COOLDOWN_SECONDS > 0:
+        elapsed = (now - LAST_REFRESH_TIME).total_seconds()
+        if elapsed < AUTO_REFRESH_COOLDOWN_SECONDS:
+            return
+    # 检查是否有数据
+    has_data = db.query(News).first() is not None
+    if not has_data:
+        # 没有数据时同步刷新（用户等待）
+        logger.info("🔄 数据库为空，触发同步刷新")
+        try:
+            results = asyncio.run(spiders.fetch_all_spiders())
+            saved_count, sources = refresh_news_data(db, results)
+            LAST_REFRESH_TIME = datetime.now(timezone.utc)
+            logger.info("📊 同步刷新完成: 共保存 %s 条新闻", saved_count)
+        except Exception as e:
+            logger.exception("❌ 同步刷新失败")
+        return
+    # 有数据但过期：后台异步刷新
+    logger.info("🔄 数据过期，触发后台自动刷新")
+    _auto_refresh_running = True
+    import threading
+    t = threading.Thread(target=_run_background_refresh, daemon=True)
+    t.start()
 
 def refresh_news_data(db: Session, results: dict = None):
     if results is None:

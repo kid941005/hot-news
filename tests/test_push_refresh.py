@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api.main import app, get_current_user_id, get_db, scheduled_push, is_allowed_webhook, _push_for_user
+from backend.api.main import app, get_current_user_id, get_db, scheduled_push, is_allowed_webhook, _push_for_user, push_to_feishu
 
 
 class DummyConfig:
@@ -135,3 +135,36 @@ def test_webhook_allowlist_accepts_supported_hosts():
     assert is_allowed_webhook("feishu", "https://open.feishu.cn/open-apis/bot/v2/hook/test")
     assert is_allowed_webhook("dingtalk", "https://oapi.dingtalk.com/robot/send?access_token=test")
     assert is_allowed_webhook("bark", "https://api.day.app/test")
+
+
+def test_push_to_feishu_uses_post_payload_for_links():
+    captured = {}
+
+    class DummyResponse:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return {"code": 0}
+
+    def fake_post(url, json, timeout):
+        captured["url"] = url
+        captured["json"] = json
+        captured["timeout"] = timeout
+        return DummyResponse()
+
+    with patch("requests.post", side_effect=fake_post):
+        success = push_to_feishu(
+            "https://open.feishu.cn/open-apis/bot/v2/hook/test",
+            "📰 热点资讯 (12:00)\n\n### 科技\n1. [微博] [AI 模型发布](https://example.com/news)\n",
+        )
+
+    assert success is True
+    assert captured["timeout"] == 10
+    assert captured["json"]["msg_type"] == "post"
+    assert captured["json"]["content"]["post"]["zh_cn"]["title"] == "📰 热点资讯 (12:00)"
+    assert captured["json"]["content"]["post"]["zh_cn"]["content"][0] == [{"tag": "text", "text": "科技"}]
+    assert captured["json"]["content"]["post"]["zh_cn"]["content"][1] == [
+        {"tag": "text", "text": "1. [微博] "},
+        {"tag": "a", "text": "AI 模型发布", "href": "https://example.com/news"},
+    ]
