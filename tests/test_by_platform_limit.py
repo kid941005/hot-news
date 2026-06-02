@@ -34,6 +34,9 @@ class DummyNewsQuery:
         count = self.limit_value or 0
         return [DummyNews(i) for i in range(count)]
 
+    def first(self):
+        return DummyNews(0)
+
 
 class DummyConfigQuery:
     def filter(self, *args, **kwargs):

@@ -699,7 +699,7 @@ onUnmounted(() => {
           <!-- 平台新闻列表 -->
           <div class="glass-scroll flex-1 divide-y divide-slate-300/22 lg:max-h-[28rem] lg:overflow-y-auto">
             <div
-              v-for="item in platformNews"
+              v-for="(item, index) in platformNews"
               :key="item.id || item.url"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
             >
