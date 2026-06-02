@@ -25,6 +25,7 @@ danger_patterns = [
     re.compile(r'\.format\(.*SELECT'),
     re.compile(r'\.format\(.*INSERT'),
 ]
+
 secret_hits = []
 danger_hits = []
 for path in paths:
@@ -39,7 +40,7 @@ for path in paths:
 readme = Path('README.md').read_text()
 print('secret_hits', secret_hits)
 print('danger_hits', danger_hits)
-print('auth_placeholder_count', readme.count('-H "Authorization: Bearer YOUR_TOKEN"'))
+print('auth_placeholder_count', readme.count('-H "Authorization: Bearer ***'))
 print('webhook_placeholders', 'hook/YOUR_TOKEN' in readme and 'access_token=YOUR_TOKEN' in readme)
 print('no_secret_key_claim', 'SECRET_KEY' not in readme)
 raise SystemExit(1 if secret_hits or danger_hits else 0)

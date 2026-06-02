@@ -10,6 +10,12 @@ backend/api/static/assets/
 *.db
 *.sqlite
 
+# Runtime data
+users.json
+cache.json
+web/cache.json
+mysql_data/
+
 # IDE
 .idea/
 .vscode/

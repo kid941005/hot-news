@@ -698,8 +698,8 @@ onUnmounted(() => {
           </div>
           <!-- 平台新闻列表 -->
           <div class="glass-scroll flex-1 divide-y divide-slate-300/22 lg:max-h-[28rem] lg:overflow-y-auto">
-            <div 
-              v-for="(item, index) in platformNews" 
+            <div
+              v-for="item in platformNews"
               :key="item.id || item.url"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
             >
@@ -760,8 +760,8 @@ onUnmounted(() => {
             <span class="text-xs text-slate-500">{{ keywordNews.length }}条</span>
           </div>
           <div class="divide-y divide-white/10">
-            <div 
-              v-for="(item, index) in keywordNews" 
+            <div
+              v-for="item in keywordNews"
               :key="item.id || item.url"
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
             >
@@ -805,8 +805,8 @@ onUnmounted(() => {
       </div>
 
       <div v-else class="space-y-3">
-        <div 
-          v-for="(item, index) in news" 
+        <div
+          v-for="item in news"
           :key="item.id || item.url"
           class="group rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] p-4 shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(145deg,_rgba(255,255,255,0.84),_rgba(219,234,254,0.48))] hover:shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_26px_64px_rgba(51,65,85,0.20)]"
         >

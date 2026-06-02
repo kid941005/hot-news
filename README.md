@@ -185,15 +185,18 @@ hot-news/
 │   │   ├── App.vue       # 主组件
 │   │   └── main.js       # 入口文件
 │   └── vite.config.js
-├── web/                  # Flask 旧版 Web（legacy，非主运行入口）
+├── legacy/               # 旧版实现归档（非主运行入口）
+│   ├── web/              # Flask 旧版 Web
+│   ├── hot_news.py       # 旧版脚本入口
+│   ├── scripts_hot_news.py
+│   └── sources/          # 旧版数据源实现
 ├── scripts/              # 工具脚本
 │   └── check_platform_consistency.py  # 平台一致性校验
-├── hot_news.py           # 旧版脚本入口（legacy，主逻辑见 backend/）
 ├── Dockerfile            # Docker 镜像构建配置
 ├── docker-compose.yml    # Docker 编排配置
 ```
 
-> 当前主运行入口是 `backend/api/main.py`，主爬虫实现是 `backend/spiders/spiders.py`。`web/`、`hot_news.py` 和 `scripts/hot_news.py` 仅作为 legacy 参考/兼容脚本保留，新功能和修复优先改 `backend/` 主链路。
+> 当前主运行入口是 `backend/api/main.py`，主爬虫实现是 `backend/spiders/spiders.py`。旧版 Flask/Web/脚本实现已归档到 `legacy/`，不参与当前生产部署；新功能和修复只改 `backend/` 主链路。
 
 ## ⚙️ 配置
 

@@ -3,14 +3,14 @@ services:
     image: mysql:8.0
     container_name: hotnews-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: hotnews123
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-hotnews123}
       MYSQL_DATABASE: hot_news
     ports:
       - "3306:3306"
     volumes:
       - ./mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-hotnews123}"]
     command: --default-authentication-plugin=mysql_native_password
     restart: always
 
@@ -20,7 +20,7 @@ services:
     ports:
       - "16888:16888"
     environment:
-      - DATABASE_URL=mysql+pymysql://root:hotnews123@mysql:3306/hot_news
+      - DATABASE_URL=mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:-hotnews123}@mysql:3306/hot_news
       - TZ=Asia/Shanghai
       - REFRESH_COOLDOWN_SECONDS=300
       - CORS_ORIGINS=*
@@ -38,7 +38,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mysql+pymysql://root:hotnews123@mysql:3306/hot_news
+      - DATABASE_URL=mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:-hotnews123}@mysql:3306/hot_news
       - MCP_TRANSPORT=streamable-http
       - MCP_HOST=0.0.0.0
       - MCP_PORT=8000

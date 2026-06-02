@@ -47,7 +47,6 @@ class WeiboSpider(BaseSpider):
     """微博热搜"""
     name = "weibo"
     COOKIE_ENV = "WEIBO_COOKIE"
-    DEFAULT_COOKIE = "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7"
     
     def fetch(self) -> List[dict]:
         url = "https://s.weibo.com/top/summary?cate=realtimehot"
@@ -56,7 +55,7 @@ class WeiboSpider(BaseSpider):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "Referer": url,
         }
-        cookie = os.getenv(self.COOKIE_ENV) or self.DEFAULT_COOKIE
+        cookie = os.getenv(self.COOKIE_ENV)
         if cookie:
             headers["Cookie"] = cookie
         session.headers.update(headers)
