@@ -235,7 +235,9 @@ hot-news/
 docker compose up -d
 ```
 
-当前仓库只保留这一份主 `docker-compose.yml`。默认 compose 偏本地/内网部署：会暴露 MySQL `3306`，且使用示例数据库密码；公网生产环境请改用强密码并移除宿主机 `3306` 映射。
+### Compose 部署注意事项
+
+当前仓库只保留这一份主 `docker-compose.yml`。默认 compose 偏本地/内网部署：MySQL 默认示例密码为 `hotnews123`（可通过 `MYSQL_ROOT_PASSWORD` 覆盖），并会暴露 MySQL `3306`；公网生产环境请改用强密码并移除宿主机 `3306` 映射。`docker-compose.yml` 里的 `DATABASE_URL` 示例使用脱敏占位形式，实际运行时会和 `MYSQL_ROOT_PASSWORD` 保持一致。
 认证 Token 当前保存在后端进程内存中，服务重启后需要重新登录。内置 APScheduler 适合单进程/单副本运行；多 worker 或多容器部署时应只保留一个调度实例，避免重复刷新和重复推送。
 
 ### 生产环境
