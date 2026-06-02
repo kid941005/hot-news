@@ -684,17 +684,17 @@ onUnmounted(() => {
         >
           <!-- 平台标题 -->
           <div class="px-4 py-3 bg-[linear-gradient(135deg,_rgba(255,255,255,0.58),_rgba(219,234,254,0.30))] border-b border-white/40 flex justify-between items-center">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="inline-flex h-8 min-w-[2rem] items-center justify-center overflow-hidden rounded-full border border-white/75 bg-white/82 px-2 text-[11px] font-semibold text-slate-700 shadow-[0_1px_0_rgba(255,255,255,0.85)_inset,0_8px_18px_rgba(51,65,85,0.12)]">
-                <img v-if="getPlatformLogoUrl(platform)" :src="getPlatformLogoUrl(platform)" :alt="platform" class="h-4 w-4 object-contain" referrerpolicy="no-referrer" />
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="inline-flex h-10 min-w-[2.5rem] items-center justify-center overflow-hidden rounded-2xl border border-white/75 bg-white/90 px-2.5 text-sm font-bold text-slate-800 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_10px_24px_rgba(51,65,85,0.16)]">
+                <img v-if="getPlatformLogoUrl(platform)" :src="getPlatformLogoUrl(platform)" :alt="platform" class="h-5 w-5 object-contain" referrerpolicy="no-referrer" />
                 <span v-else>{{ getPlatformLogo(platform) }}</span>
               </span>
               <div class="min-w-0">
-                <div class="font-semibold tracking-tight text-slate-900 truncate">{{ platform }}</div>
+                <div class="text-lg font-bold tracking-tight text-slate-900 truncate">{{ platform }}</div>
                 <div v-if="lastRefresh" class="text-[11px] text-slate-400">更新于 {{ lastRefresh }}</div>
               </div>
             </div>
-            <span class="text-xs text-slate-500">拖拽排序 · {{ platformNews.length }}条</span>
+            <span class="rounded-full border border-white/55 bg-white/60 px-2.5 py-1 text-xs font-medium text-slate-600">拖拽排序 · {{ platformNews.length }}条</span>
           </div>
           <!-- 平台新闻列表 -->
           <div class="glass-scroll flex-1 divide-y divide-slate-300/22 lg:max-h-[28rem] lg:overflow-y-auto">

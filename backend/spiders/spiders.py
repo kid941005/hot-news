@@ -47,14 +47,16 @@ class WeiboSpider(BaseSpider):
     """微博热搜"""
     name = "weibo"
     COOKIE_ENV = "WEIBO_COOKIE"
+    DEFAULT_COOKIE = "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7"
     
     def fetch(self) -> List[dict]:
         url = "https://s.weibo.com/top/summary?cate=realtimehot"
         session = requests.Session()
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "Referer": url,
         }
-        cookie = os.getenv(self.COOKIE_ENV)
+        cookie = os.getenv(self.COOKIE_ENV) or self.DEFAULT_COOKIE
         if cookie:
             headers["Cookie"] = cookie
         session.headers.update(headers)
@@ -124,45 +126,70 @@ class BaiduSpider(BaseSpider):
             return []
 
 
+
 class BilibiliSpider(BaseSpider):
     """B站热搜"""
     name = "bilibili"
     
     def fetch(self) -> List[dict]:
-        url = "https://api.bilibili.com/x/web-interface/popular"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
+        url = "https://s.search.bilibili.com/main/hotword?limit=30"
+        headers = {"User-Agent": "Mozilla/5.0"}
         
         try:
             resp = requests.get(url, timeout=10, headers=headers)
             resp.raise_for_status()
             data = resp.json()
             items = []
-            for item in data.get("data", {}).get("list", [])[:30]:
-                # Unix 时间戳统一按 UTC 解释，再转换到服务器本地时区显示
-                pubdate = item.get("pubdate", 0)
-                pub_time = format_beijing_timestamp(pubdate)
-                
-                items.append({
-                    "platform": "B站",
-                    "title": item.get("title", ""),
-                    "url": f"https://www.bilibili.com/video/{item.get('bvid', '')}",
-                    "hot": str(item.get("play", 0)),
-                    "time": pub_time
-                })
+            for item in data.get("list", [])[:30]:
+                keyword = item.get("keyword", "")
+                title = item.get("show_name") or keyword
+                if title and keyword:
+                    items.append({
+                        "platform": "B站",
+                        "title": title,
+                        "url": f"https://search.bilibili.com/all?{urlencode({'keyword': keyword})}",
+                        "hot": str(item.get("score", "")),
+                        "time": ""
+                    })
             return items
         except Exception as e:
             logger.exception("❌ B站")
             return []
-
 
 class DouyinSpider(BaseSpider):
     """抖音热搜"""
     name = "douyin"
     
     def fetch(self) -> List[dict]:
-        return []
+        url = "https://www.douyin.com/aweme/v1/web/hot/search/list/?device_platform=webapp&aid=6383&channel=channel_pc_web&detail_list=1"
+        session = requests.Session()
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "Referer": "https://www.douyin.com/",
+        }
+
+        try:
+            session.get("https://login.douyin.com/", timeout=10, headers=headers)
+            resp = session.get(url, timeout=10, headers=headers)
+            resp.raise_for_status()
+            data = resp.json()
+            items = []
+            for item in data.get("data", {}).get("word_list", [])[:30]:
+                title = item.get("word", "")
+                sentence_id = item.get("sentence_id", "")
+                if title and sentence_id:
+                    items.append({
+                        "platform": "抖音",
+                        "title": title,
+                        "url": f"https://www.douyin.com/hot/{sentence_id}",
+                        "hot": str(item.get("hot_value", "")),
+                        "time": format_beijing_timestamp(item.get("event_time")),
+                    })
+            return items
+        except Exception as e:
+            logger.exception("❌ 抖音")
+            return []
+
 
 
 class ZhihuSpider(BaseSpider):
@@ -170,7 +197,7 @@ class ZhihuSpider(BaseSpider):
     name = "zhihu"
     
     def fetch(self) -> List[dict]:
-        url = "https://api.zhihu.com/topstory/hot-lists/total"
+        url = "https://www.zhihu.com/api/v3/feed/topstory/hot-list-web?limit=20&desktop=true"
         
         try:
             resp = requests.get(url, timeout=10, headers={
@@ -179,28 +206,18 @@ class ZhihuSpider(BaseSpider):
             resp.raise_for_status()
             data = resp.json()
             items = []
-            for item in data.get("data", [])[:30]:
+            for item in data.get("data", [])[:20]:
                 target = item.get("target", {})
-                # 转换知乎API URL为网页URL
-                zhihu_url = target.get("url", "")
-                if "/questions/" in zhihu_url:
-                    # API: https://api.zhihu.com/questions/123456 -> 网页: https://www.zhihu.com/question/123456
-                    question_id = zhihu_url.split("/questions/")[-1].split("?")[0]
-                    web_url = f"https://www.zhihu.com/question/{question_id}"
-                else:
-                    web_url = zhihu_url
-                
-                # Unix 时间戳统一按 UTC 解释，再转换到服务器本地时区显示
-                created = target.get("created")
-                pub_time = format_beijing_timestamp(created)
-                
-                items.append({
-                    "platform": "知乎",
-                    "title": target.get("title", ""),
-                    "url": web_url,
-                    "hot": str(item.get("detail_text", "")),
-                    "time": pub_time
-                })
+                title = target.get("title_area", {}).get("text", "")
+                link = target.get("link", {}).get("url", "")
+                if title and link:
+                    items.append({
+                        "platform": "知乎",
+                        "title": title,
+                        "url": link,
+                        "hot": target.get("metrics_area", {}).get("text", ""),
+                        "time": ""
+                    })
             return items
         except Exception as e:
             logger.exception("❌ 知乎")
@@ -212,12 +229,10 @@ class ToutiaoSpider(BaseSpider):
     name = "toutiao"
     
     def fetch(self) -> List[dict]:
-        url = "https://www.toutiao.com/api/pc/feed/?category=news_hot&max_behot_time=0"
+        url = "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc"
         
         try:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            }
+            headers = {"User-Agent": "Mozilla/5.0"}
             cookie = os.getenv("TOUTIAO_COOKIE")
             if cookie:
                 headers["Cookie"] = cookie
@@ -225,37 +240,28 @@ class ToutiaoSpider(BaseSpider):
             resp.raise_for_status()
             data = resp.json()
             items = []
-            for item in data.get("data", []):
-                if item.get("title"):
-                    # 获取文章URL
-                    article_url = item.get("source_url", "")
-                    if article_url and not article_url.startswith("http"):
-                        article_url = "https://www.toutiao.com" + article_url
-                    
-                    # Unix 时间戳统一按 UTC 解释，再转换到服务器本地时区显示
-                    behot_time = item.get("behot_time", 0)
-                    pub_time = format_beijing_timestamp(behot_time)
-                    
+            for item in data.get("data", [])[:30]:
+                cluster_id = item.get("ClusterIdStr", "")
+                title = item.get("Title", "")
+                if title and cluster_id:
                     items.append({
                         "platform": "头条",
-                        "title": item.get("title", ""),
-                        "url": article_url,
-                        "hot": str(item.get("read_count", "")),
-                        "time": pub_time
+                        "title": title,
+                        "url": f"https://www.toutiao.com/trending/{cluster_id}/",
+                        "hot": str(item.get("HotValue", "")),
+                        "time": ""
                     })
-            return items[:30]
+            return items
         except Exception as e:
             logger.exception("❌ 头条")
             return []
 
-
 class WallstreetcnSpider(BaseSpider):
-    """华尔街见闻 - 使用RSS"""
+    """华尔街见闻"""
     name = "wallstreetcn"
     
     def fetch(self) -> List[dict]:
-        # 尝试RSS feed
-        url = "https://api.wallstreetcn.com/apiv1/content/notes"
+        url = "https://api-one.wallstcn.com/apiv1/content/lives?channel=global-channel&limit=30"
         
         try:
             resp = requests.get(url, timeout=10, headers={
@@ -265,13 +271,17 @@ class WallstreetcnSpider(BaseSpider):
             resp.raise_for_status()
             data = resp.json()
             items = []
-            for item in data.get("data", {}).get("items", [])[:20]:
+            for item in data.get("data", {}).get("items", [])[:30]:
+                title = item.get("title") or item.get("content_text") or item.get("content_short") or ""
+                link = item.get("uri", "")
+                if not title or not link:
+                    continue
                 items.append({
                     "platform": "华尔街见闻",
-                    "title": item.get("title", ""),
-                    "url": f"https://wallstreetcn.com/articles/{item.get('id', '')}",
-                    "hot": str(item.get("read_count", "")),
-                    "time": ""
+                    "title": title,
+                    "url": link,
+                    "hot": "",
+                    "time": format_beijing_timestamp(item.get("display_time")),
                 })
             return items
         except Exception as e:
@@ -279,59 +289,34 @@ class WallstreetcnSpider(BaseSpider):
             return []
 
 
+
 class ThepaperSpider(BaseSpider):
     """澎湃新闻"""
     name = "thepaper"
     
     def fetch(self) -> List[dict]:
-        # 使用澎湃新闻的API
-        url = "https://m.thepaper.cn/search?keyword=%E7%83%AD%E7%82%B9"
+        url = "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar"
         
         try:
-            resp = requests.get(url, timeout=10, headers={
-                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15"
-            })
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
             resp.raise_for_status()
-            # 澎湃页面返回HTML，需要解析
-            soup = BeautifulSoup(resp.text, 'html.parser')
+            data = resp.json()
             items = []
-            
-            # 尝试从页面提取热点
-            for item in soup.select(".hot_word a")[:20]:
-                title = item.get_text(strip=True)
-                if title:
+            for item in data.get("data", {}).get("hotNews", [])[:30]:
+                title = item.get("name", "")
+                cont_id = item.get("contId", "")
+                if title and cont_id:
                     items.append({
                         "platform": "澎湃",
                         "title": title,
-                        "url": "https://m.thepaper.cn" + item.get("href", ""),
+                        "url": f"https://www.thepaper.cn/newsDetail_forward_{cont_id}",
                         "hot": "",
                         "time": ""
                     })
-            
-            # 如果没有提取到，尝试备用方法
-            if not items:
-                url2 = "https://www.thepaper.cn/list_2565457"
-                resp2 = requests.get(url2, timeout=10, headers={
-                    "User-Agent": "Mozilla/5.0"
-                })
-                resp2.raise_for_status()
-                soup2 = BeautifulSoup(resp2.text, 'html.parser')
-                for item in soup2.select(".newslist li a")[:15]:
-                    title = item.get_text(strip=True)
-                    if title and len(title) > 5:
-                        items.append({
-                            "platform": "澎湃",
-                            "title": title,
-                            "url": "https://www.thepaper.cn" + item.get("href", ""),
-                            "hot": "",
-                            "time": ""
-                        })
-            
             return items
         except Exception as e:
             logger.exception("❌ 澎湃")
             return []
-
 
 class IfengSpider(BaseSpider):
     """凤凰网 - 使用网页解析"""
@@ -403,31 +388,39 @@ class SspaiSpider(BaseSpider):
             return []
 
 
+
 class GitHubSpider(BaseSpider):
-    """GitHub 热门仓库（按 2024 年以来仓库 star 数排序）"""
+    """GitHub Trending"""
     name = "github"
     
     def fetch(self) -> List[dict]:
-        url = "https://api.github.com/search/repositories?q=created:>2024-01-01&sort=stars&order=desc"
+        url = "https://github.com/trending?spoken_language_code="
         
         try:
-            resp = requests.get(url, timeout=10, headers={"Accept": "application/vnd.github.v3+json"})
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
             resp.raise_for_status()
-            data = resp.json()
+            soup = BeautifulSoup(resp.text, "html.parser")
             items = []
-            for item in data.get("items", [])[:20]:
-                items.append({
-                    "platform": "GitHub",
-                    "title": item.get("name", ""),
-                    "url": item.get("html_url", ""),
-                    "hot": str(item.get("stargazers_count", 0)),
-                    "time": ""
-                })
+            for article in soup.select("main .Box div[data-hpc] > article")[:25]:
+                link = article.select_one("h2 a")
+                if not link:
+                    continue
+                title = re.sub(r"\s+", "", link.get_text())
+                href = link.get("href", "")
+                star_link = article.select_one("[href$=stargazers]")
+                hot = re.sub(r"\s+", "", star_link.get_text()) if star_link else ""
+                if title and href:
+                    items.append({
+                        "platform": "GitHub",
+                        "title": title,
+                        "url": f"https://github.com{href}",
+                        "hot": hot,
+                        "time": ""
+                    })
             return items
         except Exception as e:
             logger.exception("❌ GitHub")
             return []
-
 
 class TencentSpider(BaseSpider):
     """腾讯新闻"""
@@ -579,101 +572,71 @@ class TiebaSpider(BaseSpider):
             return []
 
 
+
 class IthomeSpider(BaseSpider):
     """IT之家"""
     name = "ithome"
     
     def fetch(self) -> List[dict]:
-        import xml.etree.ElementTree as ET
-        
-        url = "https://www.ithome.com/rss"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
+        url = "https://www.ithome.com/list/"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         
         try:
             resp = requests.get(url, timeout=10, headers=headers)
             resp.raise_for_status()
-            resp.encoding = 'utf-8'
-            
-            # 解析RSS
-            root = ET.fromstring(resp.text)
-            items = root.findall('.//item')
-            
-            results = []
-            for item in items[:20]:
-                title = item.find('title').text if item.find('title') is not None else ''
-                link = item.find('link').text if item.find('link') is not None else ''
-                pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ''
-                
-                # RSS pubDate 是 GMT/UTC，按带时区时间解析后再转换显示
-                pub_time = format_rfc822_to_beijing(pub_date)
-                
-                if title and link:
-                    results.append({
+            soup = BeautifulSoup(resp.text, "html.parser")
+            items = []
+            for row in soup.select("#list > div.fl > ul > li")[:30]:
+                link = row.select_one("a.t")
+                if not link:
+                    continue
+                title = link.get_text(strip=True)
+                href = link.get("href", "")
+                if href and title and "lapin" not in href and not any(k in title for k in ["神券", "优惠", "补贴", "京东"]):
+                    items.append({
                         "platform": "IT之家",
                         "title": title,
-                        "url": link,
+                        "url": href,
                         "hot": "",
-                        "time": pub_time
+                        "time": row.select_one("i").get_text(strip=True) if row.select_one("i") else ""
                     })
-            
-            return results
+            return items
         except Exception as e:
             logger.exception("❌ IT之家")
             return []
 
 
 class Kr36Spider(BaseSpider):
-    """36Kr - 使用网页解析"""
+    """36Kr 快讯"""
     name = "36kr"
     
     def fetch(self) -> List[dict]:
-        # 尝试热榜API
-        url = "https://www.36kr.com/pp/api/pc/feed"
+        base_url = "https://www.36kr.com"
+        url = f"{base_url}/newsflashes"
         
         try:
-            resp = requests.get(url, timeout=10, headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Referer": "https://36kr.com/"
-            })
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
             resp.raise_for_status()
-            data = resp.json()
+            soup = BeautifulSoup(resp.text, "html.parser")
             items = []
-            for item in data.get("data", {}).get("items", [])[:20]:
-                items.append({
-                    "platform": "36Kr",
-                    "title": item.get("title", ""),
-                    "url": f"https://36kr.com{item.get('url', '')}",
-                    "hot": str(item.get("published_at", "")),
-                    "time": format_beijing_timestamp(item.get("published_at", 0))
-                })
+            for row in soup.select(".newsflash-item")[:30]:
+                link = row.select_one("a.item-title")
+                if not link:
+                    continue
+                title = link.get_text(strip=True)
+                href = link.get("href", "")
+                if title and href:
+                    items.append({
+                        "platform": "36Kr",
+                        "title": title,
+                        "url": f"{base_url}{href}" if href.startswith("/") else href,
+                        "hot": "",
+                        "time": row.select_one(".time").get_text(strip=True) if row.select_one(".time") else ""
+                    })
             return items
         except Exception as e:
-            # 备用：尝试解析HTML
-            try:
-                url = "https://36kr.com/information/tech"
-                resp = requests.get(url, timeout=10)
-                resp.raise_for_status()
-                soup = BeautifulSoup(resp.text, 'html.parser')
-                items = []
-                
-                for item in soup.select(".article-item-info a")[:15]:
-                    title = item.get_text(strip=True)
-                    if title:
-                        href = item.get("href", "")
-                        items.append({
-                            "platform": "36Kr",
-                            "title": title,
-                            "url": f"https://36kr.com{href}" if href.startswith("/") else href,
-                            "hot": "",
-                            "time": ""
-                        })
-                return items
-            except Exception as e2:
-                logger.exception("❌ 36Kr")
-                return []
-
+            logger.exception("❌ 36Kr")
+            return []
 
 # 注册爬虫
 SPIDERS = {
