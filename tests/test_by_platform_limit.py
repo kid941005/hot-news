@@ -1,10 +1,12 @@
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from backend.api import main
 from backend.api.main import app, get_db
 
 
@@ -59,10 +61,16 @@ def test_by_platform_uses_default_limit_per_platform():
     def override_get_db():
         yield DummyDB()
 
+    old_last = main.LAST_REFRESH_TIME
+    old_running = main._auto_refresh_running
+    main.LAST_REFRESH_TIME = datetime.now(timezone.utc)
+    main._auto_refresh_running = False
     app.dependency_overrides[get_db] = override_get_db
     try:
         response = client.get("/api/news/by_platform")
     finally:
+        main.LAST_REFRESH_TIME = old_last
+        main._auto_refresh_running = old_running
         app.dependency_overrides.clear()
 
     assert response.status_code == 200
@@ -76,10 +84,16 @@ def test_by_platform_accepts_smaller_limit_per_platform():
     def override_get_db():
         yield DummyDB()
 
+    old_last = main.LAST_REFRESH_TIME
+    old_running = main._auto_refresh_running
+    main.LAST_REFRESH_TIME = datetime.now(timezone.utc)
+    main._auto_refresh_running = False
     app.dependency_overrides[get_db] = override_get_db
     try:
         response = client.get("/api/news/by_platform?limit_per_platform=3")
     finally:
+        main.LAST_REFRESH_TIME = old_last
+        main._auto_refresh_running = old_running
         app.dependency_overrides.clear()
 
     assert response.status_code == 200

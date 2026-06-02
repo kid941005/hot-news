@@ -9,6 +9,7 @@ frontend/dist/
 backend/api/static/assets/
 *.db
 *.sqlite
+*.db-journal
 
 # Runtime data
 users.json

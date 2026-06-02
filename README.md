@@ -82,7 +82,7 @@ python3 scripts/check_platform_consistency.py
 
 ### UI 界面预览
 
-> 当前版本 UI 已升级为液态玻璃（Liquid Glass）视觉风格：深色渐变背景、半透明玻璃卡片、磨砂弹窗，以及统一的表单控件与滚动条细节。
+> 当前版本 UI 已升级为浅色灰蓝液态玻璃风格：克制渐变背景、半透明玻璃卡片、磨砂弹窗，以及统一的表单控件与滚动条细节。
 >
 > 建议在本地启动后补充最新截图到仓库（如 `docs/ui-home.png`、`docs/ui-account.png`），然后把下面占位说明替换成真实图片链接。
 >
