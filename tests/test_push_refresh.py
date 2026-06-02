@@ -98,7 +98,7 @@ def test_push_content_deduplicates_same_news_in_multiple_tags():
     config = DummyConfig()
     config.keyword_tags = {"工作": ["AI"], "科技": ["模型"]}
     db = DummyDB(config)
-    news = SimpleNamespace(id=1, title="AI 模型发布", url="https://example.com/news")
+    news = SimpleNamespace(id=1, platform="微博", title="AI 模型发布", url="https://example.com/news")
 
     with patch("backend.api.main.database.get_user_filtered_news", return_value=([news], {1: ["AI", "模型"]})):
         with patch("backend.api.main.push_to_feishu", return_value=True) as push:
@@ -108,6 +108,21 @@ def test_push_content_deduplicates_same_news_in_multiple_tags():
     assert message == "成功推送1条新闻"
     content = push.call_args.args[1]
     assert content.count("AI 模型发布") == 1
+    assert "[微博] [AI 模型发布](https://example.com/news)" in content
+
+
+def test_push_content_keeps_platform_in_untagged_news():
+    config = DummyConfig()
+    db = DummyDB(config)
+    news = SimpleNamespace(id=1, platform="知乎", title="行业观察", url="https://example.com/zhihu")
+
+    with patch("backend.api.main.database.get_user_filtered_news", return_value=([news], {1: []})):
+        with patch("backend.api.main.push_to_feishu", return_value=True) as push:
+            success, message = _push_for_user(db, config)
+
+    assert success is True
+    assert message == "成功推送1条新闻"
+    assert "[知乎] [行业观察](https://example.com/zhihu)" in push.call_args.args[1]
 
 
 def test_webhook_allowlist_rejects_internal_hosts():

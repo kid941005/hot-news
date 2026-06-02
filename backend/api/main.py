@@ -53,7 +53,7 @@ REFRESH_INTERVAL_MINUTES = get_env_int("REFRESH_INTERVAL_MINUTES", 15, min_value
 PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_value=168)
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 
-app = FastAPI(title="热点资讯", version="2.5.28")
+app = FastAPI(title="热点资讯", version="2.5.29")
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -547,12 +547,12 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
         for tag in sorted(tag_news.keys()):
             content += f"### {tag}\n"
             for i, (n, _) in enumerate(tag_news[tag], 1):
-                content += f"{i}. [{n.title}]({n.url})\n"
+                content += f"{i}. [{n.platform}] [{n.title}]({n.url})\n"
             content += "\n"
         if untagged:
             content += "### 其他\n"
             for i, n in enumerate(untagged, 1):
-                content += f"{i}. [{n.title}]({n.url})\n"
+                content += f"{i}. [{n.platform}] [{n.title}]({n.url})\n"
     else:
         for tag in sorted(tag_news.keys()):
             content += f"— {tag} —\n"
