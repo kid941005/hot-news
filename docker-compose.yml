@@ -32,3 +32,22 @@ services:
         condition: service_healthy
     restart: always
 
+  mcp:
+    image: kid941005/hot-news:latest
+    container_name: hotnews-mcp
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:hotnews123@mysql:3306/hot_news
+      - MCP_TRANSPORT=streamable-http
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8000
+      - MCP_PATH=/mcp
+      - TZ=Asia/Shanghai
+      - LOG_LEVEL=INFO
+    command: ["python", "-m", "backend.mcp_server", "--transport", "streamable-http"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: always
+
