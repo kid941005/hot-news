@@ -8,6 +8,7 @@ import ipaddress
 import socket
 import asyncio
 import re
+import time
 from urllib.parse import urlparse
 from fastapi import FastAPI, Depends, HTTPException, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -719,6 +720,9 @@ def get_news(
 ):
     _trigger_auto_refresh_if_needed(db)
     state = _get_refresh_state(db)
+    if state.get("stale") and not state.get("refreshing"):
+        _wait_for_auto_refresh(db)
+        state = _get_refresh_state(db)
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
     
     # 如果指定了all=true，获取所有热榜（不按关键词过滤）
@@ -782,6 +786,9 @@ def get_news_by_platform(
     """按平台分组获取新闻；未登录时返回公共全平台数据"""
     _trigger_auto_refresh_if_needed(db)
     state = _get_refresh_state(db)
+    if state.get("stale") and not state.get("refreshing"):
+        _wait_for_auto_refresh(db)
+        state = _get_refresh_state(db)
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first() if user_id else None
     
     # 获取用户监控的平台
@@ -863,6 +870,16 @@ def _run_background_refresh():
         logger.exception("❌ 后台自动刷新失败")
     finally:
         _auto_refresh_running = False
+
+
+def _wait_for_auto_refresh(db: Session, timeout_seconds: float = 8.0) -> None:
+    if timeout_seconds <= 0:
+        return
+    deadline = datetime.now(timezone.utc).timestamp() + timeout_seconds
+    while datetime.now(timezone.utc).timestamp() < deadline:
+        if not _auto_refresh_running and not REFRESH_LOCK.locked():
+            return
+        time.sleep(0.2)
 
 
 def _trigger_auto_refresh_if_needed(db: Session):
