@@ -45,6 +45,7 @@ const platformOptions = ref([])
 const platformOrder = ref(readJsonStorage('platformOrder', []))
 const draggingPlatform = ref(null)
 const loading = ref(false)
+const refreshState = ref({ last_refresh: null, refreshing: false, stale: false })
 const showLogin = ref(false)
 const showAccount = ref(false)
 
@@ -243,6 +244,21 @@ async function loadConfig() {
 }
 
 // 加载新闻
+function applyRefreshState(state) {
+  if (!state) return
+  refreshState.value = {
+    last_refresh: state.last_refresh || null,
+    refreshing: !!state.refreshing,
+    stale: !!state.stale,
+  }
+  if (state.last_refresh) {
+    const time = new Date(state.last_refresh)
+    if (!Number.isNaN(time.getTime())) {
+      lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
+    }
+  }
+}
+
 async function loadNews() {
   loading.value = true
   try {
@@ -254,6 +270,7 @@ async function loadNews() {
         newsByPlatform.value = res.data.platforms || {}
         newsByKeyword.value = {}
         news.value = []  // 清空普通列表
+        applyRefreshState(res.data)
       }
     } else {
       // 其他标签：按关键词筛选（需要认证）
@@ -268,6 +285,7 @@ async function loadNews() {
         if (res.data.success) {
           news.value = res.data.news || []
           newsByKeyword.value = res.data.keyword_groups || {}
+          applyRefreshState(res.data)
         }
       } else {
         // 未登录时回到公开的按平台数据
@@ -276,6 +294,7 @@ async function loadNews() {
         if (res.data.success) {
           newsByPlatform.value = res.data.platforms || {}
           news.value = []
+          applyRefreshState(res.data)
         }
       }
     }
@@ -601,7 +620,16 @@ onUnmounted(() => {
     <!-- 头部 -->
     <header class="sticky top-0 z-50 safe-area-top border-b border-white/35 bg-[linear-gradient(180deg,_rgba(248,250,252,0.78),_rgba(226,232,240,0.46))] px-5 py-3 text-slate-800 backdrop-blur-2xl shadow-[0_1px_0_rgba(255,255,255,0.75)_inset,0_18px_42px_rgba(51,65,85,0.16)] sm:px-4 sm:py-4">
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
-        <h1 class="min-w-0 flex-1 text-base font-semibold tracking-tight text-slate-900 sm:text-lg">热点资讯</h1>
+        <div class="min-w-0 flex-1">
+          <h1 class="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">热点资讯</h1>
+          <p class="mt-1 text-xs text-slate-500 sm:text-sm">
+            <span v-if="loading">正在刷新中</span>
+            <span v-else-if="refreshState.refreshing">正在后台刷新</span>
+            <span v-else-if="refreshState.last_refresh">最后刷新：{{ lastRefresh }}</span>
+            <span v-else>暂无刷新记录</span>
+            <span v-if="refreshState.stale" class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-700">数据可能已过期</span>
+          </p>
+        </div>
         <div class="flex shrink-0 flex-wrap justify-end gap-2">
           <button 
             v-if="currentUser" 
