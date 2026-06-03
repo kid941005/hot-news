@@ -835,7 +835,7 @@ def _trigger_auto_refresh_if_needed(db: Session):
     if _auto_refresh_running:
         return
     # 检查是否在手动刷新冷却期内
-    if LAST_REFRESH_TIME and REFRESH_COOLDOWN_SECONDS > 0:
+    if LAST_REFRESH_TIME and AUTO_REFRESH_COOLDOWN_SECONDS > 0:
         elapsed = (now - LAST_REFRESH_TIME).total_seconds()
         if elapsed < AUTO_REFRESH_COOLDOWN_SECONDS:
             return
