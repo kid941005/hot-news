@@ -718,6 +718,7 @@ def get_news(
     db: Session = Depends(get_db)
 ):
     _trigger_auto_refresh_if_needed(db)
+    state = _get_refresh_state(db)
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
     
     # 如果指定了all=true，获取所有热榜（不按关键词过滤）
@@ -767,7 +768,8 @@ def get_news(
         "news": news_data,
         "keyword_groups": keyword_groups,
         "total": len(news_data),
-        "current_tag": tag
+        "current_tag": tag,
+        **state,
     }
 
 
@@ -779,6 +781,7 @@ def get_news_by_platform(
 ):
     """按平台分组获取新闻；未登录时返回公共全平台数据"""
     _trigger_auto_refresh_if_needed(db)
+    state = _get_refresh_state(db)
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first() if user_id else None
     
     # 获取用户监控的平台
@@ -802,8 +805,10 @@ def get_news_by_platform(
     
     return {
         "success": True,
-        "platforms": platform_news
+        "platforms": platform_news,
+        **state,
     }
+
 
 
 from datetime import datetime, timezone
@@ -811,6 +816,37 @@ from datetime import datetime, timezone
 LAST_REFRESH_TIME = None
 REFRESH_LOCK = asyncio.Lock()
 _auto_refresh_running = False
+
+
+def _get_refresh_state(db: Session) -> dict:
+    latest_cache = None
+    try:
+        query = db.query(database.CacheRecord)
+        if hasattr(query, "order_by"):
+            query = query.order_by(database.CacheRecord.last_fetch.desc())
+        latest_cache = query.first()
+    except Exception:
+        latest_cache = None
+    last_refresh = LAST_REFRESH_TIME or (latest_cache.last_fetch if latest_cache else None)
+    if last_refresh:
+        if isinstance(last_refresh, datetime):
+            last_refresh_text = last_refresh.isoformat().replace("+00:00", "Z")
+            if last_refresh.tzinfo is None:
+                last_refresh = last_refresh.replace(tzinfo=timezone.utc)
+        else:
+            last_refresh_text = str(last_refresh)
+    else:
+        last_refresh_text = None
+    return {
+        "last_refresh": last_refresh_text,
+        "refreshing": _auto_refresh_running or REFRESH_LOCK.locked(),
+        "stale": last_refresh is None or (
+            (datetime.now(timezone.utc) - last_refresh.astimezone(timezone.utc)).total_seconds() >= AUTO_REFRESH_COOLDOWN_SECONDS
+            if isinstance(last_refresh, datetime)
+            else True
+        ),
+    }
+
 
 def _run_background_refresh():
     global LAST_REFRESH_TIME, _auto_refresh_running
@@ -828,13 +864,14 @@ def _run_background_refresh():
     finally:
         _auto_refresh_running = False
 
+
 def _trigger_auto_refresh_if_needed(db: Session):
     global _auto_refresh_running, LAST_REFRESH_TIME
     now = datetime.now(timezone.utc)
     # 如果正在刷新中，跳过
     if _auto_refresh_running:
         return
-    # 检查是否在手动刷新冷却期内
+    # 检查是否在自动刷新冷却期内
     if LAST_REFRESH_TIME and AUTO_REFRESH_COOLDOWN_SECONDS > 0:
         elapsed = (now - LAST_REFRESH_TIME).total_seconds()
         if elapsed < AUTO_REFRESH_COOLDOWN_SECONDS:
@@ -859,6 +896,7 @@ def _trigger_auto_refresh_if_needed(db: Session):
     t = threading.Thread(target=_run_background_refresh, daemon=True)
     t.start()
 
+
 def refresh_news_data(db: Session, results: dict = None):
     if results is None:
         results = awaitable_fetch_all_spiders()
@@ -868,13 +906,16 @@ def refresh_news_data(db: Session, results: dict = None):
         if news:
             try:
                 database.save_news(db, news)
+                database.update_cache_record(db, platform, "success")
                 saved_count += len(news)
                 sources[platform] = {"status": "success", "count": len(news)}
                 logger.info("✅ 保存 %s: %s 条", platform, len(news))
             except Exception as e:
+                database.update_cache_record(db, platform, "error", str(e))
                 sources[platform] = {"status": "error", "count": 0, "error": str(e)}
                 logger.exception("❌ 保存失败 %s", platform)
         else:
+            database.update_cache_record(db, platform, "empty")
             sources[platform] = {"status": "empty", "count": 0}
     return saved_count, sources
 

@@ -6,6 +6,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backend.api import main as api
+from backend.db.database import CacheRecord
 from backend.models.models import News
 
 
@@ -20,14 +21,33 @@ class DummyQuery:
     def first(self):
         return self.item
 
+    def filter(self, *_args, **_kwargs):
+        return self
+
+    def order_by(self, *_args, **_kwargs):
+        return self
+
+    def delete(self):
+        return None
+
 
 class DummyDB:
     def __init__(self, has_news):
         self.has_news = has_news
+        self.cache_records = []
 
     def query(self, model):
-        assert model is News
-        return DummyQuery(object() if self.has_news else None)
+        if model is News:
+            return DummyQuery(object() if self.has_news else None)
+        if model is CacheRecord:
+            return DummyQuery(self.cache_records[-1] if self.cache_records else None)
+        raise AssertionError(model)
+
+    def add(self, item):
+        self.cache_records.append(item)
+
+    def commit(self):
+        pass
 
 
 def reset_auto_refresh_state():
@@ -74,3 +94,27 @@ def test_auto_refresh_starts_background_thread_when_data_is_stale():
     assert api._auto_refresh_running is True
 
     reset_auto_refresh_state()
+
+
+def test_get_refresh_state_uses_cache_record_fallback():
+    db = DummyDB(has_news=True)
+    cached = type("CacheRecord", (), {"last_fetch": datetime(2026, 1, 1, tzinfo=timezone.utc)})()
+    db.cache_records.append(cached)
+    reset_auto_refresh_state()
+
+    state = api._get_refresh_state(db)
+
+    assert state["last_refresh"] == "2026-01-01T00:00:00Z"
+    assert state["refreshing"] is False
+    assert state["stale"] is True
+
+
+def test_refresh_news_data_updates_cache_records():
+    db = DummyDB(has_news=True)
+
+    saved_count, sources = api.refresh_news_data(db, {"weibo": [], "zhihu": [{"platform": "zhihu", "title": "t", "url": "u"}]})
+
+    assert saved_count == 1
+    assert sources["weibo"]["status"] == "empty"
+    assert sources["zhihu"]["status"] == "success"
+    assert [record.platform for record in db.cache_records] == ["weibo", "zhihu"]
