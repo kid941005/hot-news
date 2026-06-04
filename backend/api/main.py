@@ -915,6 +915,7 @@ def _trigger_auto_refresh_if_needed(db: Session):
 
 
 def refresh_news_data(db: Session, results: dict = None):
+    # per-source cache: 每个源写入 CacheRecord，供前端和刷新状态使用
     if results is None:
         results = awaitable_fetch_all_spiders()
     saved_count = 0
