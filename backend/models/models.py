@@ -132,9 +132,35 @@ else:
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+def ensure_cache_record_schema():
+    conn = engine.raw_connection()
+    try:
+        cur = conn.cursor()
+        if 'mysql' in DB_URL:
+            cur.execute("SHOW COLUMNS FROM cache_records")
+            cols = {r[0] for r in cur.fetchall()}
+        elif 'sqlite' in DB_URL:
+            cur.execute("PRAGMA table_info(cache_records)")
+            cols = {r[1] for r in cur.fetchall()}
+        else:
+            cols = set()
+        for column, ddl in [
+            ('last_success_at', "ALTER TABLE cache_records ADD COLUMN last_success_at DATETIME"),
+            ('last_error_at', "ALTER TABLE cache_records ADD COLUMN last_error_at DATETIME"),
+            ('last_status', "ALTER TABLE cache_records ADD COLUMN last_status VARCHAR(20) NOT NULL DEFAULT 'success'"),
+        ]:
+            if column not in cols:
+                cur.execute(ddl)
+                conn.commit()
+    finally:
+        conn.close()
+
+
 def init_db():
     """初始化数据库"""
     Base.metadata.create_all(bind=engine)
+    ensure_user_config_schema()
+    ensure_cache_record_schema()
 
 
 def get_db():
