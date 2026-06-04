@@ -230,14 +230,20 @@ def update_user_config(db: Session, user_id: int, config_data: dict) -> UserConf
 def update_cache_record(db: Session, platform: str, status: str, error: str = ""):
     """更新缓存记录"""
     record = db.query(CacheRecord).filter(CacheRecord.platform == platform).first()
+    now = datetime.now()
     
     if not record:
         record = CacheRecord(platform=platform)
         db.add(record)
     
-    record.last_fetch = datetime.now()
+    record.last_fetch = now
     record.status = status
+    record.last_status = status
     record.error_msg = error
+    if status == "success":
+        record.last_success_at = now
+    elif status == "error":
+        record.last_error_at = now
     db.commit()
 
 

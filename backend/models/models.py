@@ -101,6 +101,9 @@ class CacheRecord(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     platform = Column(String(50), nullable=False)
     last_fetch = Column(DateTime, default=datetime.now)
+    last_success_at = Column(DateTime, nullable=True)
+    last_error_at = Column(DateTime, nullable=True)
+    last_status = Column(String(20), default="success")
     status = Column(String(20), default="success")
     error_msg = Column(Text, default="")
 
