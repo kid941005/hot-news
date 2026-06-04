@@ -96,9 +96,10 @@ def ensure_user_config_schema():
 class CacheRecord(Base):
     """缓存记录"""
     __tablename__ = 'cache_records'
+    __table_args__ = (Index('ix_cache_records_platform', 'platform'),)
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    platform = Column(String(50), nullable=False, index=True)
+    platform = Column(String(50), nullable=False)
     last_fetch = Column(DateTime, default=datetime.now)
     status = Column(String(20), default="success")
     error_msg = Column(Text, default="")
