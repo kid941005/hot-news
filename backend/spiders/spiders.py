@@ -495,7 +495,7 @@ class CankaoXiaoxiSpider(BaseSpider):
         try:
             for channel in channels:
                 url = f"https://china.cankaoxiaoxi.com/json/channel/{channel}/list.json"
-                resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+                resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"}, verify=False)
                 resp.raise_for_status()
                 data = resp.json()
                 for row in data.get("list", [])[:10]:
