@@ -99,7 +99,7 @@ class CacheRecord(Base):
     __table_args__ = (Index('ix_cache_records_platform', 'platform'),)
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    platform = Column(String(50), nullable=False)
+    platform = Column(String(50), nullable=False, index=True)
     last_fetch = Column(DateTime, default=datetime.now)
     last_success_at = Column(DateTime, nullable=True)
     last_error_at = Column(DateTime, nullable=True)
