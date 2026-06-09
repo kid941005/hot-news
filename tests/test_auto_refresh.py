@@ -10,7 +10,7 @@ from backend.db.database import CacheRecord
 from backend.models.models import News
 
 
-async def fake_fetch_all_spiders():
+async def fake_fetch_all_spiders(platforms=None):
     return {"weibo": [{"title": "测试"}]}
 
 
@@ -53,6 +53,7 @@ class DummyDB:
 def reset_auto_refresh_state():
     api.LAST_REFRESH_TIME = None
     api._auto_refresh_running = False
+    api._auto_refresh_platforms.clear()
 
 
 def test_auto_refresh_syncs_when_database_is_empty():
@@ -69,29 +70,56 @@ def test_auto_refresh_syncs_when_database_is_empty():
     assert api._auto_refresh_running is False
 
 
+def test_auto_refresh_syncs_only_requested_platform_when_database_is_empty():
+    reset_auto_refresh_state()
+    calls = []
+
+    async def fake_fetch(platforms=None):
+        calls.append(platforms)
+        return {"weibo": [{"title": "测试"}]}
+
+    with patch.object(api.spiders, "fetch_all_spiders", side_effect=fake_fetch), \
+         patch.object(api, "refresh_news_data", return_value=(1, {})):
+        api._trigger_auto_refresh_if_needed(DummyDB(has_news=False), ["weibo"])
+
+    assert calls == [["weibo"]]
+
+
 def test_auto_refresh_skips_during_cooldown():
-    api.LAST_REFRESH_TIME = datetime.now(timezone.utc)
-    api._auto_refresh_running = False
+    reset_auto_refresh_state()
+    db = DummyDB(has_news=True)
+    db.cache_records.append(type("CacheRecord", (), {
+        "platform": "weibo",
+        "last_fetch": datetime.now(timezone.utc),
+        "last_success_at": datetime.now(timezone.utc),
+    })())
 
     with patch("threading.Thread") as thread:
-        api._trigger_auto_refresh_if_needed(DummyDB(has_news=True))
+        api._trigger_auto_refresh_if_needed(db, ["weibo"])
 
     thread.assert_not_called()
     assert api._auto_refresh_running is False
 
 
 def test_auto_refresh_starts_background_thread_when_data_is_stale():
-    api.LAST_REFRESH_TIME = datetime.now(timezone.utc) - timedelta(seconds=api.AUTO_REFRESH_COOLDOWN_SECONDS + 1)
-    api._auto_refresh_running = False
+    reset_auto_refresh_state()
+    db = DummyDB(has_news=True)
+    db.cache_records.append(type("CacheRecord", (), {
+        "platform": "weibo",
+        "last_fetch": datetime.now(timezone.utc) - timedelta(seconds=api.AUTO_REFRESH_COOLDOWN_SECONDS + 1),
+        "last_success_at": None,
+    })())
 
     with patch("threading.Thread") as thread:
-        api._trigger_auto_refresh_if_needed(DummyDB(has_news=True))
+        api._trigger_auto_refresh_if_needed(db, ["weibo"])
 
     thread.assert_called_once()
     assert thread.call_args.kwargs["target"] is api._run_background_refresh
+    assert thread.call_args.kwargs["args"] == (["weibo"],)
     assert thread.call_args.kwargs["daemon"] is True
     thread.return_value.start.assert_called_once()
     assert api._auto_refresh_running is True
+    assert api._auto_refresh_platforms == {"weibo"}
 
     reset_auto_refresh_state()
 
@@ -107,6 +135,7 @@ def test_get_refresh_state_uses_cache_record_fallback():
     assert state["last_refresh"] == "2026-01-01T00:00:00Z"
     assert state["refreshing"] is False
     assert state["stale"] is True
+    assert "weibo" in state["stale_platforms"]
 
 
 def test_refresh_news_data_updates_cache_records():

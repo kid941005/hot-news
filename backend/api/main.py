@@ -718,12 +718,13 @@ def get_news(
     user_id: int = Depends(get_current_user_id), 
     db: Session = Depends(get_db)
 ):
-    _trigger_auto_refresh_if_needed(db)
-    state = _get_refresh_state(db)
+    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
+    user_platforms = config.platforms if config and config.platforms else None
+    _trigger_auto_refresh_if_needed(db, user_platforms)
+    state = _get_refresh_state(db, user_platforms)
     if state.get("stale") and not state.get("refreshing"):
         _wait_for_auto_refresh(db)
-        state = _get_refresh_state(db)
-    config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first()
+        state = _get_refresh_state(db, user_platforms)
     
     # 如果指定了all=true，获取所有热榜（不按关键词过滤）
     if all:
@@ -784,11 +785,6 @@ def get_news_by_platform(
     limit_per_platform: int = Query(50, ge=1, le=100)
 ):
     """按平台分组获取新闻；未登录时返回公共全平台数据"""
-    _trigger_auto_refresh_if_needed(db)
-    state = _get_refresh_state(db)
-    if state.get("stale") and not state.get("refreshing"):
-        _wait_for_auto_refresh(db)
-        state = _get_refresh_state(db)
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first() if user_id else None
     
     # 获取用户监控的平台
@@ -801,11 +797,17 @@ def get_news_by_platform(
         chinese_platforms = [PLATFORM_MAP.get(p, p) for p in user_platforms]
     else:
         chinese_platforms = list(PLATFORM_MAP.values())
+    refresh_platforms = _normalize_platforms(chinese_platforms)
+    _trigger_auto_refresh_if_needed(db, refresh_platforms)
+    state = _get_refresh_state(db, refresh_platforms)
+    if state.get("stale") and not state.get("refreshing"):
+        _wait_for_auto_refresh(db)
+        state = _get_refresh_state(db, refresh_platforms)
     
     # 按平台分组获取新闻
     platform_news = {}
     for platform in chinese_platforms:
-        news_items = db.query(News).filter(News.platform == platform).order_by(News.id.desc()).limit(limit_per_platform).all()
+        news_items = db.query(News).filter(News.platform == platform).order_by(News.id.asc()).limit(limit_per_platform).all()
         items = [n.to_dict() for n in news_items]
         if items:
             platform_news[platform] = items
@@ -822,9 +824,37 @@ from datetime import datetime, timezone
 LAST_REFRESH_TIME = None
 REFRESH_LOCK = asyncio.Lock()
 _auto_refresh_running = False
+_auto_refresh_platforms = set()
 
 
-def _get_refresh_state(db: Session) -> dict:
+def _normalize_platforms(platforms=None):
+    if platforms is None:
+        return list(spiders.SPIDERS.keys())
+    if isinstance(platforms, str):
+        platforms = [platforms]
+    reverse_map = {value: key for key, value in PLATFORM_MAP.items()}
+    return [reverse_map.get(platform, platform) for platform in platforms if platform]
+
+
+def _is_cache_stale(record) -> bool:
+    last_refresh = getattr(record, "last_success_at", None) or getattr(record, "last_fetch", None)
+    if not isinstance(last_refresh, datetime):
+        return True
+    if last_refresh.tzinfo is None:
+        last_refresh = last_refresh.replace(tzinfo=timezone.utc)
+    return (datetime.now(timezone.utc) - last_refresh.astimezone(timezone.utc)).total_seconds() >= AUTO_REFRESH_COOLDOWN_SECONDS
+
+
+def _get_stale_platforms(db: Session, platforms=None):
+    stale_platforms = []
+    for platform in _normalize_platforms(platforms):
+        record = db.query(database.CacheRecord).filter(database.CacheRecord.platform == platform).first()
+        if record is None or _is_cache_stale(record):
+            stale_platforms.append(platform)
+    return stale_platforms
+
+
+def _get_refresh_state(db: Session, platforms=None) -> dict:
     latest_cache = None
     try:
         query = db.query(database.CacheRecord)
@@ -843,32 +873,34 @@ def _get_refresh_state(db: Session) -> dict:
             last_refresh_text = str(last_refresh)
     else:
         last_refresh_text = None
+    stale_platforms = _get_stale_platforms(db, platforms)
+    requested_platforms = _normalize_platforms(platforms)
+    refreshing = _auto_refresh_running or REFRESH_LOCK.locked() or bool(_auto_refresh_platforms.intersection(requested_platforms))
     return {
         "last_refresh": last_refresh_text,
-        "refreshing": _auto_refresh_running or REFRESH_LOCK.locked(),
-        "stale": last_refresh is None or (
-            (datetime.now(timezone.utc) - last_refresh.astimezone(timezone.utc)).total_seconds() >= AUTO_REFRESH_COOLDOWN_SECONDS
-            if isinstance(last_refresh, datetime)
-            else True
-        ),
+        "refreshing": refreshing,
+        "stale": bool(stale_platforms),
+        "stale_platforms": stale_platforms,
     }
 
 
-def _run_background_refresh():
-    global LAST_REFRESH_TIME, _auto_refresh_running
+def _run_background_refresh(platforms=None):
+    global LAST_REFRESH_TIME, _auto_refresh_running, _auto_refresh_platforms
+    platforms = _normalize_platforms(platforms)
     try:
         db = SessionLocal()
         try:
-            results = asyncio.run(spiders.fetch_all_spiders())
+            results = asyncio.run(spiders.fetch_all_spiders(platforms))
             saved_count, sources = refresh_news_data(db, results)
             LAST_REFRESH_TIME = datetime.now(timezone.utc)
-            logger.info("📊 后台自动刷新: 共保存 %s 条新闻", saved_count)
+            logger.info("📊 后台自动刷新 %s: 共保存 %s 条新闻", ",".join(platforms), saved_count)
         finally:
             db.close()
     except Exception as e:
         logger.exception("❌ 后台自动刷新失败")
     finally:
-        _auto_refresh_running = False
+        _auto_refresh_platforms.difference_update(platforms)
+        _auto_refresh_running = bool(_auto_refresh_platforms)
 
 
 def _wait_for_auto_refresh(db: Session, timeout_seconds: float = 8.0) -> None:
@@ -881,24 +913,17 @@ def _wait_for_auto_refresh(db: Session, timeout_seconds: float = 8.0) -> None:
         time.sleep(0.2)
 
 
-def _trigger_auto_refresh_if_needed(db: Session):
-    global _auto_refresh_running, LAST_REFRESH_TIME
-    now = datetime.now(timezone.utc)
-    # 如果正在刷新中，跳过
-    if _auto_refresh_running:
+def _trigger_auto_refresh_if_needed(db: Session, platforms=None):
+    global _auto_refresh_running, LAST_REFRESH_TIME, _auto_refresh_platforms
+    stale_platforms = [platform for platform in _get_stale_platforms(db, platforms) if platform not in _auto_refresh_platforms]
+    if not stale_platforms:
         return
-    # 检查是否在自动刷新冷却期内
-    if LAST_REFRESH_TIME and AUTO_REFRESH_COOLDOWN_SECONDS > 0:
-        elapsed = (now - LAST_REFRESH_TIME).total_seconds()
-        if elapsed < AUTO_REFRESH_COOLDOWN_SECONDS:
-            return
-    # 检查是否有数据
     has_data = db.query(News).first() is not None
     if not has_data:
         # 没有数据时同步刷新（用户等待）
-        logger.info("🔄 数据库为空，触发同步刷新")
+        logger.info("🔄 数据库为空，触发同步刷新: %s", ",".join(stale_platforms))
         try:
-            results = asyncio.run(spiders.fetch_all_spiders())
+            results = asyncio.run(spiders.fetch_all_spiders(stale_platforms))
             saved_count, sources = refresh_news_data(db, results)
             LAST_REFRESH_TIME = datetime.now(timezone.utc)
             logger.info("📊 同步刷新完成: 共保存 %s 条新闻", saved_count)
@@ -906,17 +931,18 @@ def _trigger_auto_refresh_if_needed(db: Session):
             logger.exception("❌ 同步刷新失败")
         return
     # 有数据但过期：后台异步刷新
-    logger.info("🔄 数据过期，触发后台自动刷新")
+    logger.info("🔄 数据过期，触发后台自动刷新: %s", ",".join(stale_platforms))
+    _auto_refresh_platforms.update(stale_platforms)
     _auto_refresh_running = True
     import threading
-    t = threading.Thread(target=_run_background_refresh, daemon=True)
+    t = threading.Thread(target=_run_background_refresh, args=(stale_platforms,), daemon=True)
     t.start()
 
 
-def refresh_news_data(db: Session, results: dict = None):
+def refresh_news_data(db: Session, results: dict = None, platforms=None):
     # per-source cache: 每个源写入 CacheRecord，供前端和刷新状态使用
     if results is None:
-        results = awaitable_fetch_all_spiders()
+        results = awaitable_fetch_all_spiders(platforms)
     saved_count = 0
     sources = {}
     for platform, news in results.items():
@@ -937,18 +963,23 @@ def refresh_news_data(db: Session, results: dict = None):
     return saved_count, sources
 
 
-def awaitable_fetch_all_spiders():
+def awaitable_fetch_all_spiders(platforms=None):
     import asyncio
-    return asyncio.run(spiders.fetch_all_spiders())
+    return asyncio.run(spiders.fetch_all_spiders(_normalize_platforms(platforms)))
 
 
 @app.post("/api/news/refresh")
-async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
+async def refresh_news(
+    platform: Optional[str] = Query(None),
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
     global LAST_REFRESH_TIME
     now = datetime.now(timezone.utc)
+    platforms = _normalize_platforms(platform)
     if REFRESH_LOCK.locked():
         return {"success": False, "error": "刷新正在进行中"}
-    if LAST_REFRESH_TIME and REFRESH_COOLDOWN_SECONDS > 0:
+    if not platform and LAST_REFRESH_TIME and REFRESH_COOLDOWN_SECONDS > 0:
         elapsed = (now - LAST_REFRESH_TIME).total_seconds()
         if elapsed < REFRESH_COOLDOWN_SECONDS:
             return {
@@ -958,7 +989,7 @@ async def refresh_news(user_id: int = Depends(get_current_user_id), db: Session 
             }
     async with REFRESH_LOCK:
         try:
-            results = await spiders.fetch_all_spiders()
+            results = await spiders.fetch_all_spiders(platforms)
             saved_count, sources = refresh_news_data(db, results)
             logger.info("📊 共保存 %s 条新闻", saved_count)
             LAST_REFRESH_TIME = datetime.now(timezone.utc)

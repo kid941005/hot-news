@@ -45,6 +45,7 @@ const platformOptions = ref([])
 const platformOrder = ref(readJsonStorage('platformOrder', []))
 const draggingPlatform = ref(null)
 const loading = ref(false)
+const refreshingPlatform = ref(null)
 const refreshState = ref({ last_refresh: null, refreshing: false, stale: false })
 const showLogin = ref(false)
 const showAccount = ref(false)
@@ -133,6 +134,10 @@ function getPlatformLogo(platform) {
 
 function getPlatformLogoUrl(platform) {
   return platformMeta[platform]?.icon || ''
+}
+
+function getPlatformId(platform) {
+  return platformOptions.value.find(item => item.name === platform)?.id || platform
 }
 
 function formatDisplayTime(item) {
@@ -551,6 +556,29 @@ async function refresh(force = false) {
   loading.value = false
 }
 
+async function refreshPlatform(platform) {
+  if (refreshingPlatform.value) return
+  const now = Date.now()
+  refreshingPlatform.value = platform
+  try {
+    const res = await axios.post(`${API_URL}/api/news/refresh`, {}, {
+      ...getAuthHeader(),
+      params: { platform: getPlatformId(platform) }
+    })
+    if (res.data.last_refresh) {
+      const time = new Date(res.data.last_refresh)
+      lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
+      lastRefreshTime.value = now
+      localStorage.setItem('lastRefreshTime', now.toString())
+    }
+    await loadNews()
+  } catch (e) {
+    handleRequestError(e)
+  } finally {
+    refreshingPlatform.value = null
+  }
+}
+
 // 加载刷新时间
 async function loadRefreshTime() {
   try {
@@ -722,7 +750,17 @@ onUnmounted(() => {
                 <div v-if="lastRefresh" class="text-[11px] text-slate-400">更新于 {{ lastRefresh }}</div>
               </div>
             </div>
-            <span class="rounded-full border border-white/55 bg-white/60 px-2.5 py-1 text-xs font-medium text-slate-600">拖拽排序 · {{ platformNews.length }}条</span>
+            <div class="flex shrink-0 items-center gap-2">
+              <span class="rounded-full border border-white/55 bg-white/60 px-2.5 py-1 text-xs font-medium text-slate-600">拖拽排序 · {{ platformNews.length }}条</span>
+              <button
+                type="button"
+                @click.stop="refreshPlatform(platform)"
+                :disabled="refreshingPlatform === platform"
+                class="rounded-full border border-sky-200/70 bg-sky-50/80 px-2.5 py-1 text-xs font-medium text-sky-700 transition hover:bg-sky-100 disabled:opacity-55"
+              >
+                {{ refreshingPlatform === platform ? '刷新中' : '刷新' }}
+              </button>
+            </div>
           </div>
           <!-- 平台新闻列表 -->
           <div class="glass-scroll flex-1 divide-y divide-slate-300/22 lg:max-h-[28rem] lg:overflow-y-auto">

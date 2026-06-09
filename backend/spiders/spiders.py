@@ -11,7 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 from typing import List
 from datetime import datetime, timezone
-from urllib.parse import urlencode, quote
+from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
 
@@ -47,13 +47,14 @@ class WeiboSpider(BaseSpider):
     """微博热搜"""
     name = "weibo"
     COOKIE_ENV = "WEIBO_COOKIE"
-    API_URL = "https://weibo.com/ajax/side/hotSearch"
+    BASE_URL = "https://s.weibo.com"
+    HOT_URL = f"{BASE_URL}/top/summary?cate=realtimehot"
     
     def fetch(self) -> List[dict]:
         session = requests.Session()
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-            "Referer": "https://weibo.com/",
+            "Referer": self.HOT_URL,
         }
         cookie = os.getenv(self.COOKIE_ENV)
         if cookie:
@@ -61,26 +62,23 @@ class WeiboSpider(BaseSpider):
         session.headers.update(headers)
         
         try:
-            resp = session.get(self.API_URL, timeout=10)
+            resp = session.get(self.HOT_URL, timeout=10)
             resp.raise_for_status()
-            data = resp.json()
+            soup = BeautifulSoup(resp.text, "html.parser")
             items = []
-            for item in data.get("data", {}).get("realtime", [])[:50]:
-                note = item.get("note", "")
-                if not note:
+            for row in soup.select("#pl_top_realtimehot table tbody tr")[1:51]:
+                link = next((a for a in row.select("td.td-02 a") if (a.get("href") or "") and "javascript:void(0);" not in (a.get("href") or "")), None)
+                if not link:
                     continue
-                word = item.get("word", "")
-                link = item.get("url", "")
-                if not link and word:
-                    link = f"https://s.weibo.com/weibo?q={quote(word)}"
-                hot = item.get("num", "")
-                if isinstance(hot, (int, float)):
-                    hot = str(hot)
+                title = link.get_text(strip=True)
+                href = link.get("href", "")
+                if not title or not href:
+                    continue
                 items.append({
                     "platform": "微博",
-                    "title": note,
-                    "url": link or "https://weibo.com",
-                    "hot": hot,
+                    "title": title,
+                    "url": f"{self.BASE_URL}{href}",
+                    "hot": "",
                     "time": ""
                 })
             return items
