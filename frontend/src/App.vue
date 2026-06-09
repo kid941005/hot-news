@@ -882,7 +882,7 @@ onUnmounted(() => {
       </div>
     </main>
 
-    <footer class="relative max-w-6xl mx-auto px-4 pb-6 text-center text-xs text-slate-400">
+    <footer class="relative max-w-6xl mx-auto px-4 pb-6 text-center text-xs text-slate-500">
       v{{ appVersion }}
     </footer>
 
