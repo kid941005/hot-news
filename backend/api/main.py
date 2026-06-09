@@ -805,8 +805,7 @@ def get_news_by_platform(
     # 按平台分组获取新闻
     platform_news = {}
     for platform in chinese_platforms:
-        db_platform = next((k for k, v in PLATFORM_MAP.items() if v == platform), platform)
-        news_items = db.query(News).filter(News.platform == db_platform).order_by(News.id.desc()).limit(limit_per_platform).all()
+        news_items = db.query(News).filter(News.platform == platform).order_by(News.id.desc()).limit(limit_per_platform).all()
         items = [n.to_dict() for n in news_items]
         if items:
             platform_news[platform] = items

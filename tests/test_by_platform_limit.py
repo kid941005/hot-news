@@ -18,11 +18,14 @@ class DummyNews:
         return {"title": f"新闻{self.index}"}
 
 
-class DummyNewsQuery:
-    def __init__(self):
+class RecordingNewsQuery:
+    def __init__(self, db):
+        self.db = db
         self.limit_value = None
+        self.platform = None
 
-    def filter(self, *args, **kwargs):
+    def filter(self, condition):
+        self.platform = condition.right.value
         return self
 
     def order_by(self, *args, **kwargs):
@@ -33,6 +36,7 @@ class DummyNewsQuery:
         return self
 
     def all(self):
+        self.db.platform_filters.append(self.platform)
         count = self.limit_value or 0
         return [DummyNews(i) for i in range(count)]
 
@@ -49,17 +53,22 @@ class DummyConfigQuery:
 
 
 class DummyDB:
+    def __init__(self):
+        self.platform_filters = []
+
     def query(self, model):
         if model.__name__ == "UserConfig":
             return DummyConfigQuery()
-        return DummyNewsQuery()
+        return RecordingNewsQuery(self)
 
 
 def test_by_platform_uses_default_limit_per_platform():
     client = TestClient(app)
 
+    db = DummyDB()
+
     def override_get_db():
-        yield DummyDB()
+        yield db
 
     old_last = main.LAST_REFRESH_TIME
     old_running = main._auto_refresh_running
@@ -74,15 +83,20 @@ def test_by_platform_uses_default_limit_per_platform():
         app.dependency_overrides.clear()
 
     assert response.status_code == 200
-    first_items = next(iter(response.json()["platforms"].values()))
+    data = response.json()["platforms"]
+    first_items = next(iter(data.values()))
     assert len(first_items) == 50
+    assert "微博" in data
+    assert "weibo" not in db.platform_filters
 
 
 def test_by_platform_accepts_smaller_limit_per_platform():
     client = TestClient(app)
 
+    db = DummyDB()
+
     def override_get_db():
-        yield DummyDB()
+        yield db
 
     old_last = main.LAST_REFRESH_TIME
     old_running = main._auto_refresh_running
