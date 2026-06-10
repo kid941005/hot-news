@@ -62,6 +62,39 @@ def test_ifeng_spider_reads_newsnow_hotnews_data():
     assert items[0]["time"] == "2026-06-10"
 
 
+def test_ifeng_spider_falls_back_when_hotnews_empty():
+    response = Mock()
+    response.raise_for_status = Mock()
+    response.status_code = 200
+    response.text = '''
+    <html><body>
+      <script>var allData = {"hotNews1": []};</script>
+      <a href="https://news.ifeng.com/c/1" title="凤凰兜底一"></a>
+      <a href="https://news.ifeng.com/c/2">凤凰兜底二</a>
+    </body></html>
+    '''
+
+    with patch("backend.spiders.spiders.requests.get", return_value=response):
+        items = IfengSpider().fetch()
+
+    assert [item["title"] for item in items] == ["凤凰兜底一", "凤凰兜底二"]
+    assert items[0]["platform"] == "凤凰"
+    assert items[0]["url"] == "https://news.ifeng.com/c/1"
+
+
+def test_ifeng_spider_falls_back_without_alldata():
+    response = Mock()
+    response.raise_for_status = Mock()
+    response.status_code = 200
+    response.text = '<a href="https://news.ifeng.com/c/1" title="凤凰兜底一"></a>'
+
+    with patch("backend.spiders.spiders.requests.get", return_value=response):
+        items = IfengSpider().fetch()
+
+    assert len(items) == 1
+    assert items[0]["title"] == "凤凰兜底一"
+
+
 def test_jin10_spider_reads_newest_js():
     response = Mock()
     response.raise_for_status = Mock()

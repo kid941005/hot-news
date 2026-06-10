@@ -387,6 +387,27 @@ class ThepaperSpider(BaseSpider):
 class IfengSpider(BaseSpider):
     """凤凰网"""
     name = "ifeng"
+
+    def _parse_links_fallback(self, html: str) -> List[dict]:
+        soup = BeautifulSoup(html, "html.parser")
+        items = []
+        seen = set()
+        for link in soup.select('a[href*="ifeng.com/c/"], a[href*="news.ifeng.com/"]'):
+            title = str(link.get("title") or link.get_text(" ", strip=True)).strip()
+            href = str(link.get("href", "")).strip()
+            if not title or not href or title in seen:
+                continue
+            seen.add(title)
+            items.append({
+                "platform": "凤凰",
+                "title": title,
+                "url": href,
+                "hot": "",
+                "time": ""
+            })
+            if len(items) >= 20:
+                break
+        return items
     
     def fetch(self) -> List[dict]:
         url = "https://www.ifeng.com/"
@@ -395,23 +416,31 @@ class IfengSpider(BaseSpider):
             resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
             resp.raise_for_status()
             match = re.search(r"var\s+allData\s*=\s*(\{[\s\S]*?\});", resp.text)
-            if not match:
-                return []
-            data = json.loads(match.group(1))
             items = []
-            for item in data.get("hotNews1", []):
-                title = item.get("title", "").strip()
-                href = item.get("url", "")
-                if not title or not href:
-                    continue
-                items.append({
-                    "platform": "凤凰",
-                    "title": title,
-                    "url": href,
-                    "hot": "",
-                    "time": item.get("newsTime", "")
-                })
-            return items[:20]
+            if match:
+                data = json.loads(match.group(1))
+                for item in data.get("hotNews1", []):
+                    title = item.get("title", "").strip()
+                    href = item.get("url", "")
+                    if not title or not href:
+                        continue
+                    items.append({
+                        "platform": "凤凰",
+                        "title": title,
+                        "url": href,
+                        "hot": "",
+                        "time": item.get("newsTime", "")
+                    })
+            if items:
+                return items[:20]
+            logger.warning(
+                "⚠️ 凤凰 hotNews1 为空，使用链接兜底: status=%s html_len=%s has_allData=%s matched=%s",
+                resp.status_code,
+                len(resp.text),
+                "allData" in resp.text,
+                bool(match),
+            )
+            return self._parse_links_fallback(resp.text)
         except Exception as e:
             logger.exception("❌ 凤凰")
             return []
