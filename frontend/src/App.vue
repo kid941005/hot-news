@@ -163,6 +163,24 @@ function formatDisplayTime(item) {
   return ''
 }
 
+function formatRelativeTime(item) {
+  const ts = item.pub_time || item.created_at
+  if (!ts) return ''
+  const now = Date.now()
+  const date = new Date(ts).getTime()
+  if (Number.isNaN(date)) return ''
+  const diff = now - date
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  if (seconds < 60) return '刚刚'
+  if (minutes < 60) return `${minutes}分钟前`
+  if (hours < 24) return `${hours}小时前`
+  if (days < 7) return `${days}天前`
+  return new Date(ts).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+}
+
 function selectCronPreset(event) {
   config.value.push_cron = event.target.value
 }
@@ -813,12 +831,31 @@ onUnmounted(() => {
             </div>
           </div>
           <!-- 平台新闻列表 -->
-          <div class="glass-scroll flex-1 divide-y divide-slate-300/22 lg:max-h-[28rem] lg:overflow-y-auto">
-            <div
-              v-for="(item, index) in platformNews"
-              :key="item.id || item.url"
-              class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
-            >
+          <div class="glass-scroll flex-1 lg:max-h-[28rem] lg:overflow-y-auto">
+            <!-- 实时模式：时间线风格 -->
+            <div v-if="allViewMode === 'realtime'" class="border-s border-slate-300/40 flex flex-col ml-3 py-2 gap-1">
+              <div v-for="item in platformNews" :key="item.id || item.url" class="flex flex-col">
+                <span class="flex items-center gap-1 text-slate-400 ml-[-1px]">
+                  <span class="text-slate-300">-</span>
+                  <span class="text-xs text-slate-400">{{ formatRelativeTime(item) }}</span>
+                </span>
+                <a
+                  :href="item.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="ml-3 px-1 py-0.5 text-base text-slate-700 hover:bg-slate-200/30 rounded transition-all visited:text-slate-400"
+                >
+                  {{ item.title }}
+                </a>
+              </div>
+            </div>
+            <!-- 热榜模式：序号排名风格 -->
+            <div v-else class="divide-y divide-slate-300/22">
+              <div
+                v-for="(item, index) in platformNews"
+                :key="item.id || item.url"
+                class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
+              >
               <div class="flex items-start gap-3">
                 <span
                   class="mt-0.5 inline-flex h-7 min-w-[1.75rem] shrink-0 items-center justify-center rounded-lg text-xs font-semibold shadow-[0_2px_8px_rgba(148,163,184,0.12)]"
@@ -859,6 +896,7 @@ onUnmounted(() => {
                   </div>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>
