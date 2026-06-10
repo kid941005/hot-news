@@ -56,7 +56,7 @@ PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_val
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 AUTO_REFRESH_COOLDOWN_SECONDS = get_env_int("AUTO_REFRESH_COOLDOWN_SECONDS", 30, min_value=5, max_value=3600)
 
-app = FastAPI(title="热点资讯", version="2.5.46")
+app = FastAPI(title="热点资讯", version="2.5.47")
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -793,7 +793,8 @@ def get_news(
 def get_news_by_platform(
     user_id: Optional[int] = Depends(get_optional_user_id),
     db: Session = Depends(get_db),
-    limit_per_platform: int = Query(50, ge=1, le=100)
+    limit_per_platform: int = Query(50, ge=1, le=100),
+    sort: str = Query("rank")
 ):
     """按平台分组获取新闻；未登录时返回公共全平台数据"""
     config = db.query(UserConfig).filter(UserConfig.user_id == user_id).first() if user_id else None
@@ -818,7 +819,8 @@ def get_news_by_platform(
     # 按平台分组获取新闻
     platform_news = {}
     for platform in chinese_platforms:
-        news_items = db.query(News).filter(News.platform == platform).order_by(News.id.asc()).limit(limit_per_platform).all()
+        order = News.created_at.desc() if sort == "timeline" else News.id.asc()
+        news_items = db.query(News).filter(News.platform == platform).order_by(order).limit(limit_per_platform).all()
         items = [n.to_dict() for n in news_items]
         if items:
             platform_news[platform] = items

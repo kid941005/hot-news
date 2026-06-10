@@ -44,6 +44,7 @@ const newsByPlatform = ref({})  // 按平台分组的新闻
 const platformOptions = ref([])
 const platformOrder = ref(readJsonStorage('platformOrder', []))
 const draggingPlatform = ref(null)
+const allViewMode = ref('hot')
 const loading = ref(false)
 const refreshingPlatform = ref(null)
 const refreshState = ref({ last_refresh: null, refreshing: false, stale: false })
@@ -116,6 +117,11 @@ const platformMeta = {
   '36kr': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com', class: 'bg-green-100/85 text-green-600 border border-green-200' },
   'GitHub': { logo: 'GH', icon: 'https://www.google.com/s2/favicons?sz=64&domain=github.com' },
   '财联社': { logo: '财', icon: 'https://www.google.com/s2/favicons?sz=64&domain=cls.cn' },
+  '金十数据': { logo: '金', icon: 'https://www.google.com/s2/favicons?sz=64&domain=jin10.com' },
+  '联合早报': { logo: '早', icon: 'https://www.google.com/s2/favicons?sz=64&domain=zaobao.com' },
+  '格隆汇': { logo: '格', icon: 'https://www.google.com/s2/favicons?sz=64&domain=gelonghui.com' },
+  '法布财经': { logo: '法', icon: 'https://www.google.com/s2/favicons?sz=64&domain=fastbull.com' },
+  '远景论坛': { logo: '远', icon: 'https://www.google.com/s2/favicons?sz=64&domain=pcbeta.com' },
   '华尔街见闻': { logo: '华', icon: 'https://www.google.com/s2/favicons?sz=64&domain=wallstreetcn.com' },
   '澎湃': { logo: '澎', icon: 'https://www.google.com/s2/favicons?sz=64&domain=thepaper.cn' },
   '凤凰': { logo: '凤', icon: 'https://www.google.com/s2/favicons?sz=64&domain=ifeng.com' },
@@ -158,13 +164,30 @@ function selectCronPreset(event) {
 }
 const newsCount = computed(() => {
   if (currentTag.value === null) {
-    return Object.values(newsByPlatform.value).reduce((sum, items) => sum + items.length, 0)
+    if (allViewMode.value === 'realtime') return currentPlatformNews.value.length
+    return currentPlatformNews.value.reduce((sum, [, items]) => sum + items.length, 0)
   }
   return Object.values(newsByKeyword.value).reduce((sum, items) => sum + items.length, 0)
 })
 
-const orderedPlatformEntries = computed(() => {
-  const entries = Object.entries(newsByPlatform.value)
+const realtimePlatforms = new Set(['华尔街见闻', '财联社', '金十数据', '联合早报', '格隆汇', '法布财经', '远景论坛', '36Kr', 'IT之家'])
+
+function isRealtimePlatform(platform) {
+  return realtimePlatforms.has(platform)
+}
+
+function getItemTimestamp(item) {
+  const value = item.created_at || item.updated_at || ''
+  const time = value ? new Date(value).getTime() : 0
+  return Number.isNaN(time) ? 0 : time
+}
+
+const currentPlatformNews = computed(() => {
+  const entries = Object.entries(newsByPlatform.value).filter(([platform]) => allViewMode.value === 'realtime' ? isRealtimePlatform(platform) : !isRealtimePlatform(platform))
+  if (allViewMode.value === 'realtime') {
+    const items = entries.flatMap(([platform, items]) => items.map(item => ({ ...item, platform: item.platform || platform })))
+    return items.sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a))
+  }
   const order = platformOrder.value
   return entries.sort(([a], [b]) => {
     const ai = order.indexOf(a)
@@ -174,6 +197,11 @@ const orderedPlatformEntries = computed(() => {
     if (bi === -1) return -1
     return ai - bi
   })
+})
+
+const orderedPlatformEntries = computed(() => {
+  if (allViewMode.value === 'realtime') return []
+  return currentPlatformNews.value
 })
 
 function movePlatform(targetPlatform) {
@@ -273,7 +301,10 @@ async function loadNews() {
     // 当currentTag为null时，获取按平台分组的数据；否则按标签筛选
     if (currentTag.value === null) {
       // 全部标签：按平台分组（登录用户按平台筛选）
-      const res = await axios.get(`${API_URL}/api/news/by_platform`, getAuthHeader())
+      const res = await axios.get(`${API_URL}/api/news/by_platform`, {
+        ...getAuthHeader(),
+        params: allViewMode.value === 'realtime' ? { sort: 'timeline' } : {}
+      })
       if (res.data.success) {
         newsByPlatform.value = res.data.platforms || {}
         newsByKeyword.value = {}
@@ -316,6 +347,12 @@ async function loadNews() {
 // 选择标签
 async function selectTag(tag) {
   currentTag.value = tag === currentTag.value ? null : tag
+  await loadNews()
+}
+
+async function selectAllView(mode) {
+  currentTag.value = null
+  allViewMode.value = mode
   await loadNews()
 }
 
@@ -662,21 +699,21 @@ onUnmounted(() => {
           </p>
         </div>
         <div class="flex shrink-0 flex-wrap justify-end gap-2">
-          <button 
+          <button
             v-if="currentUser" 
             @click="showAccount = true"
             class="px-3 py-1.5 rounded-full text-sm border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(255,255,255,0.72))] backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.45),0_10px_24px_rgba(148,163,184,0.12)] text-slate-700"
           >
             {{ currentUser }}
           </button>
-          <button 
+          <button
             v-if="currentUser" 
             @click="logout"
             class="px-3 py-1.5 rounded-full text-sm border border-red-200/70 bg-[linear-gradient(180deg,_rgba(254,226,226,0.92),_rgba(252,165,165,0.55))] text-red-700 backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.35),0_10px_28px_rgba(248,113,113,0.18)]"
           >
             退出
           </button>
-          <button 
+          <button
             v-if="!currentUser" 
             @click="showLogin = true"
             class="px-3 py-1.5 rounded-full text-sm border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(255,255,255,0.72))] backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.45),0_10px_24px_rgba(148,163,184,0.12)] text-slate-700"
@@ -690,14 +727,21 @@ onUnmounted(() => {
     <!-- 标签筛选 -->
     <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/20 bg-[linear-gradient(180deg,_rgba(241,245,249,0.42),_rgba(203,213,225,0.18))] backdrop-blur-2xl" style="top: max(3rem, env(safe-area-inset-top))">
       <div class="glass-scroll max-w-6xl mx-auto px-5 py-1.5 flex gap-2 overflow-x-auto whitespace-nowrap sm:px-4 sm:py-2">
-        <button 
-          @click="selectTag(null)"
+        <button
+          @click="selectAllView('hot')"
             class="px-3.5 py-1.5 rounded-full text-sm font-medium border backdrop-blur-xl transition-all duration-200 shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
-          :class="currentTag === null ? 'bg-[linear-gradient(135deg,_rgba(79,70,229,0.92),_rgba(14,165,233,0.82))] text-white border-white/70 shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_12px_30px_rgba(59,130,246,0.26)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.60),_rgba(255,255,255,0.34))] text-slate-600 border-white/60 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.52))]'"
+          :class="currentTag === null && allViewMode === 'hot' ? 'bg-[linear-gradient(135deg,_rgba(79,70,229,0.92),_rgba(14,165,233,0.82))] text-white border-white/70 shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_12px_30px_rgba(59,130,246,0.26)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.60),_rgba(255,255,255,0.34))] text-slate-600 border-white/60 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.52))]'"
         >
-          全部
+          热榜
         </button>
-        <button 
+        <button
+          @click="selectAllView('realtime')"
+            class="px-3.5 py-1.5 rounded-full text-sm font-medium border backdrop-blur-xl transition-all duration-200 shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
+          :class="currentTag === null && allViewMode === 'realtime' ? 'bg-[linear-gradient(135deg,_rgba(79,70,229,0.92),_rgba(14,165,233,0.82))] text-white border-white/70 shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_12px_30px_rgba(59,130,246,0.26)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.60),_rgba(255,255,255,0.34))] text-slate-600 border-white/60 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.52))]'"
+        >
+          实时
+        </button>
+        <button
           v-for="tag in tags" 
           :key="tag"
           @click="selectTag(tag)"
@@ -717,7 +761,7 @@ onUnmounted(() => {
           <span class="text-slate-700 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
           <span v-if="lastRefresh" class="text-xs text-slate-500">上次刷新: {{ lastRefresh }}</span>
         </div>
-        <button 
+        <button
           @click="refresh(true)" 
           :disabled="loading"
             class="px-4 py-2 rounded-xl text-sm font-medium border border-white/70 bg-[linear-gradient(135deg,_rgba(37,99,235,0.92),_rgba(14,165,233,0.82))] text-white backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.30)_inset,0_14px_34px_rgba(37,99,235,0.25)] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
@@ -787,8 +831,8 @@ onUnmounted(() => {
                 </span>
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <a 
-                      :href="item.url" 
+                    <a
+                      :href="item.url"
                       target="_blank"
                       rel="noopener noreferrer"
                       class="min-w-0 flex-1 text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600" 
@@ -798,7 +842,7 @@ onUnmounted(() => {
                   </div>
                   <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex flex-wrap gap-1">
-                      <span 
+                      <span
                         v-for="kw in (item.matched_keywords || [])"
                         :key="kw"
                         class="text-sm px-2.5 py-0.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-100/80 text-fuchsia-700"
@@ -813,6 +857,40 @@ onUnmounted(() => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="currentTag === null && allViewMode === 'realtime' && currentPlatformNews.length > 0" class="space-y-3">
+        <div
+          v-for="item in currentPlatformNews"
+          :key="item.id || item.url"
+          class="group rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] p-4 shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(145deg,_rgba(255,255,255,0.84),_rgba(219,234,254,0.48))] hover:shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_26px_64px_rgba(51,65,85,0.20)]"
+        >
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <a
+              :href="item.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
+            >
+              {{ item.title }}
+            </a>
+            <span
+              class="inline-flex w-fit shrink-0 items-center gap-1.5 text-xs px-2 py-1 rounded-full sm:ml-2"
+              :class="getPlatformClass(item.platform)"
+            >
+              <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center overflow-hidden rounded-full bg-slate-50/65 px-1 text-[10px] font-semibold leading-none">
+                <img v-if="getPlatformLogoUrl(item.platform)" :src="getPlatformLogoUrl(item.platform)" :alt="item.platform" class="h-3.5 w-3.5 object-contain" referrerpolicy="no-referrer" />
+                <span v-else>{{ getPlatformLogo(item.platform) }}</span>
+              </span>
+              <span>{{ item.platform }}</span>
+            </span>
+          </div>
+          <div class="mt-2 flex justify-end">
+            <span class="w-fit rounded-full border border-white/55 bg-slate-50/60 px-2.5 py-1 text-[11px] font-medium text-slate-500">
+              {{ formatDisplayTime(item) }}
+            </span>
           </div>
         </div>
       </div>
@@ -835,15 +913,15 @@ onUnmounted(() => {
               class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
             >
               <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <a 
-                  :href="item.url" 
+                <a
+                  :href="item.url"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
                 >
                   {{ item.title }}
                 </a>
-                <span 
+                <span
                   class="inline-flex w-fit shrink-0 items-center gap-1.5 text-xs px-2 py-1 rounded-full sm:ml-2"
                   :class="getPlatformClass(item.platform)"
                 >
@@ -856,7 +934,7 @@ onUnmounted(() => {
               </div>
               <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex flex-wrap gap-1">
-                  <span 
+                  <span
                     v-for="kw in (item.matched_keywords || [])"
                     :key="kw"
                     class="text-sm px-2.5 py-0.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-100/80 text-fuchsia-700"
@@ -880,15 +958,15 @@ onUnmounted(() => {
           class="group rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] p-4 shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(145deg,_rgba(255,255,255,0.84),_rgba(219,234,254,0.48))] hover:shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_26px_64px_rgba(51,65,85,0.20)]"
         >
           <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <a 
-              :href="item.url" 
+            <a
+              :href="item.url"
               target="_blank"
               rel="noopener noreferrer"
               class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
             >
               {{ item.title }}
             </a>
-            <span 
+            <span
               class="inline-flex w-fit shrink-0 items-center gap-1.5 text-xs px-2 py-1 rounded-full sm:ml-2"
               :class="getPlatformClass(item.platform)"
             >
@@ -899,7 +977,7 @@ onUnmounted(() => {
           <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <!-- 匹配关键词标签 -->
             <div class="flex flex-wrap gap-1">
-              <span 
+              <span
                 v-for="kw in (item.matched_keywords || [])"
                 :key="kw"
                 class="text-sm px-2.5 py-0.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-100/80 text-fuchsia-700"
@@ -1004,20 +1082,20 @@ onUnmounted(() => {
                 </div>
                 <!-- 操作按钮 -->
                 <div class="flex gap-1">
-                  <button 
+                  <button
                     v-if="renamingTag !== tag"
                     @click="startRenameTag(tag)"
                     class="text-xs px-2 py-1 rounded-full border border-blue-200 bg-blue-50/80 text-blue-600"
                   >
                     重命名
                   </button>
-                  <button 
+                  <button
                     @click="editTagKeywords(tag)"
                     class="text-xs px-2 py-1 rounded-full border border-indigo-200 bg-indigo-50/80 text-indigo-600"
                   >
                     {{ (keywordTags[tag] || []).length ? '编辑' : '设置' }}
                   </button>
-                  <button 
+                  <button
                     @click="deleteTag(tag)"
                     class="text-xs px-2 py-1 rounded-full border border-red-200 bg-red-50/80 text-red-600"
                   >
@@ -1033,13 +1111,13 @@ onUnmounted(() => {
                   rows="2"
                 ></textarea>
                 <div class="flex gap-2 mt-1">
-                  <button 
+                  <button
                     @click="saveTagKeywords"
                     class="text-xs px-2 py-1 rounded-full border border-white/60 bg-white/80 text-slate-700"
                   >
                     保存
                   </button>
-                  <button 
+                  <button
                     @click="editingTag = null"
                     class="text-xs px-2 py-1 rounded-full border border-white/50 bg-white/65 text-slate-500"
                   >
@@ -1144,7 +1222,7 @@ onUnmounted(() => {
               上次推送：{{ new Date(lastPushTime).toLocaleString('zh-CN') }}
             </div>
             
-            <button 
+            <button
               @click="pushNews" 
               :disabled="pushLoading"
               class="w-full py-2 rounded-2xl border border-emerald-200 bg-emerald-50/85 text-emerald-700 text-sm backdrop-blur-xl shadow-[0_8px_20px_rgba(16,185,129,0.08)]"

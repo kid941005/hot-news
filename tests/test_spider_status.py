@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import requests
 
-from backend.spiders.spiders import BaiduSpider, GitHubSpider
+from backend.spiders.spiders import BaiduSpider, FastbullSpider, GitHubSpider, IfengSpider, Jin10Spider, ZaobaoSpider
 
 
 class BaiduSuccessResponse:
@@ -46,3 +46,63 @@ def test_github_spider_rejects_http_error_status():
         assert GitHubSpider().fetch() == []
 
     response.raise_for_status.assert_called_once()
+
+
+def test_ifeng_spider_reads_newsnow_hotnews_data():
+    response = Mock()
+    response.raise_for_status = Mock()
+    response.text = 'var allData = {"hotNews1":[{"title":"凤凰标题一","url":"https://news.ifeng.com/a","newsTime":"2026-06-10"},{"title":"凤凰标题二","url":"https://news.ifeng.com/b","newsTime":""}]};'
+
+    with patch("backend.spiders.spiders.requests.get", return_value=response):
+        items = IfengSpider().fetch()
+
+    assert [item["title"] for item in items] == ["凤凰标题一", "凤凰标题二"]
+    assert items[0]["platform"] == "凤凰"
+    assert items[0]["url"] == "https://news.ifeng.com/a"
+    assert items[0]["time"] == "2026-06-10"
+
+
+def test_jin10_spider_reads_newest_js():
+    response = Mock()
+    response.raise_for_status = Mock()
+    response.text = 'var newest = [{"id":"1","time":"2026-06-10 09:43:22","type":0,"important":1,"channel":[1],"data":{"content":"【金十标题】详情"}},{"id":"2","time":"2026-06-10 09:40:00","type":0,"important":0,"channel":[5],"data":{"content":"过滤"}}];'
+
+    with patch("backend.spiders.spiders.requests.get", return_value=response):
+        items = Jin10Spider().fetch()
+
+    assert len(items) == 1
+    assert items[0]["platform"] == "金十数据"
+    assert items[0]["title"] == "金十标题"
+    assert items[0]["url"] == "https://flash.jin10.com/detail/1"
+    assert items[0]["time"] == "09:43"
+
+
+def test_zaobao_spider_reads_gb2312_realtime_page():
+    response = Mock()
+    response.raise_for_status = Mock()
+    html = '<div class="list-block"><a class="item" href="/realtime/1.html"><span class="eps">早报标题</span><span class="pdt10">2026-06-10 09:30</span></a></div>'
+    response.content = html.encode("gb2312")
+
+    with patch("backend.spiders.spiders.requests.get", return_value=response):
+        items = ZaobaoSpider().fetch()
+
+    assert items[0]["platform"] == "联合早报"
+    assert items[0]["title"] == "早报标题"
+    assert items[0]["url"] == "https://www.zaochenbao.com/realtime/1.html"
+    assert items[0]["time"] == "09:30"
+
+
+def test_fastbull_spider_reads_api_body_message():
+    response = Mock()
+    response.raise_for_status = Mock()
+    response.json.return_value = {
+        "bodyMessage": '{"pageDatas":[{"newsId":"1","path":"fastbull-title-1","title":"法布标题","point":12,"pubTime":1781048143634}]}'
+    }
+
+    with patch("backend.spiders.spiders.requests.post", return_value=response):
+        items = FastbullSpider().fetch()
+
+    assert items[0]["platform"] == "法布财经"
+    assert items[0]["title"] == "法布标题"
+    assert items[0]["url"] == "https://www.fastbull.com/cn/news-detail/fastbull-title-1"
+    assert items[0]["hot"] == "12"

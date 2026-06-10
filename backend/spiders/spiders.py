@@ -13,7 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from typing import List
 from datetime import datetime, timezone
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +35,13 @@ def format_rfc822_to_beijing(pub_date: str) -> str:
         return dt.astimezone().strftime("%H:%M")
     except Exception:
         return ""
+
+
+def format_datetime_text(value: str) -> str:
+    if not value:
+        return ""
+    match = re.search(r"(\d{1,2}:\d{2})", value)
+    return match.group(1) if match else value.strip()
 
 
 class BaseSpider:
@@ -378,41 +385,33 @@ class ThepaperSpider(BaseSpider):
             return []
 
 class IfengSpider(BaseSpider):
-    """凤凰网 - 使用网页解析"""
+    """凤凰网"""
     name = "ifeng"
     
     def fetch(self) -> List[dict]:
         url = "https://www.ifeng.com/"
         
         try:
-            resp = requests.get(url, timeout=10)
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
             resp.raise_for_status()
-            soup = BeautifulSoup(resp.text, 'html.parser')
+            match = re.search(r"var\s+allData\s*=\s*(\{[\s\S]*?\});", resp.text)
+            if not match:
+                return []
+            data = json.loads(match.group(1))
             items = []
-            
-            # 提取新闻标题和链接
-            for item in soup.select("a[title]")[:25]:
+            for item in data.get("hotNews1", []):
                 title = item.get("title", "").strip()
-                href = item.get("href", "")
-                # 过滤有效的新闻链接
-                if title and len(title) > 8 and "ifeng.com" in href and "javascript" not in href:
-                    items.append({
-                        "platform": "凤凰",
-                        "title": title,
-                        "url": href if href.startswith("http") else f"https://news.ifeng.com{href}",
-                        "hot": "",
-                        "time": ""
-                    })
-            
-            # 去重
-            seen = set()
-            unique_items = []
-            for item in items:
-                if item["title"] not in seen:
-                    seen.add(item["title"])
-                    unique_items.append(item)
-            
-            return unique_items[:20]
+                href = item.get("url", "")
+                if not title or not href:
+                    continue
+                items.append({
+                    "platform": "凤凰",
+                    "title": title,
+                    "url": href,
+                    "hot": "",
+                    "time": item.get("newsTime", "")
+                })
+            return items[:20]
         except Exception as e:
             logger.exception("❌ 凤凰")
             return []
@@ -521,6 +520,164 @@ class ClsSpider(BaseSpider):
             return items[:20]
         except Exception as e:
             logger.exception("❌ 财联社")
+            return []
+
+
+class Jin10Spider(BaseSpider):
+    """金十数据"""
+    name = "jin10"
+
+    def fetch(self) -> List[dict]:
+        url = f"https://www.jin10.com/flash_newest.js?t={int(time.time() * 1000)}"
+        try:
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.jin10.com/"})
+            resp.raise_for_status()
+            text = re.sub(r"^\s*var\s+newest\s*=\s*", "", resp.text).strip().rstrip(";")
+            data = json.loads(text)
+            items = []
+            for item in data[:30]:
+                if 5 in (item.get("channel") or []):
+                    continue
+                detail = item.get("data") or {}
+                raw_title = detail.get("title") or detail.get("content") or ""
+                title = re.sub(r"</?b>", "", raw_title).strip()
+                match = re.match(r"^【([^】]+)】(.*)$", title)
+                if match:
+                    title = match.group(1)
+                if title and item.get("id"):
+                    items.append({
+                        "platform": "金十数据",
+                        "title": title,
+                        "url": f"https://flash.jin10.com/detail/{item.get('id')}",
+                        "hot": "✰" if item.get("important") else "",
+                        "time": format_datetime_text(item.get("time", "")),
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 金十数据")
+            return []
+
+
+class ZaobaoSpider(BaseSpider):
+    """联合早报"""
+    name = "zaobao"
+
+    def fetch(self) -> List[dict]:
+        base_url = "https://www.zaochenbao.com"
+        try:
+            resp = requests.get(f"{base_url}/realtime/", timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
+            html = resp.content.decode("gb2312", errors="ignore")
+            soup = BeautifulSoup(html, "html.parser")
+            items = []
+            for row in soup.select("div.list-block > a.item")[:30]:
+                title_el = row.select_one(".eps")
+                time_el = row.select_one(".pdt10")
+                href = str(row.get("href", ""))
+                title = title_el.get_text(strip=True) if title_el else ""
+                if title and href:
+                    items.append({
+                        "platform": "联合早报",
+                        "title": title,
+                        "url": urljoin(base_url, href),
+                        "hot": "",
+                        "time": format_datetime_text(time_el.get_text(" ", strip=True) if time_el else ""),
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 联合早报")
+            return []
+
+
+class GelonghuiSpider(BaseSpider):
+    """格隆汇"""
+    name = "gelonghui"
+
+    def fetch(self) -> List[dict]:
+        base_url = "https://www.gelonghui.com"
+        try:
+            resp = requests.get(f"{base_url}/news/", timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, "html.parser")
+            items = []
+            for row in soup.select(".article-content")[:30]:
+                link = row.select_one(".detail-right > a")
+                title_el = link.select_one("h2") if link else None
+                time_el = row.select_one(".time > span:nth-child(3)")
+                href = str(link.get("href", "")) if link else ""
+                title = title_el.get_text(strip=True) if title_el else ""
+                if title and href:
+                    items.append({
+                        "platform": "格隆汇",
+                        "title": title,
+                        "url": urljoin(base_url, href),
+                        "hot": "",
+                        "time": format_datetime_text(time_el.get_text(" ", strip=True) if time_el else ""),
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 格隆汇")
+            return []
+
+
+class FastbullSpider(BaseSpider):
+    """法布财经"""
+    name = "fastbull"
+
+    def fetch(self) -> List[dict]:
+        url = "https://api.fastbull.com/fastbull-news-service/api/getNewsPageOrderByTimeDesc"
+        payload = {"pageSize": 30, "reqSource": 0, "showPoint": 1, "showNewsTypeList": [1, 2, 5]}
+        try:
+            resp = requests.post(url, json=payload, timeout=10, headers={
+                "User-Agent": "Mozilla/5.0",
+                "Referer": "https://www.fastbull.com/cn/express-news",
+                "Origin": "https://www.fastbull.com",
+            })
+            resp.raise_for_status()
+            body = json.loads(resp.json().get("bodyMessage", "{}"))
+            items = []
+            for item in body.get("pageDatas", [])[:30]:
+                title = item.get("translateTitle") or item.get("title") or ""
+                path = item.get("path") or item.get("newsId") or ""
+                if title and path:
+                    items.append({
+                        "platform": "法布财经",
+                        "title": title,
+                        "url": f"https://www.fastbull.com/cn/news-detail/{path}",
+                        "hot": str(item.get("point") or ""),
+                        "time": format_beijing_timestamp((item.get("pubTime") or 0) / 1000),
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 法布财经")
+            return []
+
+
+class PcbetaSpider(BaseSpider):
+    """远景论坛 Win11"""
+    name = "pcbeta"
+
+    def fetch(self) -> List[dict]:
+        try:
+            resp = requests.get("https://bbs.pcbeta.com/forum.php?mod=rss&fid=563&auth=0", timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, "xml")
+            items = []
+            for row in soup.select("item")[:30]:
+                title = row.title.get_text(strip=True) if row.title else ""
+                link = row.link.get_text(strip=True) if row.link else ""
+                pub_date = row.pubDate.get_text(strip=True) if row.pubDate else ""
+                if title and link:
+                    items.append({
+                        "platform": "远景论坛",
+                        "title": title,
+                        "url": link,
+                        "hot": "",
+                        "time": format_rfc822_to_beijing(pub_date),
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 远景论坛")
             return []
 
 
@@ -756,6 +913,11 @@ SPIDERS = {
     "sspai": SspaiSpider,
     "github": GitHubSpider,
     "cls": ClsSpider,
+    "jin10": Jin10Spider,
+    "zaobao": ZaobaoSpider,
+    "gelonghui": GelonghuiSpider,
+    "fastbull": FastbullSpider,
+    "pcbeta": PcbetaSpider,
     "ithome": IthomeSpider,
     "36kr": Kr36Spider,
     "tencent": TencentSpider,
