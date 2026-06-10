@@ -56,7 +56,7 @@ PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_val
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 AUTO_REFRESH_COOLDOWN_SECONDS = get_env_int("AUTO_REFRESH_COOLDOWN_SECONDS", 30, min_value=5, max_value=3600)
 
-app = FastAPI(title="热点资讯", version="2.5.49")
+app = FastAPI(title="热点资讯", version="2.5.50")
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -306,6 +306,30 @@ def logout(Authorization: Optional[str] = Header(None)):
         token = Authorization[7:]
         delete_token(token)
     return {"success": True}
+
+
+def _deduplicate_news_by_title(news_list):
+    seen_titles = set()
+    unique_news = []
+    for news in news_list:
+        title = (getattr(news, "title", "") or "").strip().casefold()
+        if title and title in seen_titles:
+            continue
+        if title:
+            seen_titles.add(title)
+        unique_news.append(news)
+    return unique_news
+
+
+def _append_keyword_group_once(keyword_groups, item, item_keywords, seen_titles):
+    title = (item.get("title") or "").strip().casefold()
+    for kw in item_keywords:
+        if title and title in seen_titles:
+            return
+        keyword_groups.setdefault(kw, []).append(item)
+        if title:
+            seen_titles.add(title)
+        return
 
 
 @app.get("/api/platforms")
@@ -755,6 +779,7 @@ def get_news(
     else:
         # 默认按用户关键词过滤
         news_list, matched_keywords = database.get_user_filtered_news(db, user_id)
+    news_list = _deduplicate_news_by_title(news_list)
     
     # 可选过滤当天入库的文章并按时间倒序
     today_str = datetime.now().strftime("%Y-%m-%d")
@@ -773,11 +798,11 @@ def get_news(
     news_data.sort(key=lambda x: x.get('pub_time', ''), reverse=True)
 
     keyword_groups = {}
+    seen_group_titles = set()
     if tag and config and config.keyword_tags is not None:
         for item in news_data:
             item_keywords = item.get('matched_keywords', []) or []
-            for kw in item_keywords:
-                keyword_groups.setdefault(kw, []).append(item)
+            _append_keyword_group_once(keyword_groups, item, item_keywords, seen_group_titles)
     
     return {
         "success": True,

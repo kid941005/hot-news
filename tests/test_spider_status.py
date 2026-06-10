@@ -2,7 +2,17 @@ from unittest.mock import Mock, patch
 
 import requests
 
-from backend.spiders.spiders import BaiduSpider, FastbullSpider, GitHubSpider, IfengSpider, Jin10Spider, ZaobaoSpider
+from backend.spiders.spiders import (
+    BaiduSpider,
+    FastbullSpider,
+    GitHubSpider,
+    IfengSpider,
+    Jin10Spider,
+    KuaishouSpider,
+    Kr36RenqiSpider,
+    XueqiuHotstockSpider,
+    ZaobaoSpider,
+)
 
 
 class BaiduSuccessResponse:
@@ -139,3 +149,73 @@ def test_fastbull_spider_reads_api_body_message():
     assert items[0]["title"] == "法布标题"
     assert items[0]["url"] == "https://www.fastbull.com/cn/news-detail/fastbull-title-1"
     assert items[0]["hot"] == "12"
+
+
+def test_36kr_renqi_spider_reads_newsnow_gateway_api():
+    response = Mock()
+    response.raise_for_status = Mock()
+    response.json.return_value = {
+        "data": {
+            "hotRankList": [
+                {
+                    "itemId": 123,
+                    "templateMaterial": {
+                        "widgetTitle": "36氪标题",
+                        "authorName": "作者",
+                        "statFormat": "热度 99",
+                    },
+                }
+            ]
+        }
+    }
+
+    with patch("backend.spiders.spiders.requests.post", return_value=response):
+        items = Kr36RenqiSpider().fetch()
+
+    assert items[0]["platform"] == "36氪人气榜"
+    assert items[0]["title"] == "36氪标题"
+    assert items[0]["url"] == "https://36kr.com/p/123"
+    assert items[0]["hot"] == "作者  |  热度 99"
+
+
+def test_xueqiu_hotstock_spider_reads_cookie_api():
+    first = Mock()
+    first.raise_for_status = Mock()
+    second = Mock()
+    second.raise_for_status = Mock()
+    second.json.return_value = {
+        "data": {
+            "items": [
+                {"code": "SH600000", "name": "浦发银行", "percent": 1.2, "exchange": "SH", "ad": 0},
+                {"code": "AD", "name": "广告", "percent": 0, "exchange": "SH", "ad": 1},
+            ]
+        }
+    }
+    session = Mock()
+    session.headers.update = Mock()
+    session.get.side_effect = [first, second]
+
+    with patch("backend.spiders.spiders.requests.Session", return_value=session):
+        items = XueqiuHotstockSpider().fetch()
+
+    assert len(items) == 1
+    assert items[0]["platform"] == "雪球热门股票"
+    assert items[0]["title"] == "浦发银行"
+    assert items[0]["url"] == "https://xueqiu.com/s/SH600000"
+    assert items[0]["hot"] == "1.2% SH"
+
+
+def test_kuaishou_spider_reads_apollo_state():
+    response = Mock()
+    response.raise_for_status = Mock()
+    response.text = '''
+    <script>window.__APOLLO_STATE__ = {"defaultClient":{"ROOT_QUERY":{"visionHotRank({\\"page\\":\\"home\\"})":{"id":"HotRank:1"}},"HotRank:1":{"items":[{"id":"VisionHotRankItem:a"},{"id":"VisionHotRankItem:b"}]},"VisionHotRankItem:a":{"name":"置顶标题","tagType":"置顶"},"VisionHotRankItem:b":{"name":"快手标题"}}};</script>
+    '''
+
+    with patch("backend.spiders.spiders.requests.get", return_value=response):
+        items = KuaishouSpider().fetch()
+
+    assert len(items) == 1
+    assert items[0]["platform"] == "快手"
+    assert items[0]["title"] == "快手标题"
+    assert items[0]["url"] == "https://www.kuaishou.com/search/video?searchKey=%E5%BF%AB%E6%89%8B%E6%A0%87%E9%A2%98"

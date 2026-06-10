@@ -79,11 +79,11 @@ class WeiboSpider(BaseSpider):
                 if not link:
                     continue
                 title = link.get_text(strip=True)
-                href = link.get("href", "")
+                href = str(link.get("href") or "")
                 if not title or not href:
                     continue
                 items.append({
-                    "platform": "微博",
+                    "platform": "微博热搜",
                     "title": title,
                     "url": f"{self.BASE_URL}{href}",
                     "hot": "",
@@ -493,7 +493,7 @@ class GitHubSpider(BaseSpider):
                 if not link:
                     continue
                 title = re.sub(r"\s+", "", link.get_text())
-                href = link.get("href", "")
+                href = str(link.get("href") or "")
                 star_link = article.select_one("[href$=stargazers]")
                 hot = re.sub(r"\s+", "", star_link.get_text()) if star_link else ""
                 if title and href:
@@ -879,7 +879,7 @@ class IthomeSpider(BaseSpider):
                 if not link:
                     continue
                 title = link.get_text(strip=True)
-                href = link.get("href", "")
+                href = str(link.get("href") or "")
                 if href and title and "lapin" not in href and not any(k in title for k in ["神券", "优惠", "补贴", "京东"]):
                     items.append({
                         "platform": "IT之家",
@@ -912,7 +912,7 @@ class Kr36Spider(BaseSpider):
                 if not link:
                     continue
                 title = link.get_text(strip=True)
-                href = link.get("href", "")
+                href = str(link.get("href") or "")
                 if title and href:
                     items.append({
                         "platform": "36Kr",
@@ -924,6 +924,113 @@ class Kr36Spider(BaseSpider):
             return items
         except Exception as e:
             logger.exception("❌ 36Kr")
+            return []
+
+
+class Kr36RenqiSpider(BaseSpider):
+    """36氪人气榜"""
+    name = "36kr-renqi"
+
+    def fetch(self) -> List[dict]:
+        url = "https://gateway.36kr.com/api/mis/nav/home/nav/rank/hot"
+        try:
+            resp = requests.post(
+                url,
+                timeout=10,
+                headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"},
+                json={"partner_id": "web", "param": {"siteId": 1, "platformId": 2}},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            items = []
+            for row in data.get("data", {}).get("hotRankList", [])[:30]:
+                item_id = row.get("itemId")
+                material = row.get("templateMaterial", {})
+                title = material.get("widgetTitle", "")
+                if item_id and title:
+                    items.append({
+                        "platform": "36氪人气榜",
+                        "title": title,
+                        "url": f"https://36kr.com/p/{item_id}",
+                        "hot": "  |  ".join(v for v in [material.get("authorName", ""), material.get("statFormat", "")] if v),
+                        "time": "",
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 36氪人气榜")
+            return []
+
+
+class XueqiuHotstockSpider(BaseSpider):
+    """雪球热门股票"""
+    name = "xueqiu-hotstock"
+
+    def fetch(self) -> List[dict]:
+        url = "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=30&_type=10&type=10"
+        headers = {"User-Agent": "Mozilla/5.0", "Referer": "https://xueqiu.com/hq"}
+        try:
+            session = requests.Session()
+            session.headers.update(headers)
+            session.get("https://xueqiu.com/hq", timeout=10).raise_for_status()
+            resp = session.get(url, timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+            items = []
+            for row in data.get("data", {}).get("items", [])[:30]:
+                if row.get("ad"):
+                    continue
+                code = row.get("code", "")
+                title = row.get("name", "")
+                if code and title:
+                    percent = row.get("percent", "")
+                    exchange = row.get("exchange", "")
+                    items.append({
+                        "platform": "雪球热门股票",
+                        "title": title,
+                        "url": f"https://xueqiu.com/s/{code}",
+                        "hot": f"{percent}% {exchange}".strip(),
+                        "time": "",
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 雪球热门股票")
+            return []
+
+
+class KuaishouSpider(BaseSpider):
+    """快手热榜"""
+    name = "kuaishou"
+
+    def fetch(self) -> List[dict]:
+        url = "https://www.kuaishou.com/?isHome=1"
+        try:
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
+            match = re.search(r"window\.__APOLLO_STATE__\s*=\s*(\{.+?\});", resp.text)
+            if not match:
+                return []
+            data = json.loads(match.group(1))
+            root = data.get("defaultClient", {}).get("ROOT_QUERY", {})
+            hot_rank_id = root.get('visionHotRank({"page":"home"})', {}).get("id")
+            hot_rank = data.get("defaultClient", {}).get(hot_rank_id, {}) if hot_rank_id else {}
+            items = []
+            for item in hot_rank.get("items", [])[:30]:
+                item_id = item.get("id", "")
+                row = data.get("defaultClient", {}).get(item_id, {})
+                if row.get("tagType") == "置顶":
+                    continue
+                title = row.get("name", "")
+                if title:
+                    items.append({
+                        "platform": "快手",
+                        "title": title,
+                        "url": f"https://www.kuaishou.com/search/video?{urlencode({'searchKey': title})}",
+                        "hot": "",
+                        "time": "",
+                    })
+            return items
+        except Exception:
+            logger.exception("❌ 快手")
             return []
 
 # 注册爬虫
@@ -949,6 +1056,9 @@ SPIDERS = {
     "pcbeta": PcbetaSpider,
     "ithome": IthomeSpider,
     "36kr": Kr36Spider,
+    "36kr-renqi": Kr36RenqiSpider,
+    "xueqiu-hotstock": XueqiuHotstockSpider,
+    "kuaishou": KuaishouSpider,
     "tencent": TencentSpider,
     "kaopu": KaopuSpider,
     "cankaoxiaoxi": CankaoXiaoxiSpider,

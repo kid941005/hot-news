@@ -15,7 +15,7 @@ from backend.models.models import News, User, UserConfig, CacheRecord, init_db
 # ============= 新闻操作 =============
 
 PLATFORM_MAP = {
-    "weibo": "微博",
+    "weibo": "微博热搜",
     "baidu": "百度",
     "bilibili": "B站",
     "bilibili-hot-video": "B站热门视频",
@@ -36,6 +36,9 @@ PLATFORM_MAP = {
     "pcbeta": "远景论坛",
     "ithome": "IT之家",
     "36kr": "36Kr",
+    "36kr-renqi": "36氪人气榜",
+    "xueqiu-hotstock": "雪球热门股票",
+    "kuaishou": "快手",
     "tencent": "腾讯新闻",
     "kaopu": "靠谱新闻",
     "cankaoxiaoxi": "参考消息",

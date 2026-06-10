@@ -104,6 +104,7 @@ const cronPresets = [
 
 const defaultPlatformClass = 'bg-slate-100/85 text-slate-700 border border-slate-200'
 const platformMeta = {
+  '微博热搜': { logo: '微', icon: 'https://www.google.com/s2/favicons?sz=64&domain=weibo.com', class: 'bg-red-100/85 text-red-600 border border-red-200' },
   '微博': { logo: '微', icon: 'https://www.google.com/s2/favicons?sz=64&domain=weibo.com', class: 'bg-red-100/85 text-red-600 border border-red-200' },
   '百度': { logo: '百', icon: 'https://www.google.com/s2/favicons?sz=64&domain=baidu.com', class: 'bg-blue-100/85 text-blue-600 border border-blue-200' },
   'B站': { logo: 'B', icon: 'https://www.google.com/s2/favicons?sz=64&domain=bilibili.com', class: 'bg-pink-100/85 text-pink-600 border border-pink-200' },
@@ -114,6 +115,9 @@ const platformMeta = {
   '头条': { logo: '头', icon: 'https://www.google.com/s2/favicons?sz=64&domain=toutiao.com', class: 'bg-yellow-100/85 text-yellow-700 border border-yellow-200' },
   'IT之家': { logo: 'IT', icon: 'https://www.google.com/s2/favicons?sz=64&domain=ithome.com', class: 'bg-cyan-100/85 text-cyan-600 border border-cyan-200' },
   '36Kr': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com' },
+  '36氪人气榜': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com', class: 'bg-green-100/85 text-green-600 border border-green-200' },
+  '雪球热门股票': { logo: '雪', icon: 'https://www.google.com/s2/favicons?sz=64&domain=xueqiu.com', class: 'bg-sky-100/85 text-sky-600 border border-sky-200' },
+  '快手': { logo: '快', icon: 'https://www.google.com/s2/favicons?sz=64&domain=kuaishou.com', class: 'bg-orange-100/85 text-orange-600 border border-orange-200' },
   '36kr': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com', class: 'bg-green-100/85 text-green-600 border border-green-200' },
   'GitHub': { logo: 'GH', icon: 'https://www.google.com/s2/favicons?sz=64&domain=github.com' },
   '财联社': { logo: '财', icon: 'https://www.google.com/s2/favicons?sz=64&domain=cls.cn' },
@@ -175,17 +179,30 @@ function isRealtimePlatform(platform) {
   return realtimePlatforms.has(platform)
 }
 
+function getItemTimestamp(item) {
+  const value = item.created_at || item.updated_at || ''
+  const time = value ? new Date(value).getTime() : 0
+  return Number.isNaN(time) ? 0 : time
+}
+
 const currentPlatformNews = computed(() => {
   const entries = Object.entries(newsByPlatform.value).filter(([platform]) => allViewMode.value === 'realtime' ? isRealtimePlatform(platform) : !isRealtimePlatform(platform))
   const order = platformOrder.value
-  return entries.sort(([a], [b]) => {
-    const ai = order.indexOf(a)
-    const bi = order.indexOf(b)
-    if (ai === -1 && bi === -1) return 0
-    if (ai === -1) return 1
-    if (bi === -1) return -1
-    return ai - bi
-  })
+  return entries
+    .map(([platform, items]) => {
+      const sortedItems = allViewMode.value === 'realtime'
+        ? [...items].sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a))
+        : items
+      return [platform, sortedItems]
+    })
+    .sort(([a], [b]) => {
+      const ai = order.indexOf(a)
+      const bi = order.indexOf(b)
+      if (ai === -1 && bi === -1) return 0
+      if (ai === -1) return 1
+      if (bi === -1) return -1
+      return ai - bi
+    })
 })
 
 const orderedPlatformEntries = computed(() => currentPlatformNews.value)

@@ -107,7 +107,7 @@ def test_by_platform_uses_default_limit_per_platform():
     data = response.json()["platforms"]
     first_items = next(iter(data.values()))
     assert len(first_items) == 50
-    assert "微博" in data
+    assert "微博热搜" in data
     assert "weibo" not in db.platform_filters
     assert any("ASC" in order.upper() for order in db.orders if order)
 
