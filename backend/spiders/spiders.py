@@ -5,8 +5,10 @@
 import logging
 import os
 import asyncio
+import hashlib
 import json
 import re
+import time
 import requests
 from bs4 import BeautifulSoup
 from typing import List
@@ -56,9 +58,8 @@ class WeiboSpider(BaseSpider):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "Referer": self.HOT_URL,
         }
-        cookie = os.getenv(self.COOKIE_ENV)
-        if cookie:
-            headers["Cookie"] = cookie
+        cookie = os.getenv(self.COOKIE_ENV) or "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7"
+        headers["Cookie"] = cookie
         session.headers.update(headers)
         
         try:
@@ -152,6 +153,67 @@ class BilibiliSpider(BaseSpider):
         except Exception as e:
             logger.exception("❌ B站")
             return []
+
+class BilibiliHotVideoSpider(BaseSpider):
+    """B站热门视频"""
+    name = "bilibili-hot-video"
+
+    def fetch(self) -> List[dict]:
+        url = "https://api.bilibili.com/x/web-interface/popular"
+        try:
+            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.bilibili.com/"})
+            resp.raise_for_status()
+            data = resp.json()
+            items = []
+            for video in data.get("data", {}).get("list", [])[:30]:
+                bvid = video.get("bvid", "")
+                title = video.get("title", "")
+                stat = video.get("stat", {})
+                if title and bvid:
+                    items.append({
+                        "platform": "B站热门视频",
+                        "title": title,
+                        "url": f"https://www.bilibili.com/video/{bvid}",
+                        "hot": f"{stat.get('view', 0)}观看",
+                        "time": format_beijing_timestamp(video.get("pubdate")),
+                    })
+            return items
+        except Exception as e:
+            logger.exception("❌ B站热门视频")
+            return []
+
+
+class BilibiliRankingSpider(BaseSpider):
+    """B站排行榜"""
+    name = "bilibili-ranking"
+
+    def fetch(self) -> List[dict]:
+        url = "https://api.bilibili.com/x/web-interface/ranking?rid=0&day=3"
+        try:
+            session = requests.Session()
+            session.headers.update({"User-Agent": "Mozilla/5.0", "Referer": "https://www.bilibili.com/v/popular/rank/all"})
+            session.get("https://www.bilibili.com/", timeout=10)
+            resp = session.get(url, timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+            items = []
+            for video in data.get("data", {}).get("list", [])[:30]:
+                bvid = video.get("bvid", "")
+                title = video.get("title", "")
+                stat = video.get("stat", {})
+                if title and bvid:
+                    items.append({
+                        "platform": "B站排行榜",
+                        "title": title,
+                        "url": f"https://www.bilibili.com/video/{bvid}",
+                        "hot": f"{stat.get('view', 0)}观看",
+                        "time": format_beijing_timestamp(video.get("pubdate")),
+                    })
+            return items
+        except Exception as e:
+            logger.exception("❌ B站排行榜")
+            return []
+
 
 class DouyinSpider(BaseSpider):
     """抖音热搜"""
@@ -419,6 +481,49 @@ class GitHubSpider(BaseSpider):
             logger.exception("❌ GitHub")
             return []
 
+class ClsSpider(BaseSpider):
+    """财联社电报"""
+    name = "cls"
+
+    def fetch(self) -> List[dict]:
+        url = "https://www.cls.cn/v1/roll/get_roll_list"
+        params = {
+            "appName": "CailianpressWeb",
+            "os": "web",
+            "refresh_type": "1",
+            "rn": "30",
+            "sv": "7.7.5",
+            "last_time": str(int(time.time())),
+        }
+        sign_base = urlencode(sorted(params.items()))
+        params["sign"] = hashlib.md5(hashlib.sha1(sign_base.encode()).hexdigest().encode()).hexdigest()
+        try:
+            resp = requests.get(url, params=params, timeout=10, headers={
+                "User-Agent": "Mozilla/5.0",
+                "Referer": "https://www.cls.cn/telegraph",
+            })
+            resp.raise_for_status()
+            data = resp.json()
+            items = []
+            for item in data.get("data", {}).get("roll_data", [])[:30]:
+                if item.get("is_ad"):
+                    continue
+                title = item.get("title") or item.get("brief") or item.get("content", "")
+                link = item.get("shareurl") or f"https://www.cls.cn/detail/{item.get('id')}"
+                if title and link:
+                    items.append({
+                        "platform": "财联社",
+                        "title": title,
+                        "url": link,
+                        "hot": "",
+                        "time": format_beijing_timestamp(item.get("ctime")),
+                    })
+            return items[:20]
+        except Exception as e:
+            logger.exception("❌ 财联社")
+            return []
+
+
 class TencentSpider(BaseSpider):
     """腾讯新闻"""
     name = "tencent"
@@ -640,6 +745,8 @@ SPIDERS = {
     "weibo": WeiboSpider,
     "baidu": BaiduSpider,
     "bilibili": BilibiliSpider,
+    "bilibili-hot-video": BilibiliHotVideoSpider,
+    "bilibili-ranking": BilibiliRankingSpider,
     "douyin": DouyinSpider,
     "zhihu": ZhihuSpider,
     "toutiao": ToutiaoSpider,
@@ -648,6 +755,7 @@ SPIDERS = {
     "ifeng": IfengSpider,
     "sspai": SspaiSpider,
     "github": GitHubSpider,
+    "cls": ClsSpider,
     "ithome": IthomeSpider,
     "36kr": Kr36Spider,
     "tencent": TencentSpider,

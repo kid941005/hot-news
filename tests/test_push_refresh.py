@@ -111,6 +111,26 @@ def test_push_content_deduplicates_same_news_in_multiple_tags():
     assert "[微博] [AI 模型发布](https://example.com/news)" in content
 
 
+def test_push_content_deduplicates_same_title_across_news():
+    config = DummyConfig()
+    db = DummyDB(config)
+    news_list = [
+        SimpleNamespace(id=1, platform="微博", title="相同标题", url="https://example.com/1"),
+        SimpleNamespace(id=2, platform="知乎", title="相同标题", url="https://example.com/2"),
+    ]
+
+    with patch("backend.api.main.database.get_user_filtered_news", return_value=(news_list, {1: [], 2: []})):
+        with patch("backend.api.main.push_to_feishu", return_value=True) as push:
+            success, message = _push_for_user(db, config)
+
+    assert success is True
+    assert message == "成功推送1条新闻"
+    content = push.call_args.args[1]
+    assert content.count("相同标题") == 1
+    assert "https://example.com/1" in content
+    assert "https://example.com/2" not in content
+
+
 def test_push_content_keeps_platform_in_untagged_news():
     config = DummyConfig()
     db = DummyDB(config)

@@ -6,7 +6,7 @@ import os
 import base64
 import hashlib
 import hmac
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from backend.models.models import News, User, UserConfig, CacheRecord, init_db
@@ -18,6 +18,8 @@ PLATFORM_MAP = {
     "weibo": "微博",
     "baidu": "百度",
     "bilibili": "B站",
+    "bilibili-hot-video": "B站热门视频",
+    "bilibili-ranking": "B站排行榜",
     "douyin": "抖音",
     "zhihu": "知乎",
     "toutiao": "头条",
@@ -26,6 +28,7 @@ PLATFORM_MAP = {
     "ifeng": "凤凰",
     "sspai": "少数派",
     "github": "GitHub",
+    "cls": "财联社",
     "ithome": "IT之家",
     "36kr": "36Kr",
     "tencent": "腾讯新闻",
@@ -41,13 +44,25 @@ def save_news(db: Session, news_list: List[dict]):
         return
 
     platform = news_list[0].get('platform', '')
+    cutoff = datetime.utcnow() - timedelta(days=7)
     
-    # 清理旧数据
-    db.query(News).filter(News.platform == platform).delete()
+    # 仅清理 7 天前旧数据，保留近 7 天历史新闻
+    db.query(News).filter(News.platform == platform, News.created_at < cutoff).delete()
     
     # 写入新数据
     try:
         for item in news_list:
+            existing = db.query(News).filter(
+                News.platform == item.get('platform', ''),
+                News.title == item.get('title', ''),
+                News.url == item.get('url', ''),
+            ).first()
+            if isinstance(existing, News):
+                existing.hot_value = item.get('hot', '')
+                existing.pub_time = item.get('time', '')
+                existing.raw_data = item
+                existing.updated_at = datetime.utcnow()
+                continue
             news = News(
                 platform=item.get('platform', ''),
                 title=item.get('title', ''),

@@ -56,7 +56,7 @@ PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_val
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 AUTO_REFRESH_COOLDOWN_SECONDS = get_env_int("AUTO_REFRESH_COOLDOWN_SECONDS", 30, min_value=5, max_value=3600)
 
-app = FastAPI(title="热点资讯", version="2.5.44")
+app = FastAPI(title="热点资讯", version="2.5.46")
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -547,6 +547,17 @@ def _push_for_user(db: Session, config: UserConfig) -> tuple:
     # 过滤屏蔽词
     if blocked_keywords:
         news_list = [n for n in news_list if not any(kw in n.title for kw in blocked_keywords)]
+
+    seen_titles = set()
+    unique_news = []
+    for n in news_list:
+        title = (n.title or "").strip()
+        if title and title in seen_titles:
+            continue
+        if title:
+            seen_titles.add(title)
+        unique_news.append(n)
+    news_list = unique_news
 
     if not news_list:
         return (False, "没有可推送的新闻")

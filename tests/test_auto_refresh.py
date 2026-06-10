@@ -15,13 +15,25 @@ async def fake_fetch_all_spiders(platforms=None):
 
 
 class DummyQuery:
-    def __init__(self, item):
+    def __init__(self, item=None, items=None):
         self.item = item
+        self.items = items
+        self.platform = None
 
     def first(self):
-        return self.item
+        if self.items is None:
+            return self.item
+        for item in reversed(self.items):
+            if self.platform is None or item.platform == self.platform:
+                return item
+        return None
 
-    def filter(self, *_args, **_kwargs):
+    def filter(self, *args, **_kwargs):
+        for arg in args:
+            right = getattr(arg, "right", None)
+            value = getattr(right, "value", None)
+            if value:
+                self.platform = value
         return self
 
     def order_by(self, *_args, **_kwargs):
@@ -35,18 +47,25 @@ class DummyDB:
     def __init__(self, has_news):
         self.has_news = has_news
         self.cache_records = []
+        self.news = []
 
     def query(self, model):
         if model is News:
             return DummyQuery(object() if self.has_news else None)
         if model is CacheRecord:
-            return DummyQuery(self.cache_records[-1] if self.cache_records else None)
+            return DummyQuery(items=self.cache_records)
         raise AssertionError(model)
 
     def add(self, item):
-        self.cache_records.append(item)
+        if isinstance(item, CacheRecord):
+            self.cache_records.append(item)
+        else:
+            self.news.append(item)
 
     def commit(self):
+        pass
+
+    def rollback(self):
         pass
 
 
@@ -126,7 +145,10 @@ def test_auto_refresh_starts_background_thread_when_data_is_stale():
 
 def test_get_refresh_state_uses_cache_record_fallback():
     db = DummyDB(has_news=True)
-    cached = type("CacheRecord", (), {"last_fetch": datetime(2026, 1, 1, tzinfo=timezone.utc)})()
+    cached = type("CacheRecord", (), {
+        "platform": "weibo",
+        "last_fetch": datetime(2026, 1, 1, tzinfo=timezone.utc),
+    })()
     db.cache_records.append(cached)
     reset_auto_refresh_state()
 
