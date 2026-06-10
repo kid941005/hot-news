@@ -164,7 +164,6 @@ function selectCronPreset(event) {
 }
 const newsCount = computed(() => {
   if (currentTag.value === null) {
-    if (allViewMode.value === 'realtime') return currentPlatformNews.value.length
     return currentPlatformNews.value.reduce((sum, [, items]) => sum + items.length, 0)
   }
   return Object.values(newsByKeyword.value).reduce((sum, items) => sum + items.length, 0)
@@ -176,18 +175,8 @@ function isRealtimePlatform(platform) {
   return realtimePlatforms.has(platform)
 }
 
-function getItemTimestamp(item) {
-  const value = item.created_at || item.updated_at || ''
-  const time = value ? new Date(value).getTime() : 0
-  return Number.isNaN(time) ? 0 : time
-}
-
 const currentPlatformNews = computed(() => {
   const entries = Object.entries(newsByPlatform.value).filter(([platform]) => allViewMode.value === 'realtime' ? isRealtimePlatform(platform) : !isRealtimePlatform(platform))
-  if (allViewMode.value === 'realtime') {
-    const items = entries.flatMap(([platform, items]) => items.map(item => ({ ...item, platform: item.platform || platform })))
-    return items.sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a))
-  }
   const order = platformOrder.value
   return entries.sort(([a], [b]) => {
     const ai = order.indexOf(a)
@@ -199,10 +188,7 @@ const currentPlatformNews = computed(() => {
   })
 })
 
-const orderedPlatformEntries = computed(() => {
-  if (allViewMode.value === 'realtime') return []
-  return currentPlatformNews.value
-})
+const orderedPlatformEntries = computed(() => currentPlatformNews.value)
 
 function movePlatform(targetPlatform) {
   if (!draggingPlatform.value || draggingPlatform.value === targetPlatform) return
@@ -798,7 +784,7 @@ onUnmounted(() => {
               </div>
             </div>
             <div class="flex shrink-0 items-center gap-2">
-              <span class="rounded-full border border-white/55 bg-white/60 px-2.5 py-1 text-xs font-medium text-slate-600">拖拽排序 · {{ platformNews.length }}条</span>
+              <span class="rounded-full border border-white/55 bg-white/60 px-2.5 py-1 text-xs font-medium text-slate-600">{{ allViewMode === 'realtime' ? '实时源' : '拖拽排序' }} · {{ platformNews.length }}条</span>
               <button
                 type="button"
                 @click.stop="refreshPlatform(platform)"
@@ -857,40 +843,6 @@ onUnmounted(() => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-else-if="currentTag === null && allViewMode === 'realtime' && currentPlatformNews.length > 0" class="space-y-3">
-        <div
-          v-for="item in currentPlatformNews"
-          :key="item.id || item.url"
-          class="group rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] p-4 shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(145deg,_rgba(255,255,255,0.84),_rgba(219,234,254,0.48))] hover:shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_26px_64px_rgba(51,65,85,0.20)]"
-        >
-          <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <a
-              :href="item.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
-            >
-              {{ item.title }}
-            </a>
-            <span
-              class="inline-flex w-fit shrink-0 items-center gap-1.5 text-xs px-2 py-1 rounded-full sm:ml-2"
-              :class="getPlatformClass(item.platform)"
-            >
-              <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center overflow-hidden rounded-full bg-slate-50/65 px-1 text-[10px] font-semibold leading-none">
-                <img v-if="getPlatformLogoUrl(item.platform)" :src="getPlatformLogoUrl(item.platform)" :alt="item.platform" class="h-3.5 w-3.5 object-contain" referrerpolicy="no-referrer" />
-                <span v-else>{{ getPlatformLogo(item.platform) }}</span>
-              </span>
-              <span>{{ item.platform }}</span>
-            </span>
-          </div>
-          <div class="mt-2 flex justify-end">
-            <span class="w-fit rounded-full border border-white/55 bg-slate-50/60 px-2.5 py-1 text-[11px] font-medium text-slate-500">
-              {{ formatDisplayTime(item) }}
-            </span>
           </div>
         </div>
       </div>
