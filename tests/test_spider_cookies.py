@@ -51,13 +51,13 @@ def test_toutiao_cookie_is_optional_env_header(monkeypatch):
     response.json.return_value = {"data": []}
     monkeypatch.delenv("TOUTIAO_COOKIE", raising=False)
 
-    with patch("backend.spiders.spiders.requests.get", return_value=response) as get:
+    with patch("backend.spiders.spiders.fetch_get", return_value=response) as get:
         assert ToutiaoSpider().fetch() == []
 
-    assert "Cookie" not in get.call_args.kwargs["headers"]
+    assert get.call_args.kwargs.get("headers") is None
 
     monkeypatch.setenv("TOUTIAO_COOKIE", "tt_webid=test")
-    with patch("backend.spiders.spiders.requests.get", return_value=response) as get:
+    with patch("backend.spiders.spiders.fetch_get", return_value=response) as get:
         ToutiaoSpider().fetch()
 
     assert get.call_args.kwargs["headers"]["Cookie"] == "tt_webid=test"

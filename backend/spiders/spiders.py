@@ -10,12 +10,53 @@ import json
 import re
 import time
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 from typing import List
 from datetime import datetime, timezone
 from urllib.parse import urlencode, urljoin
 
 logger = logging.getLogger(__name__)
+
+_DEFAULT_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+)
+
+
+def _session(headers=None):
+    """Create a requests.Session with default UA, auto-retry, and optional extra headers."""
+    s = requests.Session()
+    s.headers.update({"User-Agent": _DEFAULT_UA})
+    if headers:
+        s.headers.update(headers)
+    retry = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    s.mount("https://", HTTPAdapter(max_retries=retry))
+    s.mount("http://", HTTPAdapter(max_retries=retry))
+    return s
+
+
+def _resolve_timeout(timeout):
+    if timeout is not None:
+        return float(timeout)
+    return float(os.getenv("SPIDER_FETCH_TIMEOUT_SECONDS", "15"))
+
+
+def fetch_get(url, *, headers=None, params=None, session=None, timeout=None, verify=True):
+    """GET with default UA, retry, and env-configurable timeout. Returns requests.Response."""
+    s = session or _session(headers)
+    resp = s.get(url, params=params, timeout=_resolve_timeout(timeout), verify=verify)
+    resp.raise_for_status()
+    return resp
+
+
+def fetch_post(url, *, json=None, headers=None, session=None, timeout=None, verify=True):
+    """POST with default UA, retry, and env-configurable timeout. Returns requests.Response."""
+    s = session or _session(headers)
+    resp = s.post(url, json=json, timeout=_resolve_timeout(timeout), verify=verify)
+    resp.raise_for_status()
+    return resp
 
 
 def format_beijing_timestamp(timestamp) -> str:
@@ -34,6 +75,10 @@ def format_rfc822_to_beijing(pub_date: str) -> str:
         dt = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %Z").replace(tzinfo=timezone.utc)
         return dt.astimezone().strftime("%H:%M")
     except Exception:
+        pass
+    try:
+        return datetime.fromisoformat(pub_date.replace("Z", "+00:00")).astimezone().strftime("%H:%M")
+    except Exception:
         return ""
 
 
@@ -42,6 +87,38 @@ def format_datetime_text(value: str) -> str:
         return ""
     match = re.search(r"(\d{1,2}:\d{2})", value)
     return match.group(1) if match else value.strip()
+
+
+def _rss_text(row, tag: str) -> str:
+    node = row.find(tag)
+    return node.get_text(strip=True) if node else ""
+
+
+def _parse_rss_text(xml_text: str, platform: str, limit: int = 30) -> List[dict]:
+    soup = BeautifulSoup(xml_text, "xml")
+    items = []
+    for row in soup.select("item, entry")[:limit]:
+        title = _rss_text(row, "title")
+        link = _rss_text(row, "link")
+        if not link:
+            link_node = row.find("link", href=True)
+            href = link_node.get("href", "") if link_node else ""
+            link = str(href).strip()
+        pub_date = _rss_text(row, "pubDate") or _rss_text(row, "published") or _rss_text(row, "updated")
+        if title and link:
+            items.append({
+                "platform": platform,
+                "title": title,
+                "url": link,
+                "hot": "",
+                "time": format_rfc822_to_beijing(pub_date),
+            })
+    return items
+
+
+def define_rss_source(url: str, platform: str, limit: int = 30) -> List[dict]:
+    resp = fetch_get(url)
+    return _parse_rss_text(resp.text, platform, limit)
 
 
 class BaseSpider:
@@ -60,18 +137,15 @@ class WeiboSpider(BaseSpider):
     HOT_URL = f"{BASE_URL}/top/summary?cate=realtimehot"
     
     def fetch(self) -> List[dict]:
-        session = requests.Session()
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "Referer": self.HOT_URL,
         }
         cookie = os.getenv(self.COOKIE_ENV) or "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7"
         headers["Cookie"] = cookie
-        session.headers.update(headers)
-        
+
         try:
-            resp = session.get(self.HOT_URL, timeout=10)
-            resp.raise_for_status()
+            resp = fetch_get(self.HOT_URL, headers=headers)
             soup = BeautifulSoup(resp.text, "html.parser")
             items = []
             for row in soup.select("#pl_top_realtimehot table tbody tr")[1:51]:
@@ -103,8 +177,7 @@ class BaiduSpider(BaseSpider):
         url = "https://top.baidu.com/board?tab=realtime"
         
         try:
-            resp = requests.get(url, timeout=10)
-            resp.raise_for_status()
+            resp = fetch_get(url)
             match = re.search(r'<!--s-data:(.*?)-->', resp.text, re.S)
             if not match:
                 return []
@@ -138,11 +211,9 @@ class BilibiliSpider(BaseSpider):
     
     def fetch(self) -> List[dict]:
         url = "https://s.search.bilibili.com/main/hotword?limit=30"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        
+
         try:
-            resp = requests.get(url, timeout=10, headers=headers)
-            resp.raise_for_status()
+            resp = fetch_get(url)
             data = resp.json()
             items = []
             for item in data.get("list", [])[:30]:
@@ -168,8 +239,7 @@ class BilibiliHotVideoSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://api.bilibili.com/x/web-interface/popular"
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.bilibili.com/"})
-            resp.raise_for_status()
+            resp = fetch_get(url, headers={"Referer": "https://www.bilibili.com/"})
             data = resp.json()
             items = []
             for video in data.get("data", {}).get("list", [])[:30]:
@@ -197,11 +267,9 @@ class BilibiliRankingSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://api.bilibili.com/x/web-interface/ranking?rid=0&day=3"
         try:
-            session = requests.Session()
-            session.headers.update({"User-Agent": "Mozilla/5.0", "Referer": "https://www.bilibili.com/v/popular/rank/all"})
-            session.get("https://www.bilibili.com/", timeout=10)
-            resp = session.get(url, timeout=10)
-            resp.raise_for_status()
+            session = _session(headers={"Referer": "https://www.bilibili.com/v/popular/rank/all"})
+            fetch_get("https://www.bilibili.com/", session=session, timeout=5)
+            resp = fetch_get(url, session=session)
             data = resp.json()
             items = []
             for video in data.get("data", {}).get("list", [])[:30]:
@@ -228,16 +296,14 @@ class DouyinSpider(BaseSpider):
     
     def fetch(self) -> List[dict]:
         url = "https://www.douyin.com/aweme/v1/web/hot/search/list/?device_platform=webapp&aid=6383&channel=channel_pc_web&detail_list=1"
-        session = requests.Session()
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "Referer": "https://www.douyin.com/",
         }
 
         try:
-            session.get("https://login.douyin.com/", timeout=10, headers=headers)
-            resp = session.get(url, timeout=10, headers=headers)
-            resp.raise_for_status()
+            session = _session(headers)
+            fetch_get("https://login.douyin.com/", session=session, timeout=5)
+            resp = fetch_get(url, session=session)
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("word_list", [])[:30]:
@@ -266,10 +332,9 @@ class ZhihuSpider(BaseSpider):
         url = "https://www.zhihu.com/api/v3/feed/topstory/hot-list-web?limit=20&desktop=true"
         
         try:
-            resp = requests.get(url, timeout=10, headers={
+            resp = fetch_get(url, headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             })
-            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", [])[:20]:
@@ -298,12 +363,11 @@ class ToutiaoSpider(BaseSpider):
         url = "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc"
         
         try:
-            headers = {"User-Agent": "Mozilla/5.0"}
             cookie = os.getenv("TOUTIAO_COOKIE")
+            headers = {} if cookie else None
             if cookie:
-                headers["Cookie"] = cookie
-            resp = requests.get(url, timeout=10, headers=headers)
-            resp.raise_for_status()
+                headers = {"Cookie": cookie}
+            resp = fetch_get(url, headers=headers)
             data = resp.json()
             items = []
             for item in data.get("data", [])[:30]:
@@ -330,11 +394,9 @@ class WallstreetcnSpider(BaseSpider):
         url = "https://api-one.wallstcn.com/apiv1/content/lives?channel=global-channel&limit=30"
         
         try:
-            resp = requests.get(url, timeout=10, headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            resp = fetch_get(url, headers={
                 "Referer": "https://wallstreetcn.com/"
             })
-            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("items", [])[:30]:
@@ -364,8 +426,7 @@ class ThepaperSpider(BaseSpider):
         url = "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar"
         
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("hotNews", [])[:30]:
@@ -413,8 +474,7 @@ class IfengSpider(BaseSpider):
         url = "https://www.ifeng.com/"
         
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             match = re.search(r"var\s+allData\s*=\s*(\{[\s\S]*?\});", resp.text)
             items = []
             if match:
@@ -457,8 +517,7 @@ class SspaiSpider(BaseSpider):
         url = f"https://sspai.com/api/v1/article/tag/page/get?limit=20&offset=0&created_at={timestamp}&tag=%E7%83%AD%E9%97%A8%E6%96%87%E7%AB%A0&released=false"
         
         try:
-            resp = requests.get(url, timeout=10)
-            resp.raise_for_status()
+            resp = fetch_get(url)
             data = resp.json()
             items = []
             for item in data.get("data", []):
@@ -484,8 +543,7 @@ class GitHubSpider(BaseSpider):
         url = "https://github.com/trending?spoken_language_code="
         
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             soup = BeautifulSoup(resp.text, "html.parser")
             items = []
             for article in soup.select("main .Box div[data-hpc] > article")[:25]:
@@ -526,11 +584,9 @@ class ClsSpider(BaseSpider):
         sign_base = urlencode(sorted(params.items()))
         params["sign"] = hashlib.md5(hashlib.sha1(sign_base.encode()).hexdigest().encode()).hexdigest()
         try:
-            resp = requests.get(url, params=params, timeout=10, headers={
-                "User-Agent": "Mozilla/5.0",
+            resp = fetch_get(url, params=params, headers={
                 "Referer": "https://www.cls.cn/telegraph",
             })
-            resp.raise_for_status()
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("roll_data", [])[:30]:
@@ -559,8 +615,7 @@ class Jin10Spider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = f"https://www.jin10.com/flash_newest.js?t={int(time.time() * 1000)}"
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.jin10.com/"})
-            resp.raise_for_status()
+            resp = fetch_get(url, headers={"Referer": "https://www.jin10.com/"})
             text = re.sub(r"^\s*var\s+newest\s*=\s*", "", resp.text).strip().rstrip(";")
             data = json.loads(text)
             items = []
@@ -594,8 +649,7 @@ class ZaobaoSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         base_url = "https://www.zaochenbao.com"
         try:
-            resp = requests.get(f"{base_url}/realtime/", timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(f"{base_url}/realtime/")
             html = resp.content.decode("gb2312", errors="ignore")
             soup = BeautifulSoup(html, "html.parser")
             items = []
@@ -625,8 +679,7 @@ class GelonghuiSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         base_url = "https://www.gelonghui.com"
         try:
-            resp = requests.get(f"{base_url}/news/", timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(f"{base_url}/news/")
             soup = BeautifulSoup(resp.text, "html.parser")
             items = []
             for row in soup.select(".article-content")[:30]:
@@ -657,12 +710,10 @@ class FastbullSpider(BaseSpider):
         url = "https://api.fastbull.com/fastbull-news-service/api/getNewsPageOrderByTimeDesc"
         payload = {"pageSize": 30, "reqSource": 0, "showPoint": 1, "showNewsTypeList": [1, 2, 5]}
         try:
-            resp = requests.post(url, json=payload, timeout=10, headers={
-                "User-Agent": "Mozilla/5.0",
+            resp = fetch_post(url, json=payload, headers={
                 "Referer": "https://www.fastbull.com/cn/express-news",
                 "Origin": "https://www.fastbull.com",
             })
-            resp.raise_for_status()
             body = json.loads(resp.json().get("bodyMessage", "{}"))
             items = []
             for item in body.get("pageDatas", [])[:30]:
@@ -688,25 +739,137 @@ class PcbetaSpider(BaseSpider):
 
     def fetch(self) -> List[dict]:
         try:
-            resp = requests.get("https://bbs.pcbeta.com/forum.php?mod=rss&fid=563&auth=0", timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
-            soup = BeautifulSoup(resp.text, "xml")
-            items = []
-            for row in soup.select("item")[:30]:
-                title = row.title.get_text(strip=True) if row.title else ""
-                link = row.link.get_text(strip=True) if row.link else ""
-                pub_date = row.pubDate.get_text(strip=True) if row.pubDate else ""
-                if title and link:
-                    items.append({
-                        "platform": "远景论坛",
-                        "title": title,
-                        "url": link,
-                        "hot": "",
-                        "time": format_rfc822_to_beijing(pub_date),
-                    })
-            return items
+            return define_rss_source("https://bbs.pcbeta.com/forum.php?mod=rss&fid=563&auth=0", "远景论坛")
         except Exception:
             logger.exception("❌ 远景论坛")
+            return []
+
+
+class SolidotSpider(BaseSpider):
+    """Solidot"""
+    name = "solidot"
+
+    def fetch(self) -> List[dict]:
+        try:
+            return define_rss_source("https://www.solidot.org/index.rss", "Solidot")
+        except Exception:
+            logger.exception("❌ Solidot")
+            return []
+
+
+class AihotSpider(BaseSpider):
+    """AIHOT"""
+    name = "aihot"
+    API_URL = "https://aihot.virxact.com/api/public/items?mode=all&take=30"
+    RSS_URL = "https://aihot.virxact.com/feed/all.xml"
+
+    def _fetch_rss(self) -> List[dict]:
+        return define_rss_source(self.RSS_URL, "AIHOT")
+
+    def fetch(self) -> List[dict]:
+        try:
+            resp = fetch_get(self.API_URL, headers={
+                "User-Agent": f"{_DEFAULT_UA} hot-news/aihot"
+            })
+            items = []
+            for item in resp.json().get("items", [])[:30]:
+                title = item.get("title", "")
+                url = item.get("url", "")
+                if title and url:
+                    source = item.get("source", "")
+                    category = item.get("category", "")
+                    hot = f"{source} · {category}" if category else source
+                    items.append({
+                        "platform": "AIHOT",
+                        "title": title,
+                        "url": url,
+                        "hot": hot,
+                        "time": format_rfc822_to_beijing(item.get("publishedAt") or ""),
+                    })
+            if items:
+                return items
+            logger.warning("⚠️ AIHOT API 为空，降级 RSS")
+            return self._fetch_rss()
+        except Exception:
+            logger.warning("⚠️ AIHOT API 失败，降级 RSS", exc_info=True)
+            try:
+                return self._fetch_rss()
+            except Exception:
+                logger.exception("❌ AIHOT")
+                return []
+
+
+class ProductHuntSpider(BaseSpider):
+    """Product Hunt"""
+    name = "producthunt"
+    RSS_URL = "https://www.producthunt.com/feed"
+
+    def _fetch_rss(self) -> List[dict]:
+        return define_rss_source(self.RSS_URL, "Product Hunt")
+
+    def fetch(self) -> List[dict]:
+        token = os.getenv("PRODUCTHUNT_API_TOKEN")
+        if not token:
+            try:
+                return self._fetch_rss()
+            except Exception:
+                logger.exception("❌ Product Hunt")
+                return []
+
+        query = """
+        query {
+          posts(first: 30, order: RANKING) {
+            edges {
+              node { id name tagline votesCount url slug }
+            }
+          }
+        }
+        """
+        try:
+            resp = fetch_post(
+                "https://api.producthunt.com/v2/api/graphql",
+                json={"query": query},
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+            )
+            items = []
+            for edge in resp.json().get("data", {}).get("posts", {}).get("edges", [])[:30]:
+                post = edge.get("node", {})
+                title = post.get("name", "")
+                url = post.get("url") or f"https://www.producthunt.com/posts/{post.get('slug', '')}"
+                if title and url:
+                    items.append({
+                        "platform": "Product Hunt",
+                        "title": title,
+                        "url": url,
+                        "hot": f"△ {post.get('votesCount', 0)}",
+                        "time": "",
+                    })
+            if items:
+                return items
+            logger.warning("⚠️ Product Hunt API 为空，降级 RSS")
+            return self._fetch_rss()
+        except Exception:
+            logger.warning("⚠️ Product Hunt API 失败，降级 RSS", exc_info=True)
+            try:
+                return self._fetch_rss()
+            except Exception:
+                logger.exception("❌ Product Hunt")
+                return []
+
+
+class ChongbuluoSpider(BaseSpider):
+    """虫部落最新"""
+    name = "chongbuluo"
+
+    def fetch(self) -> List[dict]:
+        try:
+            return define_rss_source("https://www.chongbuluo.com/forum.php?mod=rss&view=newthread", "虫部落")
+        except Exception:
+            logger.exception("❌ 虫部落")
             return []
 
 
@@ -717,11 +880,9 @@ class TencentSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://i.news.qq.com/web_backend/v2/getTagInfo?tagId=aEWqxLtdgmQ%3D"
         try:
-            resp = requests.get(url, timeout=10, headers={
-                "User-Agent": "Mozilla/5.0",
+            resp = fetch_get(url, headers={
                 "Referer": "https://news.qq.com/",
             })
-            resp.raise_for_status()
             data = resp.json()
             articles = data.get("data", {}).get("tabs", [{}])[0].get("articleList", [])
             items = []
@@ -750,8 +911,7 @@ class KaopuSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://kaopustorage.blob.core.windows.net/news-prod/news_list_hans_0.json"
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             data = resp.json()
             items = []
             for item in data[:20]:
@@ -784,8 +944,7 @@ class CankaoXiaoxiSpider(BaseSpider):
         try:
             for channel in channels:
                 url = f"https://china.cankaoxiaoxi.com/json/channel/{channel}/list.json"
-                resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"}, verify=False)
-                resp.raise_for_status()
+                resp = fetch_get(url, verify=False)
                 data = resp.json()
                 for row in data.get("list", [])[:10]:
                     item = row.get("data", {})
@@ -812,8 +971,7 @@ class HupuSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://bbs.hupu.com/topic-daily-hot"
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             matches = re.findall(r'<a href="(/[^"]+?\.html)"[^>]*?class="p-title"[^>]*>([^<]+)</a>', resp.text)
             items = []
             for path, title in matches[:20]:
@@ -839,8 +997,7 @@ class TiebaSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://tieba.baidu.com/hottopic/browse/topicList"
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             data = resp.json()
             items = []
             for item in data.get("data", {}).get("bang_topic", {}).get("topic_list", [])[:20]:
@@ -868,10 +1025,9 @@ class IthomeSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://www.ithome.com/list/"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        
+
         try:
-            resp = requests.get(url, timeout=10, headers=headers)
-            resp.raise_for_status()
+            resp = fetch_get(url, headers=headers)
             soup = BeautifulSoup(resp.text, "html.parser")
             items = []
             for row in soup.select("#list > div.fl > ul > li")[:30]:
@@ -903,8 +1059,7 @@ class Kr36Spider(BaseSpider):
         url = f"{base_url}/newsflashes"
         
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             soup = BeautifulSoup(resp.text, "html.parser")
             items = []
             for row in soup.select(".newsflash-item")[:30]:
@@ -934,13 +1089,11 @@ class Kr36RenqiSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://gateway.36kr.com/api/mis/nav/home/nav/rank/hot"
         try:
-            resp = requests.post(
+            resp = fetch_post(
                 url,
-                timeout=10,
-                headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"},
                 json={"partner_id": "web", "param": {"siteId": 1, "platformId": 2}},
+                headers={"Content-Type": "application/json"},
             )
-            resp.raise_for_status()
             data = resp.json()
             items = []
             for row in data.get("data", {}).get("hotRankList", [])[:30]:
@@ -969,11 +1122,9 @@ class XueqiuHotstockSpider(BaseSpider):
         url = "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=30&_type=10&type=10"
         headers = {"User-Agent": "Mozilla/5.0", "Referer": "https://xueqiu.com/hq"}
         try:
-            session = requests.Session()
-            session.headers.update(headers)
-            session.get("https://xueqiu.com/hq", timeout=10).raise_for_status()
-            resp = session.get(url, timeout=10)
-            resp.raise_for_status()
+            session = _session(headers)
+            fetch_get("https://xueqiu.com/hq", session=session, timeout=5)
+            resp = fetch_get(url, session=session)
             data = resp.json()
             items = []
             for row in data.get("data", {}).get("items", [])[:30]:
@@ -1004,8 +1155,7 @@ class KuaishouSpider(BaseSpider):
     def fetch(self) -> List[dict]:
         url = "https://www.kuaishou.com/?isHome=1"
         try:
-            resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            resp.raise_for_status()
+            resp = fetch_get(url)
             match = re.search(r"window\.__APOLLO_STATE__\s*=\s*(\{.+?\});", resp.text)
             if not match:
                 return []
@@ -1054,6 +1204,10 @@ SPIDERS = {
     "gelonghui": GelonghuiSpider,
     "fastbull": FastbullSpider,
     "pcbeta": PcbetaSpider,
+    "solidot": SolidotSpider,
+    "aihot": AihotSpider,
+    "producthunt": ProductHuntSpider,
+    "chongbuluo": ChongbuluoSpider,
     "ithome": IthomeSpider,
     "36kr": Kr36Spider,
     "36kr-renqi": Kr36RenqiSpider,

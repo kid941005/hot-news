@@ -126,6 +126,10 @@ const platformMeta = {
   '格隆汇': { logo: '格', icon: 'https://www.google.com/s2/favicons?sz=64&domain=gelonghui.com' },
   '法布财经': { logo: '法', icon: 'https://www.google.com/s2/favicons?sz=64&domain=fastbull.com' },
   '远景论坛': { logo: '远', icon: 'https://www.google.com/s2/favicons?sz=64&domain=pcbeta.com' },
+  'Solidot': { logo: 'So', icon: 'https://www.google.com/s2/favicons?sz=64&domain=solidot.org' },
+  'AIHOT': { logo: 'AI', icon: 'https://www.google.com/s2/favicons?sz=64&domain=aihot.virxact.com' },
+  'Product Hunt': { logo: 'PH', icon: 'https://www.google.com/s2/favicons?sz=64&domain=producthunt.com' },
+  '虫部落': { logo: '虫', icon: 'https://www.google.com/s2/favicons?sz=64&domain=chongbuluo.com' },
   '华尔街见闻': { logo: '华', icon: 'https://www.google.com/s2/favicons?sz=64&domain=wallstreetcn.com' },
   '澎湃': { logo: '澎', icon: 'https://www.google.com/s2/favicons?sz=64&domain=thepaper.cn' },
   '凤凰': { logo: '凤', icon: 'https://www.google.com/s2/favicons?sz=64&domain=ifeng.com' },
@@ -209,7 +213,7 @@ const newsCount = computed(() => {
   return Object.values(newsByKeyword.value).reduce((sum, items) => sum + items.length, 0)
 })
 
-const realtimePlatforms = new Set(['华尔街见闻', '财联社', '金十数据', '联合早报', '格隆汇', '法布财经', '远景论坛', '36Kr', 'IT之家'])
+const realtimePlatforms = new Set(['华尔街见闻', '财联社', '金十数据', '联合早报', '格隆汇', '法布财经', '远景论坛', 'Solidot', 'AIHOT', '虫部落', '36Kr', 'IT之家'])
 
 function isRealtimePlatform(platform) {
   return realtimePlatforms.has(platform)
