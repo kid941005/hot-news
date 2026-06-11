@@ -15,8 +15,11 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup, FeatureNotFound
 from typing import List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import urlencode, urljoin
+
+BEIJING_TZ = timezone(timedelta(hours=8))
+
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +67,7 @@ def format_beijing_timestamp(timestamp) -> str:
     if not timestamp:
         return ""
     try:
-        return datetime.fromtimestamp(timestamp, tz=timezone.utc).astimezone().strftime("%H:%M")
+        return datetime.fromtimestamp(timestamp, tz=timezone.utc).astimezone(BEIJING_TZ).strftime("%H:%M")
     except Exception:
         return ""
 
@@ -74,11 +77,11 @@ def format_rfc822_to_beijing(pub_date: str) -> str:
         return ""
     try:
         dt = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %Z").replace(tzinfo=timezone.utc)
-        return dt.astimezone().strftime("%H:%M")
+        return dt.astimezone(BEIJING_TZ).strftime("%H:%M")
     except Exception:
         pass
     try:
-        return datetime.fromisoformat(pub_date.replace("Z", "+00:00")).astimezone().strftime("%H:%M")
+        return datetime.fromisoformat(pub_date.replace("Z", "+00:00")).astimezone(BEIJING_TZ).strftime("%H:%M")
     except Exception:
         return ""
 

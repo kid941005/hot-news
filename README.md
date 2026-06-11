@@ -261,6 +261,10 @@ docker compose up -d
 
 ## 📝 更新日志
 
+### v2.5.55 (2026-06-11)
+- 修复：RSS 时间格式化固定使用北京时间 UTC+8，避免 GitHub Actions UTC 环境下测试与显示结果不一致
+- 验证：67 项测试、安全扫描、平台一致性和前端构建均通过
+
 ### v2.5.54 (2026-06-11)
 - 修复：GitHub Actions 环境缺少 BeautifulSoup XML parser 时，RSS/Atom 解析自动回退到标准库 ElementTree，确保 CI 与生产环境都可解析 RSS 源
 - 验证：67 项测试、安全扫描、平台一致性和前端构建均通过
