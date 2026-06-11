@@ -10,9 +10,10 @@ import json
 import re
 import time
 import requests
+import xml.etree.ElementTree as ET
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, FeatureNotFound
 from typing import List
 from datetime import datetime, timezone
 from urllib.parse import urlencode, urljoin
@@ -90,12 +91,46 @@ def format_datetime_text(value: str) -> str:
 
 
 def _rss_text(row, tag: str) -> str:
-    node = row.find(tag)
+    node = row.find(tag) or row.find(tag.lower())
     return node.get_text(strip=True) if node else ""
 
 
+def _parse_rss_text_fallback(xml_text: str, platform: str, limit: int = 30) -> List[dict]:
+    def local_name(tag: str) -> str:
+        return tag.rsplit("}", 1)[-1].lower()
+
+    root = ET.fromstring(xml_text)
+    rows = [node for node in root.iter() if local_name(node.tag) in {"item", "entry"}]
+    items = []
+    for row in rows[:limit]:
+        values = {}
+        link = ""
+        for child in list(row):
+            name = local_name(child.tag)
+            text = (child.text or "").strip()
+            if name == "link" and not text:
+                text = (child.attrib.get("href") or "").strip()
+            if text:
+                values.setdefault(name, text)
+        title = values.get("title", "")
+        link = values.get("link", "")
+        pub_date = values.get("pubdate", "") or values.get("published", "") or values.get("updated", "")
+        if title and link:
+            items.append({
+                "platform": platform,
+                "title": title,
+                "url": link,
+                "hot": "",
+                "time": format_rfc822_to_beijing(pub_date),
+            })
+    return items
+
+
 def _parse_rss_text(xml_text: str, platform: str, limit: int = 30) -> List[dict]:
-    soup = BeautifulSoup(xml_text, "xml")
+    try:
+        soup = BeautifulSoup(xml_text, "xml")
+    except FeatureNotFound:
+        return _parse_rss_text_fallback(xml_text, platform, limit)
     items = []
     for row in soup.select("item, entry")[:limit]:
         title = _rss_text(row, "title")

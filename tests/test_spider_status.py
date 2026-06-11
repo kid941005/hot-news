@@ -2,6 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+from bs4 import FeatureNotFound
 
 from backend.spiders.spiders import (
     AihotSpider,
@@ -20,6 +21,7 @@ from backend.spiders.spiders import (
     ZaobaoSpider,
     fetch_get,
     fetch_post,
+    _parse_rss_text,
 )
 
 
@@ -56,6 +58,21 @@ def test_fetch_post_uses_chrome_user_agent_by_default():
 
     assert "Chrome" in session.headers.update.call_args_list[0].args[0]["User-Agent"]
     response.raise_for_status.assert_called_once()
+
+
+def test_rss_parser_falls_back_without_xml_builder():
+    xml = '''
+    <rss><channel>
+      <item><title>标题</title><link>https://example.com/1</link><pubDate>Wed, 10 Jun 2026 09:30:00 GMT</pubDate></item>
+    </channel></rss>
+    '''
+
+    with patch("backend.spiders.spiders.BeautifulSoup", side_effect=FeatureNotFound("xml")):
+        items = _parse_rss_text(xml, "测试")
+
+    assert items[0]["platform"] == "测试"
+    assert items[0]["title"] == "标题"
+    assert items[0]["time"] == "17:30"
 
 
 def test_baidu_spider_encodes_search_keyword_url():

@@ -261,6 +261,10 @@ docker compose up -d
 
 ## 📝 更新日志
 
+### v2.5.54 (2026-06-11)
+- 修复：GitHub Actions 环境缺少 BeautifulSoup XML parser 时，RSS/Atom 解析自动回退到标准库 ElementTree，确保 CI 与生产环境都可解析 RSS 源
+- 验证：67 项测试、安全扫描、平台一致性和前端构建均通过
+
 ### v2.5.53 (2026-06-11)
 - 新增：对齐 NewsNow 的 RSS 热榜源，加入 Solidot、AIHOT、Product Hunt、虫部落，平台总数提升至 33 个
 - 优化：新增统一请求封装和 RSS/Atom 解析 helper，Product Hunt Atom feed 可正常解析
