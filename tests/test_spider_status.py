@@ -218,7 +218,7 @@ def test_36kr_renqi_spider_reads_newsnow_gateway_api():
     with patch("backend.spiders.spiders.fetch_post", return_value=response):
         items = Kr36RenqiSpider().fetch()
 
-    assert items[0]["platform"] == "36氪人气榜"
+    assert items[0]["platform"] == "36Kr热榜"
     assert items[0]["title"] == "36氪标题"
     assert items[0]["url"] == "https://36kr.com/p/123"
     assert items[0]["hot"] == "作者  |  热度 99"

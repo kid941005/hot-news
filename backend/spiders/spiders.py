@@ -1113,7 +1113,7 @@ class Kr36Spider(BaseSpider):
                 href = str(link.get("href") or "")
                 if title and href:
                     items.append({
-                        "platform": "36Kr",
+                        "platform": "36Kr快讯",
                         "title": title,
                         "url": f"{base_url}{href}" if href.startswith("/") else href,
                         "hot": "",
@@ -1121,12 +1121,12 @@ class Kr36Spider(BaseSpider):
                     })
             return items
         except Exception as e:
-            logger.exception("❌ 36Kr")
+            logger.exception("❌ 36Kr快讯")
             return []
 
 
 class Kr36RenqiSpider(BaseSpider):
-    """36氪人气榜"""
+    """36Kr 热榜"""
     name = "36kr-renqi"
 
     def fetch(self) -> List[dict]:
@@ -1145,7 +1145,7 @@ class Kr36RenqiSpider(BaseSpider):
                 title = material.get("widgetTitle", "")
                 if item_id and title:
                     items.append({
-                        "platform": "36氪人气榜",
+                        "platform": "36Kr热榜",
                         "title": title,
                         "url": f"https://36kr.com/p/{item_id}",
                         "hot": "  |  ".join(v for v in [material.get("authorName", ""), material.get("statFormat", "")] if v),
@@ -1153,7 +1153,7 @@ class Kr36RenqiSpider(BaseSpider):
                     })
             return items
         except Exception:
-            logger.exception("❌ 36氪人气榜")
+            logger.exception("❌ 36Kr热榜")
             return []
 
 

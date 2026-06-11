@@ -114,8 +114,8 @@ const platformMeta = {
   '知乎': { logo: '知', icon: 'https://www.google.com/s2/favicons?sz=64&domain=zhihu.com', class: 'bg-indigo-100/85 text-indigo-600 border border-indigo-200' },
   '头条': { logo: '头', icon: 'https://www.google.com/s2/favicons?sz=64&domain=toutiao.com', class: 'bg-yellow-100/85 text-yellow-700 border border-yellow-200' },
   'IT之家': { logo: 'IT', icon: 'https://www.google.com/s2/favicons?sz=64&domain=ithome.com', class: 'bg-cyan-100/85 text-cyan-600 border border-cyan-200' },
-  '36Kr': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com' },
-  '36氪人气榜': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com', class: 'bg-green-100/85 text-green-600 border border-green-200' },
+  '36Kr快讯': { logo: '快', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com' },
+  '36Kr热榜': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com', class: 'bg-green-100/85 text-green-600 border border-green-200' },
   '雪球热门股票': { logo: '雪', icon: 'https://www.google.com/s2/favicons?sz=64&domain=xueqiu.com', class: 'bg-sky-100/85 text-sky-600 border border-sky-200' },
   '快手': { logo: '快', icon: 'https://www.google.com/s2/favicons?sz=64&domain=kuaishou.com', class: 'bg-orange-100/85 text-orange-600 border border-orange-200' },
   '36kr': { logo: '36', icon: 'https://www.google.com/s2/favicons?sz=64&domain=36kr.com', class: 'bg-green-100/85 text-green-600 border border-green-200' },
@@ -213,7 +213,7 @@ const newsCount = computed(() => {
   return Object.values(newsByKeyword.value).reduce((sum, items) => sum + items.length, 0)
 })
 
-const realtimePlatforms = new Set(['华尔街见闻', '财联社', '金十数据', '联合早报', '格隆汇', '法布财经', '远景论坛', 'Solidot', 'AIHOT', '虫部落', '36Kr', 'IT之家'])
+const realtimePlatforms = new Set(['华尔街见闻', '财联社', '金十数据', '联合早报', '格隆汇', '法布财经', '远景论坛', 'Solidot', 'AIHOT', '虫部落', '36Kr快讯', 'IT之家'])
 
 function isRealtimePlatform(platform) {
   return realtimePlatforms.has(platform)
