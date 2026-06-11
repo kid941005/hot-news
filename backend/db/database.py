@@ -56,10 +56,8 @@ def save_news(db: Session, news_list: List[dict]):
         return
 
     platform = news_list[0].get('platform', '')
-    cutoff = datetime.utcnow() - timedelta(days=7)
-    
-    # 仅清理 7 天前旧数据，保留近 7 天历史新闻
-    db.query(News).filter(News.platform == platform, News.created_at < cutoff).delete()
+    # 成功抓取到当前列表时，替换该平台旧列表；空/失败不调用本函数，旧缓存保留兜底
+    db.query(News).filter(News.platform == platform).delete()
     
     # 写入新数据
     try:

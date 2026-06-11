@@ -7,6 +7,7 @@ from bs4 import FeatureNotFound
 from backend.spiders.spiders import (
     AihotSpider,
     BaiduSpider,
+    CankaoXiaoxiSpider,
     ChongbuluoSpider,
     FastbullSpider,
     GitHubSpider,
@@ -73,6 +74,27 @@ def test_rss_parser_falls_back_without_xml_builder():
     assert items[0]["platform"] == "测试"
     assert items[0]["title"] == "标题"
     assert items[0]["time"] == "17:30"
+
+
+def test_cankaoxiaoxi_spider_sorts_by_publish_time():
+    def response(title, publish_time):
+        mock = Mock()
+        mock.json.return_value = {
+            "list": [{"data": {"title": title, "url": f"https://example.com/{title}", "publishTime": publish_time}}]
+        }
+        return mock
+
+    responses = [
+        response("旧", "2026-06-11 09:00:00"),
+        response("中", "2026-06-11 10:00:00"),
+        response("新", "2026-06-11 11:00:00"),
+    ]
+
+    with patch("backend.spiders.spiders.fetch_get", side_effect=responses):
+        items = CankaoXiaoxiSpider().fetch()
+
+    assert [item["title"] for item in items] == ["新", "中", "旧"]
+    assert items[0]["time"] == "11:00"
 
 
 def test_baidu_spider_encodes_search_keyword_url():

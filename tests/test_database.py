@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -56,19 +56,20 @@ def test_save_news_rolls_back_on_write_error():
     assert db.rolled_back is True
 
 
-def test_save_news_keeps_recent_history_and_cleans_older_than_7_days():
+def test_save_news_replaces_platform_current_list():
     db = make_db()
-    now = datetime.utcnow()
     db.add_all([
-        News(platform="微博", title="近 7 天旧新闻", url="https://example.com/recent", created_at=now - timedelta(days=6)),
-        News(platform="微博", title="超过 7 天旧新闻", url="https://example.com/old", created_at=now - timedelta(days=8)),
+        News(platform="微博", title="旧新闻", url="https://example.com/old"),
+        News(platform="知乎", title="其他平台新闻", url="https://example.com/zhihu"),
     ])
     db.commit()
 
     save_news(db, [{"platform": "微博", "title": "新新闻", "url": "https://example.com/new"}])
 
-    titles = {item.title for item in db.query(News).filter(News.platform == "微博").all()}
-    assert titles == {"近 7 天旧新闻", "新新闻"}
+    weibo_titles = {item.title for item in db.query(News).filter(News.platform == "微博").all()}
+    zhihu_titles = {item.title for item in db.query(News).filter(News.platform == "知乎").all()}
+    assert weibo_titles == {"新新闻"}
+    assert zhihu_titles == {"其他平台新闻"}
 
 
 def test_save_news_updates_existing_news_instead_of_duplicating():

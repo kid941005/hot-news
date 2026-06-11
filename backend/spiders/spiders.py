@@ -981,21 +981,26 @@ class CankaoXiaoxiSpider(BaseSpider):
         items = []
         try:
             for channel in channels:
-                url = f"https://china.cankaoxiaoxi.com/json/channel/{channel}/list.json"
+                url = f"http://china.cankaoxiaoxi.com/json/channel/{channel}/list.json"
                 resp = fetch_get(url, verify=False)
                 data = resp.json()
-                for row in data.get("list", [])[:10]:
+                for row in data.get("list", []):
                     item = row.get("data", {})
                     title = item.get("title", "")
                     link = item.get("url", "")
+                    publish_time = item.get("publishTime", "")
                     if title and link:
                         items.append({
                             "platform": "参考消息",
                             "title": title,
                             "url": link,
                             "hot": "",
-                            "time": "",
+                            "time": format_datetime_text(publish_time),
+                            "_publish_time": publish_time,
                         })
+            items.sort(key=lambda x: x.get("_publish_time", ""), reverse=True)
+            for item in items:
+                item.pop("_publish_time", None)
             return items[:20]
         except Exception as e:
             logger.exception("❌ 参考消息")
