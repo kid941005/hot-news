@@ -1,6 +1,6 @@
 {
   "name": "hot-news-frontend",
-  "version": "2.5.61",
+  "version": "2.5.62",
   "private": true,
   "type": "module",
   "scripts": {

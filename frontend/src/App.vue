@@ -167,13 +167,8 @@ function formatHotDisplayTime(item, platformNews = []) {
   return ''
 }
 
-function formatRelativeTime(item) {
-  const ts = item.updated_at || item.created_at
-  if (!ts) return ''
-  const now = Date.now()
-  const date = new Date(ts).getTime()
-  if (Number.isNaN(date)) return ''
-  const diff = now - date
+function getRelativeTimeText(date) {
+  const diff = Date.now() - date.getTime()
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
@@ -182,7 +177,39 @@ function formatRelativeTime(item) {
   if (minutes < 60) return `${minutes}分钟前`
   if (hours < 24) return `${hours}小时前`
   if (days < 7) return `${days}天前`
-  return new Date(ts).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+}
+
+function getRealtimeDate(item) {
+  const pubTime = (item.pub_time || '').trim()
+  if (pubTime) {
+    if (pubTime === '刚刚') return new Date()
+    const relative = pubTime.match(/^(\d+)\s*(秒|分钟|小时|天)前$/)
+    if (relative) {
+      const value = Number(relative[1])
+      const unit = relative[2]
+      const ms = unit === '秒' ? value * 1000 : unit === '分钟' ? value * 60 * 1000 : unit === '小时' ? value * 60 * 60 * 1000 : value * 24 * 60 * 60 * 1000
+      return new Date(Date.now() - ms)
+    }
+    const timeOnly = pubTime.match(/^(\d{1,2}):(\d{2})$/)
+    if (timeOnly) {
+      const date = new Date()
+      date.setHours(Number(timeOnly[1]), Number(timeOnly[2]), 0, 0)
+      if (date.getTime() - Date.now() > 60 * 1000) date.setDate(date.getDate() - 1)
+      return date
+    }
+    const parsed = new Date(pubTime.replace(/-/g, '/'))
+    if (!Number.isNaN(parsed.getTime())) return parsed
+  }
+  const fallback = item.updated_at || item.created_at
+  if (!fallback) return null
+  const date = new Date(fallback)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+function formatRelativeTime(item) {
+  const date = getRealtimeDate(item)
+  return date ? getRelativeTimeText(date) : ''
 }
 
 function selectCronPreset(event) {
@@ -202,9 +229,8 @@ function isRealtimePlatform(platform) {
 }
 
 function getItemTimestamp(item) {
-  const value = item.updated_at || item.created_at || ''
-  const time = value ? new Date(value).getTime() : 0
-  return Number.isNaN(time) ? 0 : time
+  const date = getRealtimeDate(item)
+  return date ? date.getTime() : 0
 }
 
 const currentPlatformNews = computed(() => {

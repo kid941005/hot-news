@@ -134,7 +134,7 @@ def test_by_platform_accepts_timeline_sort():
 
     assert response.status_code == 200
     assert any("DESC" in order.upper() for order in db.orders if order)
-    assert any("updated_at" in order.lower() for order in db.orders if order)
+    assert any("created_at" in order.lower() for order in db.orders if order)
 
 
 def test_by_platform_accepts_smaller_limit_per_platform():
