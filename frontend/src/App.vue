@@ -157,9 +157,9 @@ function getPlatformId(platform) {
   return platformOptions.value.find(item => item.name === platform)?.id || platform
 }
 
-function formatDisplayTime(item) {
-  if (item.pub_time) {
-    return `发布时间 ${item.pub_time}`
+function formatHotDisplayTime(item, platformNews = []) {
+  if (platformNews.some(news => news.pub_time)) {
+    return item.pub_time ? `发布时间 ${item.pub_time}` : ''
   }
   if (item.created_at) {
     return `抓取时间 ${new Date(item.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })}`
@@ -913,7 +913,7 @@ onUnmounted(() => {
                       </span>
                     </div>
                     <span class="w-fit rounded-full border border-white/55 bg-slate-50/60 px-2.5 py-1 text-[11px] font-medium text-slate-500 sm:ml-2">
-                      {{ formatDisplayTime(item) }}
+                      {{ formatHotDisplayTime(item, platformNews) }}
                     </span>
                   </div>
                 </div>
