@@ -34,7 +34,8 @@ class News(Base):
             "url": self.url,
             "hot_value": self.hot_value,
             "pub_time": self.pub_time,
-            "created_at": (self.created_at.isoformat() + "Z") if self.created_at else None
+            "created_at": (self.created_at.isoformat() + "Z") if self.created_at else None,
+            "updated_at": (self.updated_at.isoformat() + "Z") if self.updated_at else None,
         }
 
 

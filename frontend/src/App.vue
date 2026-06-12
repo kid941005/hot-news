@@ -168,39 +168,21 @@ function formatHotDisplayTime(item, platformNews = []) {
 }
 
 function formatRelativeTime(item) {
-  const ts = item.pub_time || item.created_at
+  const ts = item.updated_at || item.created_at
   if (!ts) return ''
   const now = Date.now()
   const date = new Date(ts).getTime()
-  if (!Number.isNaN(date)) {
-    const diff = now - date
-    const seconds = Math.floor(diff / 1000)
-    const minutes = Math.floor(seconds / 60)
-    const hours = Math.floor(minutes / 60)
-    const days = Math.floor(hours / 24)
-    if (seconds < 60) return '刚刚'
-    if (minutes < 60) return `${minutes}分钟前`
-    if (hours < 24) return `${hours}小时前`
-    if (days < 7) return `${days}天前`
-    return new Date(ts).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
-  }
-  // pub_time 存在但不可解析（如 "60分钟前"、"11:05"），回退到 created_at
-  if (item.created_at) {
-    const fallback = new Date(item.created_at).getTime()
-    if (!Number.isNaN(fallback)) {
-      const diff = now - fallback
-      const seconds = Math.floor(diff / 1000)
-      const minutes = Math.floor(seconds / 60)
-      const hours = Math.floor(minutes / 60)
-      const days = Math.floor(hours / 24)
-      if (seconds < 60) return '刚刚'
-      if (minutes < 60) return `${minutes}分钟前`
-      if (hours < 24) return `${hours}小时前`
-      if (days < 7) return `${days}天前`
-      return new Date(item.created_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
-    }
-  }
-  return ''
+  if (Number.isNaN(date)) return ''
+  const diff = now - date
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  if (seconds < 60) return '刚刚'
+  if (minutes < 60) return `${minutes}分钟前`
+  if (hours < 24) return `${hours}小时前`
+  if (days < 7) return `${days}天前`
+  return new Date(ts).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
 }
 
 function selectCronPreset(event) {
@@ -220,7 +202,7 @@ function isRealtimePlatform(platform) {
 }
 
 function getItemTimestamp(item) {
-  const value = item.created_at || item.updated_at || ''
+  const value = item.updated_at || item.created_at || ''
   const time = value ? new Date(value).getTime() : 0
   return Number.isNaN(time) ? 0 : time
 }
