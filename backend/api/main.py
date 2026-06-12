@@ -56,7 +56,7 @@ PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_val
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 AUTO_REFRESH_COOLDOWN_SECONDS = get_env_int("AUTO_REFRESH_COOLDOWN_SECONDS", 30, min_value=5, max_value=3600)
 
-app = FastAPI(title="热点资讯", version="2.5.58")
+app = FastAPI(title="热点资讯", version="2.5.59")
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -781,11 +781,12 @@ def get_news(
         news_list, matched_keywords = database.get_user_filtered_news(db, user_id)
     news_list = _deduplicate_news_by_title(news_list)
     
-    # 可选过滤当天入库的文章并按时间倒序
+    # 标签页只展示当天入库的匹配新闻；旧新闻对关键词标签页没有意义
+    today_only = today or bool(tag)
     today_str = datetime.now().strftime("%Y-%m-%d")
     news_data = []
     for n in news_list:
-        if today and n.created_at:
+        if today_only and n.created_at:
             if n.created_at.strftime("%Y-%m-%d") != today_str:
                 continue
         
