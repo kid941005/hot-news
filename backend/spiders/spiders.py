@@ -225,14 +225,14 @@ class BaiduSpider(BaseSpider):
             for item in data.get("data", {}).get("cards", [{}])[0].get("content", []):
                 if item.get("isTop"):
                     continue
-                # 使用百度搜索页URL
                 word = item.get("word", "")
-                search_url = f"https://www.baidu.com/s?{urlencode({'wd': word})}"
-                # 百度热搜列表没有稳定的原始发布时间字段，使用抓取入库时间由前端按本地时区显示
+                raw_url = item.get("rawUrl", "")
+                if not word or not raw_url:
+                    continue
                 items.append({
                     "platform": "百度",
                     "title": word,
-                    "url": search_url,
+                    "url": raw_url,
                     "hot": "",
                     "time": ""
                 })

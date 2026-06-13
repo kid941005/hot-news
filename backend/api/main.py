@@ -9,6 +9,7 @@ import socket
 import asyncio
 import re
 import time
+from contextlib import asynccontextmanager
 from urllib.parse import urlparse
 from fastapi import FastAPI, Depends, HTTPException, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,7 +57,17 @@ PUSH_INTERVAL_HOURS = get_env_int("PUSH_INTERVAL_HOURS", 4, min_value=1, max_val
 REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
 AUTO_REFRESH_COOLDOWN_SECONDS = get_env_int("AUTO_REFRESH_COOLDOWN_SECONDS", 30, min_value=5, max_value=3600)
 
-app = FastAPI(title="热点资讯", version="2.5.62")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_runtime()
+    start_scheduler()
+    try:
+        yield
+    finally:
+        stop_scheduler()
+
+
+app = FastAPI(title="热点资讯", version="2.5.63", lifespan=lifespan)
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -702,7 +713,6 @@ def scheduled_push():
         db.close()
 
 
-@app.on_event("startup")
 def start_scheduler():
     """启动定时任务调度器"""
     if scheduler.running:
@@ -716,7 +726,6 @@ def start_scheduler():
     logger.info("⏰ 定时推送已启动（每分钟检查 cron 表达式）")
 
 
-@app.on_event("shutdown")
 def stop_scheduler():
     """关闭定时推送调度器"""
     if scheduler.running:
@@ -894,6 +903,13 @@ def _get_stale_platforms(db: Session, platforms=None):
 
 
 def _get_refresh_state(db: Session, platforms=None) -> dict:
+    def format_time(value):
+        if not value:
+            return None
+        if isinstance(value, datetime):
+            return value.isoformat().replace("+00:00", "Z")
+        return str(value)
+
     latest_cache = None
     try:
         query = db.query(database.CacheRecord)
@@ -903,23 +919,29 @@ def _get_refresh_state(db: Session, platforms=None) -> dict:
     except Exception:
         latest_cache = None
     last_refresh = LAST_REFRESH_TIME or (latest_cache.last_fetch if latest_cache else None)
-    if last_refresh:
-        if isinstance(last_refresh, datetime):
-            last_refresh_text = last_refresh.isoformat().replace("+00:00", "Z")
-            if last_refresh.tzinfo is None:
-                last_refresh = last_refresh.replace(tzinfo=timezone.utc)
-        else:
-            last_refresh_text = str(last_refresh)
-    else:
-        last_refresh_text = None
+    last_refresh_text = format_time(last_refresh)
     stale_platforms = _get_stale_platforms(db, platforms)
     requested_platforms = _normalize_platforms(platforms)
     refreshing = _auto_refresh_running or REFRESH_LOCK.locked() or bool(_auto_refresh_platforms.intersection(requested_platforms))
+    sources = {}
+    for platform in requested_platforms:
+        record = db.query(database.CacheRecord).filter(database.CacheRecord.platform == platform).first()
+        if not record:
+            sources[platform] = {"status": "missing"}
+            continue
+        sources[platform] = {
+            "status": getattr(record, "last_status", None) or getattr(record, "status", ""),
+            "last_fetch": format_time(getattr(record, "last_fetch", None)),
+            "last_success_at": format_time(getattr(record, "last_success_at", None)),
+            "last_error_at": format_time(getattr(record, "last_error_at", None)),
+            "error": getattr(record, "error_msg", ""),
+        }
     return {
         "last_refresh": last_refresh_text,
         "refreshing": refreshing,
         "stale": bool(stale_platforms),
         "stale_platforms": stale_platforms,
+        "sources": sources,
     }
 
 
@@ -1057,8 +1079,7 @@ def get_refresh_time(db: Session = Depends(get_db)):
     return {"success": True, "last_refresh": None}
 
 
-@app.on_event("startup")
-def startup():
+def init_runtime():
     init_db()
     ensure_user_config_schema()
     # 挂载静态文件

@@ -27,7 +27,7 @@ from backend.spiders.spiders import (
 
 
 class BaiduSuccessResponse:
-    text = '<!--s-data:{"data":{"cards":[{"content":[{"word":"A&B #测试","isTop":false}]}]}}-->'
+    text = '<!--s-data:{"data":{"cards":[{"content":[{"word":"A&B #测试","rawUrl":"https://example.com/raw","isTop":false}]}]}}-->'
 
 
 def test_baidu_spider_rejects_http_error_status():
@@ -97,13 +97,13 @@ def test_cankaoxiaoxi_spider_sorts_by_publish_time():
     assert items[0]["time"] == "11:00"
 
 
-def test_baidu_spider_encodes_search_keyword_url():
+def test_baidu_spider_uses_newsnow_raw_url():
     response = BaiduSuccessResponse()
 
     with patch("backend.spiders.spiders.fetch_get", return_value=response):
         items = BaiduSpider().fetch()
 
-    assert items[0]["url"] == "https://www.baidu.com/s?wd=A%26B+%23%E6%B5%8B%E8%AF%95"
+    assert items[0]["url"] == "https://example.com/raw"
 
 
 def test_github_spider_rejects_http_error_status():

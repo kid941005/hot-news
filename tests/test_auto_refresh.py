@@ -148,6 +148,11 @@ def test_get_refresh_state_uses_cache_record_fallback():
     cached = type("CacheRecord", (), {
         "platform": "weibo",
         "last_fetch": datetime(2026, 1, 1, tzinfo=timezone.utc),
+        "last_success_at": datetime(2026, 1, 1, tzinfo=timezone.utc),
+        "last_error_at": None,
+        "last_status": "success",
+        "status": "success",
+        "error_msg": "",
     })()
     db.cache_records.append(cached)
     reset_auto_refresh_state()
@@ -158,6 +163,13 @@ def test_get_refresh_state_uses_cache_record_fallback():
     assert state["refreshing"] is False
     assert state["stale"] is True
     assert "weibo" in state["stale_platforms"]
+    assert state["sources"]["weibo"] == {
+        "status": "success",
+        "last_fetch": "2026-01-01T00:00:00Z",
+        "last_success_at": "2026-01-01T00:00:00Z",
+        "last_error_at": None,
+        "error": "",
+    }
 
 
 def test_refresh_news_data_updates_cache_records():

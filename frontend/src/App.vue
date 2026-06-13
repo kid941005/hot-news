@@ -254,6 +254,8 @@ const currentPlatformNews = computed(() => {
 })
 
 const orderedPlatformEntries = computed(() => currentPlatformNews.value)
+const keywordGroupEntries = computed(() => Object.entries(newsByKeyword.value))
+const hasKeywordGroups = computed(() => keywordGroupEntries.value.length > 0)
 
 function movePlatform(targetPlatform) {
   if (!draggingPlatform.value || draggingPlatform.value === targetPlatform) return
@@ -823,7 +825,7 @@ onUnmounted(() => {
 
       <!-- 新闻列表 -->
       <!-- 按平台分组显示（全部标签） -->
-      <div v-if="orderedPlatformEntries.length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <div v-if="currentTag === null && orderedPlatformEntries.length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <div
           v-for="[platform, platformNews] in orderedPlatformEntries"
           :key="platform"
@@ -933,9 +935,9 @@ onUnmounted(() => {
       </div>
 
       <!-- 普通列表（筛选标签） -->
-      <div v-else-if="Object.keys(newsByKeyword).length > 0" class="space-y-4">
+      <div v-else-if="hasKeywordGroups" class="space-y-4">
         <div 
-          v-for="(keywordNews, keyword) in newsByKeyword" 
+          v-for="[keyword, keywordNews] in keywordGroupEntries"
           :key="keyword"
           class="overflow-hidden rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl"
         >
@@ -1030,7 +1032,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div v-if="currentTag !== null && Object.keys(newsByKeyword).length === 0 && !loading" class="text-center py-12 text-slate-400">
+      <div v-if="currentTag !== null && !hasKeywordGroups && news.length === 0 && !loading" class="text-center py-12 text-slate-400">
         暂无匹配的热点资讯
       </div>
       <div v-else-if="currentTag === null && news.length === 0 && Object.keys(newsByPlatform).length === 0 && !loading" class="text-center py-12 text-slate-400">
