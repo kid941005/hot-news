@@ -1,6 +1,6 @@
 {
   "name": "hot-news-frontend",
-  "version": "2.5.63",
+  "version": "2.5.64",
   "private": true,
   "type": "module",
   "scripts": {
@@ -19,5 +19,6 @@
     "vite": "^5.0.0",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32"
-  }
+  },
+  "packageManager": "npm@11.16.0+sha1.954286fbc25d74f3c91f402ca8b1e66c8038e861"
 }

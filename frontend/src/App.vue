@@ -212,6 +212,10 @@ function formatRelativeTime(item) {
   return date ? getRelativeTimeText(date) : ''
 }
 
+function formatDisplayTime(item) {
+  return formatRelativeTime(item)
+}
+
 function selectCronPreset(event) {
   config.value.push_cron = event.target.value
 }
