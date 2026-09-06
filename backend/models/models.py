@@ -8,6 +8,8 @@ from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, B
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
+from backend.config import settings
+
 Base = declarative_base()
 
 
@@ -147,7 +149,7 @@ class CacheRecord(Base):
 # 数据库连接
 def get_database_url():
     """获取数据库URL"""
-    db_url = os.environ.get('DATABASE_URL', '')
+    db_url = settings.database_url or ''
     
     if db_url:
         return db_url

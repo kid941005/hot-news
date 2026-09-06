@@ -19,7 +19,7 @@ from typing import List
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlencode, urljoin
 
-from backend.config import get_env_float, get_env_int
+from backend.config import settings
 
 BEIJING_TZ = timezone(timedelta(hours=8))
 
@@ -1322,8 +1322,8 @@ SPIDERS = {
 }
 
 
-SPIDER_CONCURRENCY = get_env_int("SPIDER_CONCURRENCY", 5, min_value=1, max_value=20)
-SPIDER_FETCH_TIMEOUT_SECONDS = get_env_float("SPIDER_FETCH_TIMEOUT_SECONDS", 15.0, min_value=1.0, max_value=60.0)
+SPIDER_CONCURRENCY = settings.spider_concurrency
+SPIDER_FETCH_TIMEOUT_SECONDS = settings.spider_fetch_timeout_seconds
 
 # 进程级抓取锁：防止手动/定时/自动刷新在单机多线程下并发重复抓取同一批源。
 # 多实例部署时可替换为 Redis 分布式锁。

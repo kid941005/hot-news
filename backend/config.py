@@ -1,50 +1,57 @@
 #!/usr/bin/env python3
-"""统一的环境变量解析工具。"""
-import logging
-import os
-from typing import Optional
+"""统一环境变量配置（基于 pydantic-settings）。
+
+后端所有数值型/列表型配置集中在此定义，避免各处散落的 os.getenv + 手工校验。
+配置非法时启动即报错（fail fast），防止静默使用错误参数。
+"""
+from functools import lru_cache
+from typing import List, Optional, Set
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-logger = logging.getLogger(__name__)
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    # ---- 调度与刷新 ----
+    refresh_interval_minutes: int = Field(15, ge=1, le=1440)
+    refresh_cooldown_seconds: int = Field(300, ge=0, le=86400)
+    auto_refresh_cooldown_seconds: int = Field(30, ge=5, le=3600)
+
+    # ---- 爬虫 ----
+    spider_concurrency: int = Field(5, ge=1, le=20)
+    spider_fetch_timeout_seconds: float = Field(15.0, ge=1.0, le=60.0)
+
+    # ---- 应用 ----
+    cors_origins: str = "*"
+    database_url: Optional[str] = None
+
+    # ---- 推送 ----
+    bark_webhook_hosts: str = "api.day.app"
+
+    # ---- MCP ----
+    mcp_host: str = "127.0.0.1"
+    mcp_port: int = Field(8000, ge=1, le=65535)
+    mcp_path: str = "/mcp"
+    mcp_transport: str = "stdio"
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def bark_webhook_hosts_set(self) -> Set[str]:
+        return {h.strip().lower() for h in self.bark_webhook_hosts.split(",") if h.strip()}
 
 
-def get_env_int(
-    name: str,
-    default: int,
-    min_value: int = 1,
-    max_value: Optional[int] = None,
-) -> int:
-    """读取整数环境变量；非法或越界时回退到默认值。"""
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    try:
-        value = int(raw)
-    except ValueError:
-        logger.warning("%s=%r 无效，使用默认值 %s", name, raw, default)
-        return default
-    if value < min_value or (max_value is not None and value > max_value):
-        logger.warning("%s=%r 超出范围，使用默认值 %s", name, raw, default)
-        return default
-    return value
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
 
 
-def get_env_float(
-    name: str,
-    default: float,
-    min_value: Optional[float] = None,
-    max_value: Optional[float] = None,
-) -> float:
-    """读取浮点环境变量；非法或越界时回退到默认值。"""
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    try:
-        value = float(raw)
-    except ValueError:
-        logger.warning("%s=%r 无效，使用默认值 %s", name, raw, default)
-        return default
-    if (min_value is not None and value < min_value) or (max_value is not None and value > max_value):
-        logger.warning("%s=%r 超出范围，使用默认值 %s", name, raw, default)
-        return default
-    return value
+settings = get_settings()

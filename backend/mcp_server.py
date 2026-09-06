@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 """Hot News MCP server."""
 import argparse
-import os
 from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
-from backend.config import get_env_int
+from backend.config import settings
 from backend.db.database import PLATFORM_MAP, REALTIME_PLATFORM_IDS
 from backend.models.models import News, SessionLocal, init_db
 
 
 mcp = FastMCP(
     "hot-news",
-    host=os.getenv("MCP_HOST", "127.0.0.1"),
-    port=get_env_int("MCP_PORT", 8000),
-    streamable_http_path=os.getenv("MCP_PATH", "/mcp"),
+    host=settings.mcp_host,
+    port=settings.mcp_port,
+    streamable_http_path=settings.mcp_path,
 )
 
 
@@ -89,7 +88,7 @@ def main():
     parser.add_argument(
         "--transport",
         choices=["stdio", "streamable-http"],
-        default=os.getenv("MCP_TRANSPORT", "stdio"),
+        default=settings.mcp_transport,
     )
     args = parser.parse_args()
     init_db()

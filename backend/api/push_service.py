@@ -9,7 +9,6 @@
 import hashlib
 import ipaddress
 import logging
-import os
 import re
 import socket
 from abc import ABC, abstractmethod
@@ -23,6 +22,7 @@ from sqlalchemy.orm import Session
 
 from backend.api import scheduler_service
 from backend.api.auth import get_current_user_id
+from backend.config import settings
 from backend.db import database
 from backend.models.models import SessionLocal, UserConfig, get_db
 
@@ -173,8 +173,7 @@ class BarkPusher(BasePusher):
         if parsed.scheme != "https" or not _is_public_hostname(parsed.hostname or ""):
             return False
         host = (parsed.hostname or "").lower()
-        allowed = {h.strip().lower() for h in os.getenv("BARK_WEBHOOK_HOSTS", "api.day.app").split(",") if h.strip()}
-        return host in allowed
+        return host in settings.bark_webhook_hosts_set
 
     def push(self, webhook: str, content: str) -> bool:
         import requests

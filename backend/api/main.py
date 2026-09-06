@@ -18,7 +18,7 @@ from backend.api.config_service import config_router
 from backend.api.news_service import news_router, scheduled_refresh
 from backend.api.push_service import push_router, scheduled_push
 from backend.api.scheduler_service import configure_scheduler, scheduler_router
-from backend.config import get_env_int
+from backend.config import settings
 from backend.logging_config import setup_logging
 from backend.models.models import SessionLocal, ensure_user_config_schema, init_db
 
@@ -26,7 +26,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 scheduler = BackgroundScheduler()
-REFRESH_INTERVAL_MINUTES = get_env_int("REFRESH_INTERVAL_MINUTES", 15, min_value=1, max_value=1440)
+REFRESH_INTERVAL_MINUTES = settings.refresh_interval_minutes
 
 # 静态文件路径
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="热点资讯", version="2.5.64", lifespan=lifespan)
 
 # CORS
-CORS_ORIGINS = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "*").split(",") if origin.strip()]
+CORS_ORIGINS = settings.cors_origins_list
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,

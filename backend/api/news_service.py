@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from backend.api import scheduler_service
 from backend.api.auth import get_current_user_id, get_optional_user_id
-from backend.config import get_env_int
+from backend.config import settings
 from backend.db import database
 from backend.db.database import PLATFORM_MAP
 from backend.models.models import News, SessionLocal, UserConfig, get_db
@@ -25,8 +25,8 @@ logger = logging.getLogger(__name__)
 
 news_router = APIRouter()
 
-REFRESH_COOLDOWN_SECONDS = get_env_int("REFRESH_COOLDOWN_SECONDS", 300, min_value=0, max_value=86400)
-AUTO_REFRESH_COOLDOWN_SECONDS = get_env_int("AUTO_REFRESH_COOLDOWN_SECONDS", 30, min_value=5, max_value=3600)
+REFRESH_COOLDOWN_SECONDS = settings.refresh_cooldown_seconds
+AUTO_REFRESH_COOLDOWN_SECONDS = settings.auto_refresh_cooldown_seconds
 
 LAST_REFRESH_TIME = None
 REFRESH_LOCK = asyncio.Lock()
