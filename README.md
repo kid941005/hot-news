@@ -10,7 +10,9 @@
 - **智能过滤**: 支持按关键词精准过滤感兴趣的内容
 - **标签管理**: 自定义多标签，每个标签独立配置关键词
 - **用户系统**: 独立账号，数据按用户隔离
-- **推送功能**: 支持飞书、钉钉 Webhook 推送
+- **推送功能**: 支持飞书、钉钉、Bark Webhook 推送，含 7 天条目指纹去重与推送历史
+- **调度管理**: 调度状态 API 支持查看运行状态、暂停/恢复、调整刷新间隔
+- **每日归档**: GitHub Actions 自动将每日热榜快照提交到仓库留档（`archive/YYYY-MM-DD.json`）
 - **定时更新**: 后台自动刷新热点数据
 
 ## 🖥️ 支持平台
@@ -138,6 +140,20 @@ curl http://localhost:16888/api/news \
 # 手动刷新热点（需认证）
 curl -X POST http://localhost:16888/api/news/refresh \
   -H "Authorization: Bearer YOUR_TOKEN"
+
+# 调度状态（需认证）
+curl http://localhost:16888/api/scheduler \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 暂停 / 恢复 / 调整刷新间隔（需认证）
+curl -X POST http://localhost:16888/api/scheduler/pause \
+  -H "Authorization: Bearer YOUR_TOKEN"
+curl -X POST http://localhost:16888/api/scheduler/resume \
+  -H "Authorization: Bearer YOUR_TOKEN"
+curl -X POST http://localhost:16888/api/scheduler/interval \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"minutes": 30}'
 ```
 
 ### MCP 服务
@@ -185,19 +201,27 @@ mcp_servers:
 hot-news/
 ├── backend/              # FastAPI 后端
 │   ├── api/
-│   │   ├── main.py       # API 入口
-│   │   └── static/       # 已构建前端静态文件
+│   │   ├── main.py             # API 入口与调度器装配
+│   │   ├── auth.py             # 登录/注册/令牌
+│   │   ├── config_service.py   # 用户配置接口
+│   │   ├── news_service.py     # 新闻查询与刷新
+│   │   ├── push_service.py     # 推送插件与定时推送
+│   │   ├── scheduler_service.py# 调度状态 API
+│   │   └── static/             # 已构建前端静态文件
 │   ├── db/
 │   │   └── database.py   # 数据库操作
 │   ├── models/
 │   │   └── models.py     # 数据模型
 │   ├── spiders/
 │   │   └── spiders.py    # 爬虫模块
+│   ├── config.py         # pydantic-settings 统一配置
 │   ├── mcp_server.py     # MCP stdio 服务入口
 │   └── requirements.txt  # 后端依赖
 ├── frontend/             # Vue3 前端源码
 │   ├── src/
 │   │   ├── App.vue       # 主组件
+│   │   ├── api/          # axios 统一封装（token 注入与错误提示）
+│   │   ├── composables/  # 组合式函数（useToast 等）
 │   │   └── main.js       # 入口文件
 │   └── vite.config.js
 ├── legacy/               # 旧版实现归档（非主运行入口）
@@ -206,7 +230,10 @@ hot-news/
 │   ├── scripts_hot_news.py
 │   └── sources/          # 旧版数据源实现
 ├── scripts/              # 工具脚本
-│   └── check_platform_consistency.py  # 平台一致性校验
+│   ├── check_platform_consistency.py  # 平台一致性校验
+│   ├── verify_security_scan.py        # 安全扫描
+│   ├── archive_daily.py               # 每日热点归档
+│   └── smoke_test.py                  # 端到端冒烟测试
 ├── Dockerfile            # Docker 镜像构建配置
 ├── docker-compose.yml    # Docker 编排配置
 ```
@@ -221,8 +248,8 @@ hot-news/
 |------|------|--------|
 | `DATABASE_URL` | 数据库连接 | `sqlite:///./hot_news.db` |
 | `REFRESH_INTERVAL_MINUTES` | 独立定时刷新新闻的间隔分钟数 | `15` |
-| `PUSH_INTERVAL_HOURS` | 推送间隔小时数（兼容旧配置） | `4` |
 | `REFRESH_COOLDOWN_SECONDS` | 手动刷新最小间隔秒数 | `300` |
+| `AUTO_REFRESH_COOLDOWN_SECONDS` | 自动刷新最小间隔秒数 | `30` |
 | `CORS_ORIGINS` | 允许跨域来源，多个用逗号分隔 | `*` |
 | `SPIDER_CONCURRENCY` | 爬虫并发数 | `5` |
 | `SPIDER_FETCH_TIMEOUT_SECONDS` | 单平台爬虫超时秒数 | `15` |
@@ -235,12 +262,16 @@ hot-news/
 | `MCP_PATH` | Streamable HTTP MCP 路径 | `/mcp` |
 | `MCP_TRANSPORT` | MCP 默认传输方式，支持 `stdio` / `streamable-http` | `stdio` |
 
+> 所有环境变量均可通过 `.env` 文件或进程环境提供（基于 pydantic-settings）；配置非法时服务启动即报错。
+
 ### 推送配置
 
 在用户配置中设置 Webhook 地址：
 - 飞书: `https://open.feishu.cn/open-apis/bot/v2/hook/YOUR_TOKEN`
 - 钉钉: `https://oapi.dingtalk.com/robot/send?access_token=YOUR_TOKEN`
 - Bark: `https://api.day.app/YOUR_KEY`
+
+推送会记录成功/失败历史，并按条目指纹（`platform|url|title` 的 MD5）对近 7 天已推送内容去重，避免重复推送。
 
 ## 🛠️ 部署
 
@@ -253,7 +284,9 @@ docker compose up -d
 ### Compose 部署注意事项
 
 当前仓库只保留这一份主 `docker-compose.yml`。默认 compose 偏本地/内网部署：MySQL 默认示例密码为 `hotnews123`（可通过 `MYSQL_ROOT_PASSWORD` 覆盖），并会暴露 MySQL `3306`；公网生产环境请改用强密码并移除宿主机 `3306` 映射。`docker-compose.yml` 里的 `DATABASE_URL` 示例使用脱敏占位形式，实际运行时会和 `MYSQL_ROOT_PASSWORD` 保持一致。
-认证 Token 当前保存在后端进程内存中，服务重启后需要重新登录。内置 APScheduler 适合单进程/单副本运行；多 worker 或多容器部署时应只保留一个调度实例，避免重复刷新和重复推送。
+登录令牌已持久化到数据库 `user_tokens` 表，服务重启后登录态保留。内置 APScheduler 适合单进程/单副本运行；多 worker 或多容器部署时应只保留一个调度实例，避免重复刷新和重复推送。
+
+仓库还提供 GitHub Actions 每日归档工作流（`.github/workflows/archive.yml`）：每天自动抓取全平台热榜并把快照提交到 `archive/YYYY-MM-DD.json`，无需额外服务器即可留档。
 
 ### 生产环境
 
