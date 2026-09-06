@@ -257,8 +257,15 @@ def update_user_config(db: Session, user_id: int, config_data: dict) -> UserConf
 
 # ============= 缓存操作 =============
 
-def update_cache_record(db: Session, platform: str, status: str, error: str = ""):
-    """更新缓存记录"""
+def update_cache_record(
+    db: Session,
+    platform: str,
+    status: str,
+    error: str = "",
+    etag: Optional[str] = None,
+    last_modified: Optional[str] = None,
+):
+    """更新缓存记录（可选同步 ETag/Last-Modified 条件请求元数据）"""
     record = db.query(CacheRecord).filter(CacheRecord.platform == platform).first()
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     
@@ -270,6 +277,10 @@ def update_cache_record(db: Session, platform: str, status: str, error: str = ""
     record.status = status
     record.last_status = status
     record.error_msg = error
+    if etag is not None:
+        record.etag = etag
+    if last_modified is not None:
+        record.last_modified = last_modified
     if status == "success":
         record.last_success_at = now
     elif status == "error":
@@ -280,6 +291,23 @@ def update_cache_record(db: Session, platform: str, status: str, error: str = ""
 def get_cache_status(db: Session) -> List[CacheRecord]:
     """获取缓存状态"""
     return db.query(CacheRecord).all()
+
+
+def get_cache_meta_map(db: Session, platforms: List[str] = None) -> dict:
+    """获取各平台最近一次响应头的 ETag/Last-Modified，供条件请求使用。"""
+    query = db.query(CacheRecord)
+    if platforms:
+        query = query.filter(CacheRecord.platform.in_(platforms))
+    meta = {}
+    for record in query.all():
+        etag = getattr(record, "etag", None)
+        last_modified = getattr(record, "last_modified", None)
+        if etag or last_modified:
+            meta[record.platform] = {
+                "etag": etag,
+                "last_modified": last_modified,
+            }
+    return meta
 
 
 # ============= 令牌操作 =============

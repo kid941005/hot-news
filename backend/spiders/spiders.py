@@ -8,6 +8,7 @@ import asyncio
 import hashlib
 import json
 import re
+import threading
 import time
 import requests
 import xml.etree.ElementTree as ET
@@ -24,6 +25,45 @@ BEIJING_TZ = timezone(timedelta(hours=8))
 
 
 logger = logging.getLogger(__name__)
+
+
+class NotModified(Exception):
+    """HTTP 304 Not Modified：内容未变化，应保留旧数据。"""
+
+
+# 条件请求元数据：{platform_key: {"etag": ..., "last_modified": ...}}
+# 由 news_service 在抓取前从 CacheRecord 注入，抓取后写回数据库。
+_conditional_meta: dict = {}
+
+# 抓取结果哨兵：表示该源 304 未修改，应保留旧数据
+UNCHANGED = object()
+
+
+def set_conditional_meta(meta: dict) -> None:
+    """注入抓取前读取到的各平台 ETag/Last-Modified。"""
+    _conditional_meta.clear()
+    _conditional_meta.update(meta or {})
+
+
+def get_conditional_meta(platform: str) -> dict:
+    """读取某平台当前条件请求元数据（供 news_service 写回数据库）。"""
+    return _conditional_meta.get(platform, {})
+
+
+def _store_response_meta(source_key: str, resp) -> None:
+    """从响应头提取 ETag/Last-Modified，供抓取后写回数据库。"""
+    if not source_key:
+        return
+    headers = getattr(resp, "headers", None)
+    if headers is None:
+        return
+    etag = headers.get("ETag")
+    last_modified = headers.get("Last-Modified")
+    meta = _conditional_meta.setdefault(source_key, {})
+    if isinstance(etag, str) and etag:
+        meta["etag"] = etag
+    if isinstance(last_modified, str) and last_modified:
+        meta["last_modified"] = last_modified
 
 _DEFAULT_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -53,6 +93,8 @@ def fetch_get(url, *, headers=None, params=None, session=None, timeout=None, ver
     """GET with default UA, retry, and env-configurable timeout. Returns requests.Response."""
     s = session or _session(headers)
     resp = s.get(url, params=params, timeout=_resolve_timeout(timeout), verify=verify)
+    if resp.status_code == 304:
+        raise NotModified(url)
     resp.raise_for_status()
     return resp
 
@@ -156,8 +198,21 @@ def _parse_rss_text(xml_text: str, platform: str, limit: int = 30) -> List[dict]
     return items
 
 
-def define_rss_source(url: str, platform: str, limit: int = 30) -> List[dict]:
-    resp = fetch_get(url)
+def define_rss_source(url: str, platform: str, limit: int = 30, source_key: str = None) -> List[dict]:
+    """抓取 RSS/Atom 源；支持 ETag/Last-Modified 条件请求（304 时抛 NotModified）。"""
+    meta = _conditional_meta.get(source_key) if source_key else None
+    headers = {}
+    if meta:
+        if meta.get("etag"):
+            headers["If-None-Match"] = meta["etag"]
+        if meta.get("last_modified"):
+            headers["If-Modified-Since"] = meta["last_modified"]
+    try:
+        resp = fetch_get(url, headers=headers)
+    except NotModified:
+        return UNCHANGED
+    if source_key:
+        _store_response_meta(source_key, resp)
     return _parse_rss_text(resp.text, platform, limit)
 
 
@@ -780,7 +835,7 @@ class PcbetaSpider(BaseSpider):
 
     def fetch(self) -> List[dict]:
         try:
-            return define_rss_source("https://bbs.pcbeta.com/forum.php?mod=rss&fid=563&auth=0", "远景论坛")
+            return define_rss_source("https://bbs.pcbeta.com/forum.php?mod=rss&fid=563&auth=0", "远景论坛", source_key=self.name)
         except Exception:
             logger.exception("❌ 远景论坛")
             return []
@@ -792,7 +847,7 @@ class SolidotSpider(BaseSpider):
 
     def fetch(self) -> List[dict]:
         try:
-            return define_rss_source("https://www.solidot.org/index.rss", "Solidot")
+            return define_rss_source("https://www.solidot.org/index.rss", "Solidot", source_key=self.name)
         except Exception:
             logger.exception("❌ Solidot")
             return []
@@ -805,7 +860,7 @@ class AihotSpider(BaseSpider):
     RSS_URL = "https://aihot.virxact.com/feed/all.xml"
 
     def _fetch_rss(self) -> List[dict]:
-        return define_rss_source(self.RSS_URL, "AIHOT")
+        return define_rss_source(self.RSS_URL, "AIHOT", source_key=self.name)
 
     def fetch(self) -> List[dict]:
         try:
@@ -846,7 +901,7 @@ class ProductHuntSpider(BaseSpider):
     RSS_URL = "https://www.producthunt.com/feed"
 
     def _fetch_rss(self) -> List[dict]:
-        return define_rss_source(self.RSS_URL, "Product Hunt")
+        return define_rss_source(self.RSS_URL, "Product Hunt", source_key=self.name)
 
     def fetch(self) -> List[dict]:
         token = os.getenv("PRODUCTHUNT_API_TOKEN")
@@ -908,7 +963,7 @@ class ChongbuluoSpider(BaseSpider):
 
     def fetch(self) -> List[dict]:
         try:
-            return define_rss_source("https://www.chongbuluo.com/forum.php?mod=rss&view=newthread", "虫部落")
+            return define_rss_source("https://www.chongbuluo.com/forum.php?mod=rss&view=newthread", "虫部落", source_key=self.name)
         except Exception:
             logger.exception("❌ 虫部落")
             return []
@@ -1270,36 +1325,49 @@ SPIDERS = {
 SPIDER_CONCURRENCY = get_env_int("SPIDER_CONCURRENCY", 5, min_value=1, max_value=20)
 SPIDER_FETCH_TIMEOUT_SECONDS = get_env_float("SPIDER_FETCH_TIMEOUT_SECONDS", 15.0, min_value=1.0, max_value=60.0)
 
+# 进程级抓取锁：防止手动/定时/自动刷新在单机多线程下并发重复抓取同一批源。
+# 多实例部署时可替换为 Redis 分布式锁。
+_FETCH_LOCK = threading.Lock()
+
 
 async def fetch_all_spiders(platforms: List[str] = None) -> dict:
-    """获取所有平台的热点"""
-    
-    if platforms is None:
-        platforms = list(SPIDERS.keys())
-    
-    results = {}
-    semaphore = asyncio.Semaphore(max(1, SPIDER_CONCURRENCY))
+    """获取所有平台的热点；已有抓取在进行时直接跳过（返回空 dict）。"""
+    if not _FETCH_LOCK.acquire(blocking=False):
+        logger.warning("⏳ 已有抓取任务进行中，跳过本次抓取")
+        return {}
 
-    async def fetch_one(platform: str):
-        if platform not in SPIDERS:
-            return None
-        async with semaphore:
-            try:
-                spider = SPIDERS[platform]()
-                news = await asyncio.wait_for(
-                    asyncio.to_thread(spider.fetch),
-                    timeout=max(0.001, SPIDER_FETCH_TIMEOUT_SECONDS),
-                )
-                logger.info("✅ %s: 获取 %s 条", spider.name, len(news))
-                return platform, news
-            except Exception:
-                logger.exception("❌ %s", platform)
-                return platform, []
+    try:
+        if platforms is None:
+            platforms = list(SPIDERS.keys())
 
-    fetched = await asyncio.gather(*(fetch_one(platform) for platform in platforms))
-    for item in fetched:
-        if item is not None:
-            platform, news = item
-            results[platform] = news
-    
-    return results
+        results = {}
+        semaphore = asyncio.Semaphore(max(1, SPIDER_CONCURRENCY))
+
+        async def fetch_one(platform: str):
+            if platform not in SPIDERS:
+                return None
+            async with semaphore:
+                try:
+                    spider = SPIDERS[platform]()
+                    news = await asyncio.wait_for(
+                        asyncio.to_thread(spider.fetch),
+                        timeout=max(0.001, SPIDER_FETCH_TIMEOUT_SECONDS),
+                    )
+                    if news is UNCHANGED:
+                        logger.info("✅ %s: 304 未修改，保留旧数据", spider.name)
+                        return platform, UNCHANGED
+                    logger.info("✅ %s: 获取 %s 条", spider.name, len(news))
+                    return platform, news
+                except Exception:
+                    logger.exception("❌ %s", platform)
+                    return platform, []
+
+        fetched = await asyncio.gather(*(fetch_one(platform) for platform in platforms))
+        for item in fetched:
+            if item is not None:
+                platform, news = item
+                results[platform] = news
+
+        return results
+    finally:
+        _FETCH_LOCK.release()

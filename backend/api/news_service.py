@@ -261,7 +261,7 @@ def _run_background_refresh(platforms=None):
     try:
         db = SessionLocal()
         try:
-            results = asyncio.run(spiders.fetch_all_spiders(platforms))
+            results = asyncio.run(_prepare_fetch(db, platforms))
             saved_count, sources = refresh_news_data(db, results)
             LAST_REFRESH_TIME = datetime.now(timezone.utc)
             logger.info("📊 后台自动刷新 %s: 共保存 %s 条新闻", ",".join(platforms), saved_count)
@@ -300,7 +300,7 @@ def _trigger_auto_refresh_if_needed(db: Session, platforms=None):
             # 没有数据时同步刷新（用户等待）
             logger.info("🔄 数据库为空，触发同步刷新: %s", ",".join(stale_platforms))
             try:
-                results = asyncio.run(spiders.fetch_all_spiders(stale_platforms))
+                results = asyncio.run(_prepare_fetch(db, stale_platforms))
                 saved_count, sources = refresh_news_data(db, results)
                 LAST_REFRESH_TIME = datetime.now(timezone.utc)
                 logger.info("📊 同步刷新完成: 共保存 %s 条新闻", saved_count)
@@ -315,32 +315,43 @@ def _trigger_auto_refresh_if_needed(db: Session, platforms=None):
         t.start()
 
 
+def _prepare_fetch(db: Session, platforms=None):
+    """抓取前注入 ETag/Last-Modified 条件请求元数据，统一各刷新路径的调用方式。"""
+    spiders.set_conditional_meta(database.get_cache_meta_map(db, platforms))
+    return spiders.fetch_all_spiders(_normalize_platforms(platforms))
+
+
 def refresh_news_data(db: Session, results: dict = None, platforms=None):
     # per-source cache: 每个源写入 CacheRecord，供前端和刷新状态使用
     if results is None:
-        results = awaitable_fetch_all_spiders(platforms)
+        results = asyncio.run(_prepare_fetch(db, platforms))
     saved_count = 0
     sources = {}
     for platform, news in results.items():
+        meta = spiders.get_conditional_meta(platform)
+        etag = meta.get("etag")
+        last_modified = meta.get("last_modified")
+        if news is spiders.UNCHANGED:
+            # 304 未修改：保留旧数据，仅刷新缓存状态（last_success_at 置为当前）
+            database.update_cache_record(db, platform, "success", etag=etag, last_modified=last_modified)
+            sources[platform] = {"status": "unchanged", "count": 0}
+            logger.info("✅ %s: 未修改，保留旧数据", platform)
+            continue
         if news:
             try:
                 database.save_news(db, news)
-                database.update_cache_record(db, platform, "success")
+                database.update_cache_record(db, platform, "success", etag=etag, last_modified=last_modified)
                 saved_count += len(news)
                 sources[platform] = {"status": "success", "count": len(news)}
                 logger.info("✅ 保存 %s: %s 条", platform, len(news))
             except Exception as e:
-                database.update_cache_record(db, platform, "error", str(e))
+                database.update_cache_record(db, platform, "error", str(e), etag=etag, last_modified=last_modified)
                 sources[platform] = {"status": "error", "count": 0, "error": str(e)}
                 logger.exception("❌ 保存失败 %s", platform)
         else:
-            database.update_cache_record(db, platform, "empty")
+            database.update_cache_record(db, platform, "empty", etag=etag, last_modified=last_modified)
             sources[platform] = {"status": "empty", "count": 0}
     return saved_count, sources
-
-
-def awaitable_fetch_all_spiders(platforms=None):
-    return asyncio.run(spiders.fetch_all_spiders(_normalize_platforms(platforms)))
 
 
 def scheduled_refresh():
@@ -380,7 +391,7 @@ async def refresh_news(
             }
     async with REFRESH_LOCK:
         try:
-            results = await spiders.fetch_all_spiders(platforms)
+            results = await _prepare_fetch(db, platforms)
             saved_count, sources = refresh_news_data(db, results)
             logger.info("📊 共保存 %s 条新闻", saved_count)
             LAST_REFRESH_TIME = datetime.now(timezone.utc)

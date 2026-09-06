@@ -140,6 +140,8 @@ class CacheRecord(Base):
     last_status = Column(String(20), default="success")
     status = Column(String(20), default="success")
     error_msg = Column(Text, default="")
+    etag = Column(String(255), nullable=True)
+    last_modified = Column(String(255), nullable=True)
 
 
 # 数据库连接
@@ -182,6 +184,8 @@ def ensure_cache_record_schema():
             ('last_success_at', "ALTER TABLE cache_records ADD COLUMN last_success_at DATETIME"),
             ('last_error_at', "ALTER TABLE cache_records ADD COLUMN last_error_at DATETIME"),
             ('last_status', "ALTER TABLE cache_records ADD COLUMN last_status VARCHAR(20) NOT NULL DEFAULT 'success'"),
+            ('etag', "ALTER TABLE cache_records ADD COLUMN etag VARCHAR(255)"),
+            ('last_modified', "ALTER TABLE cache_records ADD COLUMN last_modified VARCHAR(255)"),
         ]:
             if column not in cols:
                 cur.execute(ddl)

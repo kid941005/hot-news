@@ -39,6 +39,9 @@ class DummyQuery:
     def order_by(self, *_args, **_kwargs):
         return self
 
+    def all(self):
+        return self.items or []
+
     def delete(self):
         return None
 
