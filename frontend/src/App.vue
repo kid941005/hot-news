@@ -30,7 +30,10 @@ function clearLoginState() {
 }
 
 function handleRequestError(e) {
-  showToast(getErrorMessage(e), 'error')
+  // 403/404/500 已由 api 拦截器统一提示，这里避免重复 toast
+  if (![403, 404, 500].includes(e?.response?.status)) {
+    showToast(getErrorMessage(e), 'error')
+  }
   console.error(e)
 }
 
