@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backend.api import news_service as main
 from backend.api.main import app
+from backend.db.database import PLATFORM_MAP
 from backend.models.models import get_db
 
 
@@ -69,6 +70,18 @@ class DummyCacheRecordQuery:
             "last_fetch": now,
             "last_success_at": now,
         })()
+
+    def all(self):
+        """所有平台都视为最近成功抓取，避免触发后台刷新。"""
+        now = datetime.now(timezone.utc)
+        return [
+            type("CacheRecord", (), {
+                "platform": platform,
+                "last_fetch": now,
+                "last_success_at": now,
+            })()
+            for platform in PLATFORM_MAP
+        ]
 
 
 class DummyDB:

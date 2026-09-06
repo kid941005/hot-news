@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import api, { getErrorMessage } from './api'
 import { useToast } from './composables/useToast'
 import packageInfo from '../package.json'
@@ -352,6 +352,8 @@ function applyRefreshState(state) {
     last_refresh: state.last_refresh || null,
     refreshing: !!state.refreshing,
     stale: !!state.stale,
+    stale_platforms: state.stale_platforms || [],
+    sources: state.sources || {},
   }
   if (state.last_refresh) {
     const time = new Date(state.last_refresh)
@@ -361,8 +363,32 @@ function applyRefreshState(state) {
   }
 }
 
-async function loadNews() {
-  loading.value = true
+function formatClockText(value) {
+  if (!value) return ''
+  const time = new Date(value)
+  if (Number.isNaN(time.getTime())) return ''
+  return time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
+}
+
+function platformSource(platform) {
+  const id = getPlatformId(platform)
+  return (refreshState.value.sources || {})[id] || null
+}
+
+// 每个平台卡片显示该平台真实的最近更新时间/失败状态，替代全局时间
+function platformStatusText(platform) {
+  const src = platformSource(platform)
+  if (!src) return lastRefresh.value ? `更新于 ${lastRefresh.value}` : ''
+  const fetchTime = formatClockText(src.last_fetch)
+  if (src.status === 'error') return fetchTime ? `更新失败 ${fetchTime}` : '更新失败'
+  if (src.status === 'empty') return fetchTime ? `暂无数据 ${fetchTime}` : '暂无数据'
+  if (src.status === 'missing') return '暂无数据'
+  const successTime = formatClockText(src.last_success_at || src.last_fetch)
+  return successTime ? `更新于 ${successTime}` : ''
+}
+
+async function loadNews(silent = false) {
+  if (!silent) loading.value = true
   try {
     // 当currentTag为null时，获取按平台分组的数据；否则按标签筛选
     if (currentTag.value === null) {
@@ -403,9 +429,13 @@ async function loadNews() {
       }
     }
   } catch (e) {
-    handleRequestError(e)
+    if (silent) {
+      console.error(e)
+    } else {
+      handleRequestError(e)
+    }
   } finally {
-    loading.value = false
+    if (!silent) loading.value = false
   }
 }
 
@@ -733,6 +763,32 @@ function startAutoRefresh() {
   }, REFRESH_INTERVAL)
 }
 
+// 静默轮询：后台刷新中 5s 一次，空闲 60s 一次，不打断用户操作
+let pollTimer = null
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+}
+
+function startPolling() {
+  stopPolling()
+  const interval = refreshState.value.refreshing ? 5000 : 60000
+  pollTimer = setInterval(() => {
+    silentReload()
+  }, interval)
+}
+
+async function silentReload() {
+  if (loading.value || refreshingPlatform.value) return
+  await loadNews(true)
+}
+
+// 后台刷新完成后自动切换回低频轮询
+watch(() => refreshState.value.refreshing, () => startPolling())
+
 // 初始化
 function onAuthExpired() {
   clearLoginState()
@@ -760,6 +816,7 @@ onMounted(async () => {
   
   // 启动自动刷新定时器
   startAutoRefresh()
+  startPolling()
 })
 
 // 组件卸载时清除定时器
@@ -767,6 +824,7 @@ onUnmounted(() => {
   if (autoRefreshTimer) {
     clearInterval(autoRefreshTimer)
   }
+  stopPolling()
   window.removeEventListener('auth:expired', onAuthExpired)
   window.removeEventListener('api:error', onApiError)
 })
@@ -786,7 +844,7 @@ onUnmounted(() => {
             <span v-else-if="refreshState.refreshing">正在后台刷新</span>
             <span v-else-if="refreshState.last_refresh">最后刷新：{{ lastRefresh }}</span>
             <span v-else>暂无刷新记录</span>
-            <span v-if="refreshState.stale" class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-700">数据可能已过期</span>
+            <span v-if="refreshState.stale" class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-700" :title="'过期平台数：' + (refreshState.stale_platforms || []).length">部分数据已过期</span>
           </p>
         </div>
         <div class="flex shrink-0 flex-wrap justify-end gap-2">
@@ -885,7 +943,7 @@ onUnmounted(() => {
               </span>
               <div class="min-w-0">
                 <div class="text-lg font-bold tracking-tight text-slate-900 truncate">{{ platform }}</div>
-                <div v-if="lastRefresh" class="text-[11px] text-slate-400">更新于 {{ lastRefresh }}</div>
+                <div v-if="platformStatusText(platform)" class="text-[11px] text-slate-400">{{ platformStatusText(platform) }}</div>
               </div>
             </div>
             <div class="flex shrink-0 items-center gap-2">

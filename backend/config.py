@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     refresh_interval_minutes: int = Field(15, ge=1, le=1440)
     refresh_cooldown_seconds: int = Field(300, ge=0, le=86400)
     auto_refresh_cooldown_seconds: int = Field(30, ge=5, le=3600)
+    stale_after_seconds: int = Field(600, ge=30, le=86400)
 
     # ---- 爬虫 ----
     spider_concurrency: int = Field(5, ge=1, le=20)

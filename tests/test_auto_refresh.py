@@ -146,6 +146,55 @@ def test_auto_refresh_starts_background_thread_when_data_is_stale():
     reset_auto_refresh_state()
 
 
+def test_auto_refresh_recent_success_is_not_stale():
+    reset_auto_refresh_state()
+    db = DummyDB(has_news=True)
+    db.cache_records.append(type("CacheRecord", (), {
+        "platform": "weibo",
+        "last_fetch": datetime.now(timezone.utc),
+        "last_success_at": datetime.now(timezone.utc) - timedelta(seconds=120),
+    })())
+
+    with patch("threading.Thread") as thread:
+        api._trigger_auto_refresh_if_needed(db, ["weibo"])
+
+    thread.assert_not_called()
+    assert api._auto_refresh_running is False
+
+
+def test_auto_refresh_old_success_is_stale():
+    reset_auto_refresh_state()
+    db = DummyDB(has_news=True)
+    db.cache_records.append(type("CacheRecord", (), {
+        "platform": "weibo",
+        "last_fetch": datetime.now(timezone.utc) - timedelta(seconds=api.AUTO_REFRESH_COOLDOWN_SECONDS + 1),
+        "last_success_at": datetime.now(timezone.utc) - timedelta(seconds=api.STALE_AFTER_SECONDS + 1),
+    })())
+
+    with patch("threading.Thread") as thread:
+        api._trigger_auto_refresh_if_needed(db, ["weibo"])
+
+    thread.assert_called_once()
+    reset_auto_refresh_state()
+
+
+def test_auto_refresh_failed_source_skips_retry_during_cooldown():
+    """失败源（有旧数据、最近刚尝试过）只标记过期，不进入自动刷新冷却重试。"""
+    reset_auto_refresh_state()
+    db = DummyDB(has_news=True)
+    db.cache_records.append(type("CacheRecord", (), {
+        "platform": "weibo",
+        "last_fetch": datetime.now(timezone.utc),
+        "last_success_at": datetime.now(timezone.utc) - timedelta(seconds=api.STALE_AFTER_SECONDS + 1),
+    })())
+
+    with patch("threading.Thread") as thread:
+        api._trigger_auto_refresh_if_needed(db, ["weibo"])
+
+    thread.assert_not_called()
+    assert api._auto_refresh_running is False
+
+
 def test_get_refresh_state_uses_cache_record_fallback():
     db = DummyDB(has_news=True)
     cached = type("CacheRecord", (), {

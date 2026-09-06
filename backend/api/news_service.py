@@ -6,7 +6,6 @@ import asyncio
 import json
 import logging
 import threading
-import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -27,6 +26,7 @@ news_router = APIRouter()
 
 REFRESH_COOLDOWN_SECONDS = settings.refresh_cooldown_seconds
 AUTO_REFRESH_COOLDOWN_SECONDS = settings.auto_refresh_cooldown_seconds
+STALE_AFTER_SECONDS = settings.stale_after_seconds
 
 LAST_REFRESH_TIME = None
 REFRESH_LOCK = asyncio.Lock()
@@ -70,6 +70,15 @@ def _created_at_to_local(value):
     return value.astimezone()
 
 
+def _as_utc(value):
+    """将数据库中的 naive UTC datetime 规范为带时区的 UTC。"""
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
 @news_router.get("/api/news")
 def get_news(
     tag: str = None,  # 标签筛选
@@ -82,9 +91,6 @@ def get_news(
     user_platforms = config.platforms if config and config.platforms else None
     _trigger_auto_refresh_if_needed(db, user_platforms)
     state = _get_refresh_state(db, user_platforms)
-    if state.get("stale") and not state.get("refreshing"):
-        _wait_for_auto_refresh(db)
-        state = _get_refresh_state(db, user_platforms)
 
     # 如果指定了all=true，获取所有热榜（不按关键词过滤）
     if all:
@@ -165,9 +171,6 @@ def get_news_by_platform(
     refresh_platforms = _normalize_platforms(chinese_platforms)
     _trigger_auto_refresh_if_needed(db, refresh_platforms)
     state = _get_refresh_state(db, refresh_platforms)
-    if state.get("stale") and not state.get("refreshing"):
-        _wait_for_auto_refresh(db)
-        state = _get_refresh_state(db, refresh_platforms)
 
     # 按平台分组获取新闻
     platform_news = {}
@@ -195,20 +198,46 @@ def _normalize_platforms(platforms=None):
 
 
 def _is_cache_stale(record) -> bool:
-    last_refresh = getattr(record, "last_success_at", None) or getattr(record, "last_fetch", None)
-    if not isinstance(last_refresh, datetime):
+    """判断平台数据是否过期：
+    - 无缓存记录：视为过期（尚未抓到数据）
+    - 从未成功过：距上次尝试超过冷却时间才视为过期，避免失败源被反复重试
+    - 最近成功过：超过 STALE_AFTER_SECONDS 视为过期
+    """
+    if record is None:
         return True
-    if last_refresh.tzinfo is None:
-        last_refresh = last_refresh.replace(tzinfo=timezone.utc)
-    return (datetime.now(timezone.utc) - last_refresh.astimezone(timezone.utc)).total_seconds() >= AUTO_REFRESH_COOLDOWN_SECONDS
+    now = datetime.now(timezone.utc)
+    last_success = _as_utc(getattr(record, "last_success_at", None))
+    last_fetch = _as_utc(getattr(record, "last_fetch", None))
+    if last_success is None:
+        if last_fetch is None:
+            return True
+        return (now - last_fetch).total_seconds() >= AUTO_REFRESH_COOLDOWN_SECONDS
+    return (now - last_success).total_seconds() >= STALE_AFTER_SECONDS
 
 
-def _get_stale_platforms(db: Session, platforms=None):
+def _get_stale_platforms(db: Session, platforms=None, records=None, for_refresh: bool = False):
+    """返回过期平台列表。
+
+    - records: 可选，一次查询的 CacheRecord 列表，避免逐平台 N+1 查询
+    - for_refresh=True：自动刷新额外要求距上次尝试已过冷却期，防止失败源被反复重试
+    """
+    if records is None:
+        records = db.query(database.CacheRecord).all()
+    record_map = {record.platform: record for record in records}
     stale_platforms = []
+    now = datetime.now(timezone.utc)
     for platform in _normalize_platforms(platforms):
-        record = db.query(database.CacheRecord).filter(database.CacheRecord.platform == platform).first()
-        if record is None or _is_cache_stale(record):
+        record = record_map.get(platform)
+        if record is None:
             stale_platforms.append(platform)
+            continue
+        if not _is_cache_stale(record):
+            continue
+        if for_refresh:
+            last_fetch = _as_utc(getattr(record, "last_fetch", None))
+            if last_fetch is not None and (now - last_fetch).total_seconds() < AUTO_REFRESH_COOLDOWN_SECONDS:
+                continue
+        stale_platforms.append(platform)
     return stale_platforms
 
 
@@ -220,22 +249,20 @@ def _get_refresh_state(db: Session, platforms=None) -> dict:
             return value.isoformat().replace("+00:00", "Z")
         return str(value)
 
+    records = db.query(database.CacheRecord).all()
+    record_map = {record.platform: record for record in records}
     latest_cache = None
-    try:
-        query = db.query(database.CacheRecord)
-        if hasattr(query, "order_by"):
-            query = query.order_by(database.CacheRecord.last_fetch.desc())
-        latest_cache = query.first()
-    except Exception:
-        latest_cache = None
+    for record in records:
+        if latest_cache is None or (record.last_fetch or datetime.min) > (latest_cache.last_fetch or datetime.min):
+            latest_cache = record
     last_refresh = LAST_REFRESH_TIME or (latest_cache.last_fetch if latest_cache else None)
     last_refresh_text = format_time(last_refresh)
-    stale_platforms = _get_stale_platforms(db, platforms)
+    stale_platforms = _get_stale_platforms(db, platforms, records=records)
     requested_platforms = _normalize_platforms(platforms)
     refreshing = _auto_refresh_running or REFRESH_LOCK.locked() or bool(_auto_refresh_platforms.intersection(requested_platforms))
     sources = {}
     for platform in requested_platforms:
-        record = db.query(database.CacheRecord).filter(database.CacheRecord.platform == platform).first()
+        record = record_map.get(platform)
         if not record:
             sources[platform] = {"status": "missing"}
             continue
@@ -275,19 +302,9 @@ def _run_background_refresh(platforms=None):
             _auto_refresh_running = bool(_auto_refresh_platforms)
 
 
-def _wait_for_auto_refresh(db: Session, timeout_seconds: float = 8.0) -> None:
-    if timeout_seconds <= 0:
-        return
-    deadline = datetime.now(timezone.utc).timestamp() + timeout_seconds
-    while datetime.now(timezone.utc).timestamp() < deadline:
-        if not _auto_refresh_running and not REFRESH_LOCK.locked():
-            return
-        time.sleep(0.2)
-
-
 def _trigger_auto_refresh_if_needed(db: Session, platforms=None):
     global _auto_refresh_running, LAST_REFRESH_TIME, _auto_refresh_platforms
-    stale_platforms = [platform for platform in _get_stale_platforms(db, platforms) if platform not in _auto_refresh_platforms]
+    stale_platforms = [platform for platform in _get_stale_platforms(db, platforms, for_refresh=True) if platform not in _auto_refresh_platforms]
     if not stale_platforms:
         return
     with _AUTO_REFRESH_LOCK:

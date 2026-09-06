@@ -250,6 +250,7 @@ hot-news/
 | `REFRESH_INTERVAL_MINUTES` | 独立定时刷新新闻的间隔分钟数 | `15` |
 | `REFRESH_COOLDOWN_SECONDS` | 手动刷新最小间隔秒数 | `300` |
 | `AUTO_REFRESH_COOLDOWN_SECONDS` | 自动刷新最小间隔秒数 | `30` |
+| `STALE_AFTER_SECONDS` | 数据超过该秒数未成功更新即判定过期（展示与自动刷新阈值） | `600` |
 | `CORS_ORIGINS` | 允许跨域来源，多个用逗号分隔 | `*` |
 | `SPIDER_CONCURRENCY` | 爬虫并发数 | `5` |
 | `SPIDER_FETCH_TIMEOUT_SECONDS` | 单平台爬虫超时秒数 | `15` |
@@ -293,6 +294,14 @@ docker compose up -d
 建议使用 Nginx 反向代理 + HTTPS
 
 ## 📝 更新日志
+
+### v2.5.66 (2026-09-06)
+- 优化：数据过期判定从“30 秒未刷新即过期”调整为可配置阈值（`STALE_AFTER_SECONDS`，默认 10 分钟），避免每次访问都触发全量后台刷新与“数据可能已过期”误报
+- 优化：过期/失败源进入冷却（`AUTO_REFRESH_COOLDOWN_SECONDS`）后才允许自动重试，防止故障源被反复抓取
+- 优化：刷新状态与过期平台改为批量查询，去除 N+1 查询；页面请求不再阻塞等待后台刷新完成
+- 优化：平台卡片展示该平台真实最近成功更新时间/失败状态，替代全局统一时间；顶部“数据可能已过期”改为“部分数据已过期”并标注过期平台数
+- 新增：前端静默轮询（后台刷新中 5 秒、空闲 60 秒），刷新完成后自动拉取最新数据
+- 对齐：参考 hotpush 的 TTL 缓存与 newsnow 的按源 freshness 语义
 
 ### v2.5.65 (2026-09-06)
 - 新增：推送渠道插件化（BasePusher），统一注册表分发；推送历史记录与 7 天条目指纹去重
