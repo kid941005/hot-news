@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api import main
+from backend.api import auth as main
 
 
 def test_cleanup_expired_tokens_removes_only_expired_tokens():

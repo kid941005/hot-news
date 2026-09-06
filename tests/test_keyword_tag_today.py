@@ -1,5 +1,5 @@
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -8,9 +8,11 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api import main
-from backend.api.main import app, get_current_user_id, get_db
+from backend.api import news_service as main
+from backend.api.auth import get_current_user_id
+from backend.api.main import app
 from backend.models.models import UserConfig
+from backend.models.models import get_db
 
 
 class DummyConfigQuery:
@@ -57,7 +59,8 @@ class DummyNews:
 
 
 def test_keyword_tag_filters_to_today_news():
-    today = datetime.now()
+    # News.created_at 在代码中按 naive UTC 存储，这里与生产保持一致
+    today = datetime.now(timezone.utc).replace(tzinfo=None)
     yesterday = today - timedelta(days=1)
     config = SimpleNamespace(keyword_tags={"AI": ["AI"]}, platforms=[])
     db = DummyDB(config)
@@ -77,8 +80,8 @@ def test_keyword_tag_filters_to_today_news():
     app.dependency_overrides[get_current_user_id] = lambda: 1
     app.dependency_overrides[get_db] = override_get_db
     try:
-        with patch("backend.api.main._trigger_auto_refresh_if_needed"), \
-             patch("backend.api.main._get_refresh_state", return_value={"stale": False, "refreshing": False}), \
+        with patch("backend.api.news_service._trigger_auto_refresh_if_needed"), \
+             patch("backend.api.news_service._get_refresh_state", return_value={"stale": False, "refreshing": False}), \
              patch("backend.db.database.get_user_filtered_news", return_value=(news_list, matched)):
             response = TestClient(app).get("/api/news?tag=AI")
     finally:

@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from backend.spiders.spiders import ToutiaoSpider, WeiboSpider
 
 
-def test_weibo_uses_fallback_cookie_or_env_header(monkeypatch):
+def test_weibo_does_not_send_hardcoded_cookie_without_env(monkeypatch):
     session = Mock()
     session.headers = {}
     session.get.return_value.text = ""
@@ -12,8 +12,10 @@ def test_weibo_uses_fallback_cookie_or_env_header(monkeypatch):
     with patch("backend.spiders.spiders.requests.Session", return_value=session):
         assert WeiboSpider().fetch() == []
 
-    assert session.headers["Cookie"].startswith("SUB=")
+    assert "Cookie" not in session.headers
 
+
+def test_weibo_uses_env_cookie_header(monkeypatch):
     session = Mock()
     session.headers = {}
     session.get.return_value.text = ""

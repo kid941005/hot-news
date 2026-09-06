@@ -6,7 +6,6 @@ __pycache__/
 
 # Build
 frontend/dist/
-backend/api/static/assets/
 *.db
 *.sqlite
 *.db-journal

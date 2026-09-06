@@ -16,4 +16,5 @@ def test_user_config_user_id_is_indexed():
 
 
 def test_cache_record_platform_is_indexed():
-    assert CacheRecord.__table__.c.platform.index is True
+    indexes = {index.name for index in CacheRecord.__table__.indexes}
+    assert "ix_cache_records_platform" in indexes

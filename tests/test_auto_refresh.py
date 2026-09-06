@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api import main as api
+from backend.api import news_service as api
 from backend.db.database import CacheRecord
 from backend.models.models import News
 

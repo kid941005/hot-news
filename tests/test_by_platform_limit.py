@@ -6,8 +6,9 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api import main
-from backend.api.main import app, get_db
+from backend.api import news_service as main
+from backend.api.main import app
+from backend.models.models import get_db
 
 
 class DummyNews:

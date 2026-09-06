@@ -5,7 +5,9 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api.main import app, get_current_user_id, get_db
+from backend.api.auth import get_current_user_id
+from backend.api.main import app
+from backend.models.models import get_db
 
 
 class DummyDB:

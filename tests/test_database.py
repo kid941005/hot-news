@@ -72,7 +72,7 @@ def test_save_news_replaces_platform_current_list():
     assert zhihu_titles == {"其他平台新闻"}
 
 
-def test_save_news_updates_existing_news_instead_of_duplicating():
+def test_save_news_replaces_platform_rows_with_latest_hot_value():
     db = make_db()
     db.add(News(platform="微博", title="相同新闻", url="https://example.com/same", hot_value="1"))
     db.commit()

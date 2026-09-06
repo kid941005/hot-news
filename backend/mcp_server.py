@@ -6,21 +6,9 @@ from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
-from backend.db.database import PLATFORM_MAP
+from backend.config import get_env_int
+from backend.db.database import PLATFORM_MAP, REALTIME_PLATFORM_IDS
 from backend.models.models import News, SessionLocal, init_db
-
-
-def get_env_int(name: str, default: int, min_value: int = 1, max_value: int = 65535) -> int:
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    try:
-        value = int(raw)
-    except ValueError:
-        return default
-    if value < min_value or value > max_value:
-        return default
-    return value
 
 
 mcp = FastMCP(
@@ -38,7 +26,10 @@ def _news_to_dict(news: News) -> dict:
 @mcp.tool()
 def list_platforms() -> list[dict]:
     """List supported news platforms."""
-    return [{"id": k, "name": v} for k, v in PLATFORM_MAP.items()]
+    return [
+        {"id": k, "name": v, "realtime": k in REALTIME_PLATFORM_IDS}
+        for k, v in PLATFORM_MAP.items()
+    ]
 
 
 @mcp.tool()

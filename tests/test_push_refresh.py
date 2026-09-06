@@ -7,7 +7,10 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api.main import app, get_current_user_id, get_db, scheduled_push, is_allowed_webhook, _push_for_user, push_to_feishu
+from backend.api.auth import get_current_user_id
+from backend.api.main import app
+from backend.api.push_service import _push_for_user, is_allowed_webhook, push_to_feishu, scheduled_push
+from backend.models.models import get_db
 
 
 class DummyConfig:
@@ -65,8 +68,8 @@ def test_manual_push_does_not_refresh_before_push():
     app.dependency_overrides[get_db] = override_get_db
 
     try:
-        with patch("backend.api.main.refresh_news_data", side_effect=AssertionError("manual push should not refresh")):
-            with patch("backend.api.main._push_for_user", side_effect=lambda current_db, config: (calls.append(("push", current_db, config)), (True, "ok"))[1]):
+        with patch("backend.api.push_service.refresh_news_data", create=True, side_effect=AssertionError("manual push should not refresh")):
+            with patch("backend.api.push_service._push_for_user", side_effect=lambda current_db, config: (calls.append(("push", current_db, config)), (True, "ok"))[1]):
                 response = client.post("/api/push")
     finally:
         app.dependency_overrides.clear()
@@ -82,9 +85,9 @@ def test_scheduled_push_does_not_refresh_before_push():
     db = DummyDB(DummyConfig())
     calls = []
 
-    with patch("backend.models.models.SessionLocal", return_value=db):
-        with patch("backend.api.main.refresh_news_data", side_effect=AssertionError("scheduled push should not refresh")):
-            with patch("backend.api.main._push_for_user", side_effect=lambda current_db, config: (calls.append(("push", current_db, config)), (True, "ok"))[1]):
+    with patch("backend.api.push_service.SessionLocal", return_value=db):
+        with patch("backend.api.push_service.refresh_news_data", create=True, side_effect=AssertionError("scheduled push should not refresh")):
+            with patch("backend.api.push_service._push_for_user", side_effect=lambda current_db, config: (calls.append(("push", current_db, config)), (True, "ok"))[1]):
                 scheduled_push()
 
     assert calls[0][0] == "push"
@@ -100,8 +103,8 @@ def test_push_content_deduplicates_same_news_in_multiple_tags():
     db = DummyDB(config)
     news = SimpleNamespace(id=1, platform="微博", title="AI 模型发布", url="https://example.com/news")
 
-    with patch("backend.api.main.database.get_user_filtered_news", return_value=([news], {1: ["AI", "模型"]})):
-        with patch("backend.api.main.push_to_feishu", return_value=True) as push:
+    with patch("backend.api.push_service.database.get_user_filtered_news", return_value=([news], {1: ["AI", "模型"]})):
+        with patch("backend.api.push_service.push_to_feishu", return_value=True) as push:
             success, message = _push_for_user(db, config)
 
     assert success is True
@@ -119,8 +122,8 @@ def test_push_content_deduplicates_same_title_across_news():
         SimpleNamespace(id=2, platform="知乎", title="相同标题", url="https://example.com/2"),
     ]
 
-    with patch("backend.api.main.database.get_user_filtered_news", return_value=(news_list, {1: [], 2: []})):
-        with patch("backend.api.main.push_to_feishu", return_value=True) as push:
+    with patch("backend.api.push_service.database.get_user_filtered_news", return_value=(news_list, {1: [], 2: []})):
+        with patch("backend.api.push_service.push_to_feishu", return_value=True) as push:
             success, message = _push_for_user(db, config)
 
     assert success is True
@@ -136,8 +139,8 @@ def test_push_content_keeps_platform_in_untagged_news():
     db = DummyDB(config)
     news = SimpleNamespace(id=1, platform="知乎", title="行业观察", url="https://example.com/zhihu")
 
-    with patch("backend.api.main.database.get_user_filtered_news", return_value=([news], {1: []})):
-        with patch("backend.api.main.push_to_feishu", return_value=True) as push:
+    with patch("backend.api.push_service.database.get_user_filtered_news", return_value=([news], {1: []})):
+        with patch("backend.api.push_service.push_to_feishu", return_value=True) as push:
             success, message = _push_for_user(db, config)
 
     assert success is True

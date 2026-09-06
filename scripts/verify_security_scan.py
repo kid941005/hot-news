@@ -4,7 +4,11 @@ import re
 paths = [
     'README.md',
     'backend/api/main.py',
+    'backend/config.py',
     'backend/db/database.py',
+    'backend/logging_config.py',
+    'backend/mcp_server.py',
+    'backend/models/models.py',
     'backend/spiders/spiders.py',
     'frontend/src/App.vue',
     'scripts/check_platform_consistency.py',
@@ -14,6 +18,7 @@ secret_patterns = [
     re.compile(r'Bearer\s+[A-Za-z0-9._~+/=-]{10,}'),
     re.compile(r'access_token=(?!YOUR_TOKEN)[A-Za-z0-9._~+/=-]{6,}', re.I),
     re.compile(r'hook/(?!YOUR_TOKEN)[A-Za-z0-9_-]{6,}', re.I),
+    re.compile(r'\b(?:cookie|session|SUB)\s*=\s*["\'][^"\']{10,}["\']', re.I),
 ]
 danger_patterns = [
     re.compile(r'os\.system\('),
@@ -29,7 +34,7 @@ danger_patterns = [
 secret_hits = []
 danger_hits = []
 for path in paths:
-    text = Path(path).read_text(errors='ignore')
+    text = Path(path).read_text(encoding='utf-8', errors='ignore')
     for i, line in enumerate(text.splitlines(), 1):
         if any(p.search(line) for p in secret_patterns):
             if 'YOUR_PASSWORD' not in line and 'YOUR_TOKEN' not in line and 'Bearer YOUR_TOKEN' not in line:
@@ -37,7 +42,7 @@ for path in paths:
         if any(p.search(line) for p in danger_patterns):
             danger_hits.append((path, i, line.strip()))
 
-readme = Path('README.md').read_text()
+readme = Path('README.md').read_text(encoding='utf-8')
 print('secret_hits', secret_hits)
 print('danger_hits', danger_hits)
 print('auth_placeholder_count', readme.count('-H "Authorization: Bearer ***'))

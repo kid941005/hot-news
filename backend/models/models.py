@@ -3,12 +3,17 @@
 数据库模型 - 支持MySQL和SQLite
 """
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean, JSON, ForeignKey, Index
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 Base = declarative_base()
+
+
+def utcnow_naive() -> datetime:
+    """返回 naive UTC 时间，保持数据库列语义一致。"""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class News(Base):
@@ -23,8 +28,8 @@ class News(Base):
     hot_value = Column(String(100), default="")
     pub_time = Column(String(50), default="")
     raw_data = Column(JSON, default=dict)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow_naive)
+    updated_at = Column(DateTime, default=utcnow_naive, onupdate=utcnow_naive)
     
     def to_dict(self):
         return {
@@ -46,7 +51,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(100), unique=True, nullable=False)
     password_hash = Column(String(200), nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default=utcnow_naive)
     
     config = relationship("UserConfig", back_populates="user", uselist=False)
 
@@ -66,9 +71,21 @@ class UserConfig(Base):
     push_webhook = Column(String(500), default="")
     push_cron = Column(String(50), default="0 */4 * * *")  # cron 表达式
     last_push_at = Column(DateTime, nullable=True)  # 最后一次成功推送时间
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=utcnow_naive, onupdate=utcnow_naive)
     
     user = relationship("User", back_populates="config")
+
+
+class UserToken(Base):
+    """用户登录令牌（持久化，服务重启后登录态不丢失）"""
+    __tablename__ = 'user_tokens'
+    __table_args__ = (Index('ix_user_tokens_user_id', 'user_id'),)
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    token = Column(String(64), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=utcnow_naive)
 
 
 def ensure_user_config_schema():
@@ -100,8 +117,8 @@ class CacheRecord(Base):
     __table_args__ = (Index('ix_cache_records_platform', 'platform'),)
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    platform = Column(String(50), nullable=False, index=True)
-    last_fetch = Column(DateTime, default=datetime.now)
+    platform = Column(String(50), nullable=False)
+    last_fetch = Column(DateTime, default=utcnow_naive)
     last_success_at = Column(DateTime, nullable=True)
     last_error_at = Column(DateTime, nullable=True)
     last_status = Column(String(20), default="success")

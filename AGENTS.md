@@ -2,15 +2,15 @@
 
 ## 项目概述
 
-FastAPI + Vue3 + MySQL 的新闻聚合器，Docker 部署，支持 18 个新闻平台抓取。
+FastAPI + Vue3 + MySQL 的新闻聚合器，Docker 部署，支持 33 个新闻平台抓取。
 
 ## 项目结构
 
 ```
 hot-news/
 ├── backend/
-│   ├── api/main.py       # FastAPI 主入口（API + MCP 集成）
-│   ├── spiders/spiders.py # 18 个平台爬虫
+│   ├── api/main.py       # FastAPI 主入口（REST API + 定时任务）
+│   ├── spiders/spiders.py # 33 个平台爬虫
 │   ├── db/database.py    # 数据库操作
 │   ├── models/models.py  # ORM 模型
 │   └── mcp_server.py     # MCP 服务入口
@@ -70,4 +70,4 @@ git diff --check
 - 设置 `AUTO_REFRESH_COOLDOWN_SECONDS` 环境变量可调整冷却
 
 ## 渠道
-共 18 个新闻平台，定义在 `backend/spiders/spiders.py` 和 `backend/db/database.py` 的 PLATFORM_MAP 中。
+共 33 个新闻平台，定义在 `backend/spiders/spiders.py` 和 `backend/db/database.py` 的 PLATFORM_MAP 中。

@@ -226,11 +226,13 @@ const newsCount = computed(() => {
   return Object.values(newsByKeyword.value).reduce((sum, items) => sum + items.length, 0)
 })
 
-const realtimePlatforms = new Set(['华尔街见闻', '财联社', '金十数据', '联合早报', '格隆汇', '法布财经', '远景论坛', 'Solidot', 'AIHOT', '虫部落', '36Kr快讯', 'IT之家'])
-
 function isRealtimePlatform(platform) {
-  return realtimePlatforms.has(platform)
+  return realtimePlatformSet.value.has(platform)
 }
+
+const realtimePlatformSet = computed(
+  () => new Set(platformOptions.value.filter(p => p.realtime).map(p => p.name))
+)
 
 function getItemTimestamp(item) {
   const date = getRealtimeDate(item)
@@ -261,9 +263,19 @@ const orderedPlatformEntries = computed(() => currentPlatformNews.value)
 const keywordGroupEntries = computed(() => Object.entries(newsByKeyword.value))
 const hasKeywordGroups = computed(() => keywordGroupEntries.value.length > 0)
 
+function ensurePlatformOrder() {
+  const all = Object.keys(newsByPlatform.value)
+  const merged = [
+    ...platformOrder.value.filter(p => all.includes(p)),
+    ...all.filter(p => !platformOrder.value.includes(p)),
+  ]
+  platformOrder.value = merged
+  localStorage.setItem('platformOrder', JSON.stringify(merged))
+}
+
 function movePlatform(targetPlatform) {
   if (!draggingPlatform.value || draggingPlatform.value === targetPlatform) return
-  const current = orderedPlatformEntries.value.map(([platform]) => platform)
+  const current = [...platformOrder.value]
   const from = current.indexOf(draggingPlatform.value)
   const to = current.indexOf(targetPlatform)
   if (from === -1 || to === -1) return
@@ -364,6 +376,7 @@ async function loadNews() {
       })
       if (res.data.success) {
         newsByPlatform.value = res.data.platforms || {}
+        ensurePlatformOrder()
         newsByKeyword.value = {}
         news.value = []  // 清空普通列表
         applyRefreshState(res.data)
@@ -389,6 +402,7 @@ async function loadNews() {
         const res = await axios.get(`${API_URL}/api/news/by_platform`)
         if (res.data.success) {
           newsByPlatform.value = res.data.platforms || {}
+          ensurePlatformOrder()
           news.value = []
           applyRefreshState(res.data)
         }
@@ -569,9 +583,10 @@ function switchAccount() {
 
 // 添加自定义标签
 function addCustomTag() {
-  if (newTag.value && !tags.value.includes(newTag.value)) {
-    tags.value.push(newTag.value)
-    keywordTags.value[newTag.value] = []  // 新标签初始关键词为空
+  const tag = newTag.value.trim()
+  if (tag && !tags.value.includes(tag)) {
+    tags.value.push(tag)
+    keywordTags.value[tag] = []  // 新标签初始关键词为空
     newTag.value = ''
   }
 }
@@ -640,6 +655,10 @@ async function refresh(force = false) {
   loading.value = true
   try {
     const res = await axios.post(`${API_URL}/api/news/refresh`, {}, getAuthHeader())
+    if (!res.data.success) {
+      alert(res.data.error || '刷新失败')
+      return
+    }
     if (res.data.last_refresh) {
       const time = new Date(res.data.last_refresh)
       lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
@@ -649,8 +668,11 @@ async function refresh(force = false) {
     await loadNews()
   } catch (e) {
     console.error(e)
+    const message = e.response?.data?.error || '刷新失败'
+    alert(message)
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 
 async function refreshPlatform(platform) {
@@ -662,6 +684,10 @@ async function refreshPlatform(platform) {
       ...getAuthHeader(),
       params: { platform: getPlatformId(platform) }
     })
+    if (!res.data.success) {
+      alert(res.data.error || '刷新失败')
+      return
+    }
     if (res.data.last_refresh) {
       const time = new Date(res.data.last_refresh)
       lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
@@ -1121,7 +1147,7 @@ onUnmounted(() => {
                     class="glass-input font-medium text-sm border border-white/60 bg-white/80 rounded px-1 py-0.5 w-20 text-slate-800"
                   />
                   <button @click="confirmRenameTag(tag)" class="text-green-500">✓</button>
-                  <button @click="cancelRenameTag" class="text-gray-500">✕</button>
+                  <button @click="cancelRenameTag()" class="text-gray-500">✕</button>
                 </div>
                 <!-- 操作按钮 -->
                 <div class="flex gap-1">

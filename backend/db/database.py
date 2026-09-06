@@ -6,10 +6,10 @@ import os
 import base64
 import hashlib
 import hmac
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from backend.models.models import News, User, UserConfig, CacheRecord, init_db
+from backend.models.models import News, User, UserConfig, UserToken, CacheRecord, init_db
 
 
 # ============= 新闻操作 =============
@@ -50,38 +50,44 @@ PLATFORM_MAP = {
     "tieba": "百度贴吧",
 }
 
+# 实时/时间线来源（与前端 realtime 视图共用；新增平台时在此登记）
+REALTIME_PLATFORM_IDS = {
+    "wallstreetcn",
+    "cls",
+    "jin10",
+    "zaobao",
+    "gelonghui",
+    "fastbull",
+    "pcbeta",
+    "solidot",
+    "aihot",
+    "chongbuluo",
+    "36kr",
+    "ithome",
+}
+
 def save_news(db: Session, news_list: List[dict]):
     """批量保存新闻"""
     if not news_list:
         return
 
     platform = news_list[0].get('platform', '')
-    # 成功抓取到当前列表时，替换该平台旧列表；空/失败不调用本函数，旧缓存保留兜底
-    db.query(News).filter(News.platform == platform).delete()
-    
-    # 写入新数据
     try:
+        # 成功抓取到当前列表时，替换该平台旧列表；空/失败不调用本函数，旧缓存保留兜底
+        db.query(News).filter(News.platform == platform).delete()
+
+        # 批量写入新数据，避免逐条查询造成的无效 N+1 和死代码
         for item in news_list:
-            existing = db.query(News).filter(
-                News.platform == item.get('platform', ''),
-                News.title == item.get('title', ''),
-                News.url == item.get('url', ''),
-            ).first()
-            if isinstance(existing, News):
-                existing.hot_value = item.get('hot', '')
-                existing.pub_time = item.get('time', '')
-                existing.raw_data = item
-                existing.updated_at = datetime.utcnow()
-                continue
-            news = News(
-                platform=item.get('platform', ''),
-                title=item.get('title', ''),
-                url=item.get('url', ''),
-                hot_value=item.get('hot', ''),
-                pub_time=item.get('time', ''),
-                raw_data=item
+            db.add(
+                News(
+                    platform=item.get('platform', ''),
+                    title=item.get('title', ''),
+                    url=item.get('url', ''),
+                    hot_value=item.get('hot', ''),
+                    pub_time=item.get('time', ''),
+                    raw_data=item,
+                )
             )
-            db.add(news)
         db.commit()
     except Exception:
         db.rollback()
@@ -191,16 +197,15 @@ def verify_password(password: str, stored_hash: str) -> bool:
 def create_user(db: Session, username: str, password: str) -> User:
     """创建用户"""
     password_hash = hash_password(password)
-    
+
     user = User(username=username, password_hash=password_hash)
     db.add(user)
-    db.commit()
-    db.refresh(user)
-    
     # 创建默认配置
+    db.flush()  # 先拿到 user.id，再在同一事务内创建默认配置
     config = UserConfig(user_id=user.id)
     db.add(config)
     db.commit()
+    db.refresh(user)
     
     return user
 
@@ -243,7 +248,7 @@ def update_user_config(db: Session, user_id: int, config_data: dict) -> UserConf
     if 'push_cron' in config_data:
         config.push_cron = config_data['push_cron']
     
-    config.updated_at = datetime.utcnow()
+    config.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
     db.refresh(config)
     
@@ -255,7 +260,7 @@ def update_user_config(db: Session, user_id: int, config_data: dict) -> UserConf
 def update_cache_record(db: Session, platform: str, status: str, error: str = ""):
     """更新缓存记录"""
     record = db.query(CacheRecord).filter(CacheRecord.platform == platform).first()
-    now = datetime.now()
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
     
     if not record:
         record = CacheRecord(platform=platform)
@@ -275,3 +280,29 @@ def update_cache_record(db: Session, platform: str, status: str, error: str = ""
 def get_cache_status(db: Session) -> List[CacheRecord]:
     """获取缓存状态"""
     return db.query(CacheRecord).all()
+
+
+# ============= 令牌操作 =============
+
+def save_token(db: Session, token: str, user_id: int, expires_at: datetime) -> None:
+    """持久化登录令牌"""
+    db.add(UserToken(token=token, user_id=user_id, expires_at=expires_at))
+    db.commit()
+
+
+def get_token(db: Session, token: str) -> Optional[UserToken]:
+    """按令牌查询持久化记录"""
+    return db.query(UserToken).filter(UserToken.token == token).first()
+
+
+def delete_token_record(db: Session, token: str) -> None:
+    """删除持久化令牌"""
+    db.query(UserToken).filter(UserToken.token == token).delete()
+    db.commit()
+
+
+def delete_expired_tokens(db: Session, now: datetime) -> int:
+    """删除过期令牌，返回删除数量"""
+    result = db.query(UserToken).filter(UserToken.expires_at <= now).delete()
+    db.commit()
+    return result or 0

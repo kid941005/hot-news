@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && mkdir -p ../backend/api/static && rm -rf ../backend/api/static/* && cp -r dist/* ../backend/api/static/",
+    "build": "vite build && node -e \"const fs=require('fs'),path=require('path');const dest=path.resolve(__dirname,'../backend/api/static');fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(dest,{recursive:true});fs.cpSync(path.resolve(__dirname,'dist'),dest,{recursive:true});\"",
     "preview": "vite preview"
   },
   "dependencies": {

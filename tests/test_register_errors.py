@@ -7,7 +7,8 @@ from sqlalchemy.exc import IntegrityError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.api.main import app, get_db
+from backend.api.main import app
+from backend.models.models import get_db
 
 
 class DummyDB:
@@ -31,8 +32,8 @@ def test_register_hides_internal_error_detail():
     app.dependency_overrides[get_db] = override_get_db
 
     try:
-        with patch("backend.api.main.database.create_user", side_effect=RuntimeError("internal db detail")):
-            response = client.post("/api/register", json={"username": "u", "password": "p"})
+        with patch("backend.api.auth.database.create_user", side_effect=RuntimeError("internal db detail")):
+            response = client.post("/api/register", json={"username": "valid_user", "password": "valid123"})
     finally:
         app.dependency_overrides.clear()
 
@@ -51,8 +52,8 @@ def test_register_duplicate_user_returns_stable_message():
     app.dependency_overrides[get_db] = override_get_db
 
     try:
-        with patch("backend.api.main.database.create_user", side_effect=IntegrityError("stmt", "params", Exception("orig"))):
-            response = client.post("/api/register", json={"username": "u", "password": "p"})
+        with patch("backend.api.auth.database.create_user", side_effect=IntegrityError("stmt", "params", Exception("orig"))):
+            response = client.post("/api/register", json={"username": "valid_user", "password": "valid123"})
     finally:
         app.dependency_overrides.clear()
 

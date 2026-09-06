@@ -31,7 +31,7 @@ class HangingSpider:
     name = "hang"
 
     def fetch(self):
-        time.sleep(0.2)
+        time.sleep(1.0)
         return [{"title": self.name}]
 
 
@@ -63,7 +63,7 @@ def test_fetch_all_spiders_times_out_single_platform():
 
     with patch.object(spiders, "SPIDERS", test_spiders), \
         patch.object(spiders, "SPIDER_CONCURRENCY", 2), \
-        patch.object(spiders, "SPIDER_FETCH_TIMEOUT_SECONDS", 0.01):
+        patch.object(spiders, "SPIDER_FETCH_TIMEOUT_SECONDS", 0.1):
         results = asyncio.run(spiders.fetch_all_spiders(["hang", "ok"]))
 
     assert results["hang"] == []

@@ -56,7 +56,8 @@ class DummyDB:
 
 def test_mcp_list_platforms():
     platforms = list_platforms()
-    assert {"id": "weibo", "name": "微博热搜"} in platforms
+    assert {"id": "weibo", "name": "微博热搜", "realtime": False} in platforms
+    assert {"id": "wallstreetcn", "name": "华尔街见闻", "realtime": True} in platforms
 
 
 def test_mcp_get_latest_news_closes_db():

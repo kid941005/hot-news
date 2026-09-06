@@ -18,6 +18,8 @@ from typing import List
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlencode, urljoin
 
+from backend.config import get_env_float, get_env_int
+
 BEIJING_TZ = timezone(timedelta(hours=8))
 
 
@@ -44,7 +46,7 @@ def _session(headers=None):
 def _resolve_timeout(timeout):
     if timeout is not None:
         return float(timeout)
-    return float(os.getenv("SPIDER_FETCH_TIMEOUT_SECONDS", "15"))
+    return SPIDER_FETCH_TIMEOUT_SECONDS
 
 
 def fetch_get(url, *, headers=None, params=None, session=None, timeout=None, verify=True):
@@ -179,8 +181,9 @@ class WeiboSpider(BaseSpider):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "Referer": self.HOT_URL,
         }
-        cookie = os.getenv(self.COOKIE_ENV) or "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7"
-        headers["Cookie"] = cookie
+        cookie = os.getenv(self.COOKIE_ENV)
+        if cookie:
+            headers["Cookie"] = cookie
 
         try:
             resp = fetch_get(self.HOT_URL, headers=headers)
@@ -1199,7 +1202,7 @@ class KuaishouSpider(BaseSpider):
         url = "https://www.kuaishou.com/?isHome=1"
         try:
             resp = fetch_get(url)
-            match = re.search(r"window\.__APOLLO_STATE__\s*=\s*(\{.+?\});", resp.text)
+            match = re.search(r"window\.__APOLLO_STATE__\s*=\s*(\{.+?\});", resp.text, re.S)
             if not match:
                 return []
             data = json.loads(match.group(1))
@@ -1264,23 +1267,8 @@ SPIDERS = {
 }
 
 
-def get_env_number(name: str, default, cast, min_value, max_value):
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    try:
-        value = cast(raw)
-    except ValueError:
-        logger.warning("%s=%r 无效，使用默认值 %s", name, raw, default)
-        return default
-    if value < min_value or value > max_value:
-        logger.warning("%s=%r 超出范围，使用默认值 %s", name, raw, default)
-        return default
-    return value
-
-
-SPIDER_CONCURRENCY = get_env_number("SPIDER_CONCURRENCY", 5, int, 1, 20)
-SPIDER_FETCH_TIMEOUT_SECONDS = get_env_number("SPIDER_FETCH_TIMEOUT_SECONDS", 15.0, float, 1.0, 60.0)
+SPIDER_CONCURRENCY = get_env_int("SPIDER_CONCURRENCY", 5, min_value=1, max_value=20)
+SPIDER_FETCH_TIMEOUT_SECONDS = get_env_float("SPIDER_FETCH_TIMEOUT_SECONDS", 15.0, min_value=1.0, max_value=60.0)
 
 
 async def fetch_all_spiders(platforms: List[str] = None) -> dict:
