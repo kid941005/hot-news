@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import axios from 'axios'
+import api, { getErrorMessage } from './api'
+import { useToast } from './composables/useToast'
 import packageInfo from '../package.json'
 
-const API_URL = ''  // 通过代理访问
+const { toasts, showToast, removeToast } = useToast()
 const appVersion = packageInfo.version
 
 function readJsonStorage(key, fallback) {
@@ -29,9 +30,7 @@ function clearLoginState() {
 }
 
 function handleRequestError(e) {
-  if (e.response?.status === 401) {
-    clearLoginState()
-  }
+  showToast(getErrorMessage(e), 'error')
   console.error(e)
 }
 
@@ -295,15 +294,10 @@ function moveTag(targetTag) {
   keywordTags.value = Object.fromEntries(current.map(tag => [tag, keywordTags.value[tag] || []]))
 }
 
-// 请求头
-function getAuthHeader() {
-  return token.value ? { headers: { Authorization: `Bearer ${token.value}` } } : {}
-}
-
 // 加载平台列表
 async function loadPlatforms() {
   try {
-    const res = await axios.get(`${API_URL}/api/platforms`)
+    const res = await api.get('/api/platforms')
     if (res.data.success) {
       platformOptions.value = res.data.platforms || []
     }
@@ -315,7 +309,7 @@ async function loadPlatforms() {
 // 加载标签
 async function loadTags() {
   try {
-    const res = await axios.get(`${API_URL}/api/tags`, getAuthHeader())
+    const res = await api.get('/api/tags')
     if (res.data.success) {
       tags.value = res.data.tags || ['工作', '生活', '科技']
       keywordTags.value = res.data.keyword_tags || {}
@@ -328,7 +322,7 @@ async function loadTags() {
 // 加载配置
 async function loadConfig() {
   try {
-    const res = await axios.get(`${API_URL}/api/config`, getAuthHeader())
+    const res = await api.get('/api/config')
     if (res.data.success) {
       config.value = {
         keywords: (res.data.config.keywords || []).join(', '),
@@ -370,8 +364,7 @@ async function loadNews() {
     // 当currentTag为null时，获取按平台分组的数据；否则按标签筛选
     if (currentTag.value === null) {
       // 全部标签：按平台分组（登录用户按平台筛选）
-      const res = await axios.get(`${API_URL}/api/news/by_platform`, {
-        ...getAuthHeader(),
+      const res = await api.get('/api/news/by_platform', {
         params: allViewMode.value === 'realtime' ? { sort: 'timeline' } : {}
       })
       if (res.data.success) {
@@ -385,10 +378,8 @@ async function loadNews() {
       // 其他标签：按关键词筛选（需要认证）
       newsByPlatform.value = {}  // 清空分组数据
       newsByKeyword.value = {}
-      const authHeader = getAuthHeader()
       if (token.value) {
-        const res = await axios.get(`${API_URL}/api/news`, { 
-          ...authHeader, 
+        const res = await api.get('/api/news', {
           params: { tag: currentTag.value }
         })
         if (res.data.success) {
@@ -399,7 +390,7 @@ async function loadNews() {
       } else {
         // 未登录时回到公开的按平台数据
         currentTag.value = null
-        const res = await axios.get(`${API_URL}/api/news/by_platform`)
+        const res = await api.get('/api/news/by_platform')
         if (res.data.success) {
           newsByPlatform.value = res.data.platforms || {}
           ensurePlatformOrder()
@@ -458,7 +449,7 @@ async function saveConfig() {
     
     const keywords = Array.from(new Set(Object.values(keywordTags.value).flat().map(s => s.trim()).filter(s => s)))
 
-    await axios.post(`${API_URL}/api/config`, {
+    await api.post('/api/config', {
       keywords: keywords,
       blocked_keywords: blocked,
       platforms: config.value.platforms,
@@ -467,15 +458,15 @@ async function saveConfig() {
       push_channel: config.value.push_channel,
       push_webhook: config.value.push_webhook,
       push_cron: config.value.push_cron
-    }, getAuthHeader())
-    alert('保存成功')
+    })
+    showToast('保存成功', 'success')
     showAccount.value = false
     await loadConfig()
     await loadTags()
     await loadNews()
   } catch (e) {
     console.error(e)
-    alert('保存失败')
+    showToast(getErrorMessage(e, '保存失败'), 'error')
   }
 }
 
@@ -489,14 +480,14 @@ async function pushNews() {
   pushLoading.value = true
   pushMessage.value = ''
   try {
-    const res = await axios.post(`${API_URL}/api/push`, {}, getAuthHeader())
+    const res = await api.post('/api/push', {})
     if (res.data.success) {
       pushMessage.value = res.data.message || '推送成功'
     } else {
       pushMessage.value = res.data.error || '推送失败'
     }
   } catch (e) {
-    pushMessage.value = '推送失败: ' + (e.response?.data?.detail || e.message)
+    pushMessage.value = '推送失败: ' + getErrorMessage(e, '推送失败')
   }
   pushLoading.value = false
 }
@@ -508,7 +499,7 @@ async function login() {
     return
   }
   try {
-    const res = await axios.post(`${API_URL}/api/login`, {
+    const res = await api.post('/api/login', {
       username: username.value,
       password: password.value
     })
@@ -527,7 +518,7 @@ async function login() {
       alert(res.data.error || '登录失败')
     }
   } catch (e) {
-    alert('登录失败')
+    alert(getErrorMessage(e, '登录失败'))
   }
 }
 
@@ -538,7 +529,7 @@ async function register() {
     return
   }
   try {
-    const res = await axios.post(`${API_URL}/api/register`, {
+    const res = await api.post('/api/register', {
       username: username.value,
       password: password.value
     })
@@ -557,14 +548,14 @@ async function register() {
       alert(res.data.error || '注册失败')
     }
   } catch (e) {
-    alert('注册失败')
+    alert(getErrorMessage(e, '注册失败'))
   }
 }
 
 // 退出登录
 async function logout() {
   try {
-    await axios.post(`${API_URL}/api/logout`, {}, getAuthHeader())
+    await api.post('/api/logout', {})
   } catch (e) {
     console.error(e)
   }
@@ -648,15 +639,15 @@ async function refresh(force = false) {
   // 非强制刷新时检查时间间隔
   if (!force && lastRefreshTime.value > 0 && timeSinceLastRefresh < MIN_REFRESH_INTERVAL) {
     const remainingSeconds = Math.ceil((MIN_REFRESH_INTERVAL - timeSinceLastRefresh) / 1000)
-    alert(`刷新太频繁，请等待 ${remainingSeconds} 秒后再试`)
+    showToast(`刷新太频繁，请等待 ${remainingSeconds} 秒后再试`, 'info')
     return
   }
   
   loading.value = true
   try {
-    const res = await axios.post(`${API_URL}/api/news/refresh`, {}, getAuthHeader())
+    const res = await api.post('/api/news/refresh', {})
     if (!res.data.success) {
-      alert(res.data.error || '刷新失败')
+      showToast(res.data.error || '刷新失败', 'error')
       return
     }
     if (res.data.last_refresh) {
@@ -668,8 +659,7 @@ async function refresh(force = false) {
     await loadNews()
   } catch (e) {
     console.error(e)
-    const message = e.response?.data?.error || '刷新失败'
-    alert(message)
+    showToast(getErrorMessage(e, '刷新失败'), 'error')
   } finally {
     loading.value = false
   }
@@ -680,12 +670,11 @@ async function refreshPlatform(platform) {
   const now = Date.now()
   refreshingPlatform.value = platform
   try {
-    const res = await axios.post(`${API_URL}/api/news/refresh`, {}, {
-      ...getAuthHeader(),
+    const res = await api.post('/api/news/refresh', {}, {
       params: { platform: getPlatformId(platform) }
     })
     if (!res.data.success) {
-      alert(res.data.error || '刷新失败')
+      showToast(res.data.error || '刷新失败', 'error')
       return
     }
     if (res.data.last_refresh) {
@@ -705,7 +694,7 @@ async function refreshPlatform(platform) {
 // 加载刷新时间
 async function loadRefreshTime() {
   try {
-    const res = await axios.get(`${API_URL}/api/news/refresh`, getAuthHeader())
+    const res = await api.get('/api/news/refresh')
     if (res.data.last_refresh) {
       const time = new Date(res.data.last_refresh)
       lastRefresh.value = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0')
@@ -742,7 +731,21 @@ function startAutoRefresh() {
 }
 
 // 初始化
+function onAuthExpired() {
+  clearLoginState()
+  showToast('登录已过期，请重新登录', 'error')
+}
+
+function onApiError(e) {
+  const message = e?.detail?.message
+  if (message) {
+    showToast(message, 'error')
+  }
+}
+
 onMounted(async () => {
+  window.addEventListener('auth:expired', onAuthExpired)
+  window.addEventListener('api:error', onApiError)
   // 页面加载时不自动刷新，只加载已有数据（刷新操作由用户手动触发或定时任务）
   await loadPlatforms()
   if (currentUser.value && token.value) {
@@ -761,6 +764,8 @@ onUnmounted(() => {
   if (autoRefreshTimer) {
     clearInterval(autoRefreshTimer)
   }
+  window.removeEventListener('auth:expired', onAuthExpired)
+  window.removeEventListener('api:error', onApiError)
 })
 </script>
 
@@ -1314,6 +1319,21 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- 全局 Toast -->
+    <div class="fixed inset-x-0 top-4 z-[100] flex flex-col items-center gap-2 px-4 pointer-events-none">
+      <TransitionGroup name="toast">
+        <div
+          v-for="toast in toasts"
+          :key="toast.id"
+          class="pointer-events-auto max-w-sm rounded-2xl border px-4 py-2.5 text-sm shadow-lg backdrop-blur-xl"
+          :class="toast.type === 'success' ? 'border-emerald-200 bg-emerald-50/95 text-emerald-700' : toast.type === 'error' ? 'border-red-200 bg-red-50/95 text-red-700' : 'border-slate-200 bg-white/95 text-slate-700'"
+          @click="removeToast(toast.id)"
+        >
+          {{ toast.message }}
+        </div>
+      </TransitionGroup>
+    </div>
   </div>
 </template>
 
@@ -1538,5 +1558,16 @@ body::before {
 .config-panel select:focus {
   border-color: rgba(96, 165, 250, 0.98);
   box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 </style>
