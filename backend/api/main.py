@@ -17,6 +17,7 @@ from backend.api.auth import auth_router, cleanup_expired_tokens
 from backend.api.config_service import config_router
 from backend.api.news_service import news_router, scheduled_refresh
 from backend.api.push_service import push_router, scheduled_push
+from backend.api.scheduler_service import configure_scheduler, scheduler_router
 from backend.config import get_env_int
 from backend.logging_config import setup_logging
 from backend.models.models import SessionLocal, ensure_user_config_schema, init_db
@@ -58,6 +59,7 @@ app.include_router(auth_router)
 app.include_router(config_router)
 app.include_router(news_router)
 app.include_router(push_router)
+app.include_router(scheduler_router)
 
 # ============= 前端页面 =============
 
@@ -98,6 +100,7 @@ def start_scheduler():
     scheduler.add_job(scheduled_push, 'interval', minutes=1, id='push_job', replace_existing=True)
     scheduler.add_job(_cleanup_expired_tokens_job, 'interval', hours=1, id='token_cleanup_job', replace_existing=True)
     scheduler.start()
+    configure_scheduler(scheduler)
     logger.info("⏰ 定时刷新已启动（每 %s 分钟抓取一次）", REFRESH_INTERVAL_MINUTES)
     logger.info("⏰ 定时推送已启动（每分钟检查 cron 表达式）")
 

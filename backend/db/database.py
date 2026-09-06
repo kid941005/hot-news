@@ -6,10 +6,10 @@ import os
 import base64
 import hashlib
 import hmac
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from backend.models.models import News, User, UserConfig, UserToken, CacheRecord, init_db
+from backend.models.models import News, User, UserConfig, UserToken, PushLog, CacheRecord, init_db
 
 
 # ============= 新闻操作 =============
@@ -306,3 +306,78 @@ def delete_expired_tokens(db: Session, now: datetime) -> int:
     result = db.query(UserToken).filter(UserToken.expires_at <= now).delete()
     db.commit()
     return result or 0
+
+
+# ============= 推送历史操作 =============
+
+def record_push_log(
+    db: Session,
+    user_id: int,
+    channel: str,
+    status: str,
+    message: str,
+    item_count: int = 0,
+    item_hashes: Optional[List[str]] = None,
+    error: Optional[str] = None,
+) -> None:
+    """记录一次推送历史"""
+    db.add(PushLog(
+        user_id=user_id,
+        channel=channel,
+        status=status,
+        message=message or "",
+        item_count=item_count,
+        item_hashes=item_hashes or [],
+        error=error,
+    ))
+    db.commit()
+
+
+def get_push_logs(db: Session, user_id: int, limit: int = 20) -> List[PushLog]:
+    """获取用户最近的推送历史"""
+    return (
+        db.query(PushLog)
+        .filter(PushLog.user_id == user_id)
+        .order_by(PushLog.created_at.desc(), PushLog.id.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def get_pushed_item_hashes(db: Session, user_id: int, days: int = 7) -> set:
+    """获取用户近 N 天已推送的条目指纹集合（用于去重）"""
+    since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
+    logs = (
+        db.query(PushLog)
+        .filter(PushLog.user_id == user_id, PushLog.created_at >= since, PushLog.status == "success")
+        .all()
+    )
+    hashes = set()
+    for log in logs:
+        if log.item_hashes:
+            hashes.update(log.item_hashes)
+    return hashes
+
+
+def get_push_stats(db: Session, user_id: int, days: int = 7) -> dict:
+    """获取用户近 N 天推送统计"""
+    since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
+    logs = (
+        db.query(PushLog)
+        .filter(PushLog.user_id == user_id, PushLog.created_at >= since)
+        .all()
+    )
+    by_channel = {}
+    by_status = {"success": 0, "failed": 0}
+    for log in logs:
+        by_status[log.status if log.status in by_status else "failed"] += 1
+        channel = by_channel.setdefault(log.channel, {"success": 0, "failed": 0, "items": 0})
+        key = log.status if log.status in channel else "failed"
+        channel[key] += 1
+        channel["items"] += log.item_count or 0
+    return {
+        "total": len(logs),
+        "days": days,
+        "by_status": by_status,
+        "by_channel": by_channel,
+    }

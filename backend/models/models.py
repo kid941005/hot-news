@@ -88,6 +88,22 @@ class UserToken(Base):
     created_at = Column(DateTime, default=utcnow_naive)
 
 
+class PushLog(Base):
+    """推送历史记录（含条目指纹，用于去重与统计）"""
+    __tablename__ = 'push_logs'
+    __table_args__ = (Index('ix_push_logs_user_created', 'user_id', 'created_at'),)
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    channel = Column(String(50), nullable=False)
+    status = Column(String(20), nullable=False)  # success / failed
+    message = Column(String(500), default="")
+    item_count = Column(Integer, default=0)
+    item_hashes = Column(JSON, default=list)  # 本次推送的条目指纹（去重用）
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=utcnow_naive)
+
+
 def ensure_user_config_schema():
     conn = engine.raw_connection()
     try:

@@ -13,6 +13,7 @@ from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
 from backend.api.auth import get_current_user_id
+from backend.api.push_service import ALLOWED_PUSH_CHANNELS
 from backend.db import database
 from backend.db.database import PLATFORM_MAP, REALTIME_PLATFORM_IDS
 from backend.models.models import get_db
@@ -28,7 +29,6 @@ MAX_KEYWORD_LENGTH = 50
 MAX_TAGS = 30
 MAX_TAG_LENGTH = 30
 MAX_WEBHOOK_LENGTH = 500
-ALLOWED_PUSH_CHANNELS = {"feishu", "dingtalk", "bark"}
 
 
 def _clean_string_list(values, field_name, max_items=MAX_KEYWORDS, max_length=MAX_KEYWORD_LENGTH):

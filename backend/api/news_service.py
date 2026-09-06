@@ -13,6 +13,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from backend.api import scheduler_service
 from backend.api.auth import get_current_user_id, get_optional_user_id
 from backend.config import get_env_int
 from backend.db import database
@@ -350,8 +351,10 @@ def scheduled_refresh():
         saved_count, _ = refresh_news_data(db)
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
         logger.info("🔄 定时刷新完成，共保存 %s 条新闻", saved_count)
+        scheduler_service.mark_job_run("refresh_job", True, f"共保存 {saved_count} 条新闻")
     except Exception:
         logger.exception("❌ 定时刷新失败")
+        scheduler_service.mark_job_run("refresh_job", False, "定时刷新失败")
     finally:
         db.close()
 

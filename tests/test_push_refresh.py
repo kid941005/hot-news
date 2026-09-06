@@ -8,9 +8,10 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backend.api.auth import get_current_user_id
+from backend.api import push_service
 from backend.api.main import app
 from backend.api.push_service import _push_for_user, is_allowed_webhook, push_to_feishu, scheduled_push
-from backend.models.models import get_db
+from backend.models.models import PushLog, get_db
 
 
 class DummyConfig:
@@ -37,6 +38,8 @@ class DummyQuery:
         return self.result
 
     def all(self):
+        if isinstance(self.result, list):
+            return self.result
         return [self.result] if self.result else []
 
 
@@ -45,9 +48,15 @@ class DummyDB:
         self.config = config
         self.commits = 0
         self.closed = False
+        self.logs = []
 
     def query(self, model):
+        if getattr(model, "__name__", "") == "PushLog":
+            return DummyQuery(self.logs)
         return DummyQuery(self.config)
+
+    def add(self, item):
+        self.logs.append(item)
 
     def commit(self):
         self.commits += 1
@@ -104,7 +113,7 @@ def test_push_content_deduplicates_same_news_in_multiple_tags():
     news = SimpleNamespace(id=1, platform="微博", title="AI 模型发布", url="https://example.com/news")
 
     with patch("backend.api.push_service.database.get_user_filtered_news", return_value=([news], {1: ["AI", "模型"]})):
-        with patch("backend.api.push_service.push_to_feishu", return_value=True) as push:
+        with patch.object(push_service.PUSHERS["feishu"], "push", return_value=True) as push:
             success, message = _push_for_user(db, config)
 
     assert success is True
@@ -123,7 +132,7 @@ def test_push_content_deduplicates_same_title_across_news():
     ]
 
     with patch("backend.api.push_service.database.get_user_filtered_news", return_value=(news_list, {1: [], 2: []})):
-        with patch("backend.api.push_service.push_to_feishu", return_value=True) as push:
+        with patch.object(push_service.PUSHERS["feishu"], "push", return_value=True) as push:
             success, message = _push_for_user(db, config)
 
     assert success is True
@@ -140,7 +149,7 @@ def test_push_content_keeps_platform_in_untagged_news():
     news = SimpleNamespace(id=1, platform="知乎", title="行业观察", url="https://example.com/zhihu")
 
     with patch("backend.api.push_service.database.get_user_filtered_news", return_value=([news], {1: []})):
-        with patch("backend.api.push_service.push_to_feishu", return_value=True) as push:
+        with patch.object(push_service.PUSHERS["feishu"], "push", return_value=True) as push:
             success, message = _push_for_user(db, config)
 
     assert success is True
@@ -191,3 +200,37 @@ def test_push_to_feishu_uses_post_payload_for_links():
         {"tag": "text", "text": "1. [微博] "},
         {"tag": "a", "text": "AI 模型发布", "href": "https://example.com/news"},
     ]
+
+
+def test_push_skips_items_already_pushed_recently():
+    config = DummyConfig()
+    db = DummyDB(config)
+    news = SimpleNamespace(id=1, platform="微博", title="AI 模型发布", url="https://example.com/news")
+    pushed_hash = push_service._item_hash(news)
+    db.logs.append(SimpleNamespace(item_hashes=[pushed_hash]))
+
+    with patch("backend.api.push_service.database.get_user_filtered_news", return_value=([news], {1: []})):
+        with patch.object(push_service.PUSHERS["feishu"], "push", return_value=True) as push:
+            success, message = _push_for_user(db, config)
+
+    assert success is False
+    assert message == "没有可推送的新闻"
+    push.assert_not_called()
+
+
+def test_push_records_success_log_with_item_hashes():
+    config = DummyConfig()
+    db = DummyDB(config)
+    news = SimpleNamespace(id=1, platform="微博", title="AI 模型发布", url="https://example.com/news")
+
+    with patch("backend.api.push_service.database.get_user_filtered_news", return_value=([news], {1: []})):
+        with patch.object(push_service.PUSHERS["feishu"], "push", return_value=True):
+            success, message = _push_for_user(db, config)
+
+    assert success is True
+    assert message == "成功推送1条新闻"
+    assert len(db.logs) == 1
+    log = db.logs[0]
+    assert log.status == "success"
+    assert log.item_count == 1
+    assert log.item_hashes == [push_service._item_hash(news)]
