@@ -288,11 +288,6 @@ def update_cache_record(
     db.commit()
 
 
-def get_cache_status(db: Session) -> List[CacheRecord]:
-    """获取缓存状态"""
-    return db.query(CacheRecord).all()
-
-
 def get_cache_meta_map(db: Session, platforms: List[str] = None) -> dict:
     """获取各平台最近一次响应头的 ETag/Last-Modified，供条件请求使用。"""
     query = db.query(CacheRecord)
@@ -361,17 +356,6 @@ def record_push_log(
     db.commit()
 
 
-def get_push_logs(db: Session, user_id: int, limit: int = 20) -> List[PushLog]:
-    """获取用户最近的推送历史"""
-    return (
-        db.query(PushLog)
-        .filter(PushLog.user_id == user_id)
-        .order_by(PushLog.created_at.desc(), PushLog.id.desc())
-        .limit(limit)
-        .all()
-    )
-
-
 def get_pushed_item_hashes(db: Session, user_id: int, days: int = 7) -> set:
     """获取用户近 N 天已推送的条目指纹集合（用于去重）"""
     since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
@@ -385,27 +369,3 @@ def get_pushed_item_hashes(db: Session, user_id: int, days: int = 7) -> set:
         if log.item_hashes:
             hashes.update(log.item_hashes)
     return hashes
-
-
-def get_push_stats(db: Session, user_id: int, days: int = 7) -> dict:
-    """获取用户近 N 天推送统计"""
-    since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
-    logs = (
-        db.query(PushLog)
-        .filter(PushLog.user_id == user_id, PushLog.created_at >= since)
-        .all()
-    )
-    by_channel = {}
-    by_status = {"success": 0, "failed": 0}
-    for log in logs:
-        by_status[log.status if log.status in by_status else "failed"] += 1
-        channel = by_channel.setdefault(log.channel, {"success": 0, "failed": 0, "items": 0})
-        key = log.status if log.status in channel else "failed"
-        channel[key] += 1
-        channel["items"] += log.item_count or 0
-    return {
-        "total": len(logs),
-        "days": days,
-        "by_status": by_status,
-        "by_channel": by_channel,
-    }

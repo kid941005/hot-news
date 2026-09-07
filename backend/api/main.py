@@ -75,6 +75,9 @@ FALLBACK_PAGE = """
 """
 
 
+# 说明：下方 "/" 路由与 init_runtime 中的 StaticFiles 挂载并存是有意设计——
+# 挂载负责 /assets、/icons 等全部静态文件；显式 "/" 路由则保证在静态文件
+# 缺失（未构建前端）时返回友好的构建提示页，而不是 404。
 @app.get("/", response_class=HTMLResponse)
 def index():
     index_path = os.path.join(STATIC_DIR, "index.html")
@@ -86,7 +89,7 @@ def index():
 def init_runtime():
     init_db()
     ensure_user_config_schema()
-    # 挂载静态文件
+    # 挂载静态文件（含 index.html 兜底；"/" 显式路由注册在前，优先命中）
     if os.path.exists(STATIC_DIR):
         app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 

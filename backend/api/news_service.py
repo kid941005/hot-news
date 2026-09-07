@@ -19,6 +19,7 @@ from backend.db import database
 from backend.db.database import PLATFORM_MAP
 from backend.models.models import News, SessionLocal, UserConfig, get_db
 from backend.spiders import spiders
+from backend.utils import as_utc
 
 logger = logging.getLogger(__name__)
 
@@ -68,15 +69,6 @@ def _created_at_to_local(value):
     if value.tzinfo is None:
         value = value.replace(tzinfo=timezone.utc)
     return value.astimezone()
-
-
-def _as_utc(value):
-    """将数据库中的 naive UTC datetime 规范为带时区的 UTC。"""
-    if value is None:
-        return None
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
 
 
 @news_router.get("/api/news")
@@ -206,8 +198,8 @@ def _is_cache_stale(record) -> bool:
     if record is None:
         return True
     now = datetime.now(timezone.utc)
-    last_success = _as_utc(getattr(record, "last_success_at", None))
-    last_fetch = _as_utc(getattr(record, "last_fetch", None))
+    last_success = as_utc(getattr(record, "last_success_at", None))
+    last_fetch = as_utc(getattr(record, "last_fetch", None))
     if last_success is None:
         if last_fetch is None:
             return True
@@ -234,7 +226,7 @@ def _get_stale_platforms(db: Session, platforms=None, records=None, for_refresh:
         if not _is_cache_stale(record):
             continue
         if for_refresh:
-            last_fetch = _as_utc(getattr(record, "last_fetch", None))
+            last_fetch = as_utc(getattr(record, "last_fetch", None))
             if last_fetch is not None and (now - last_fetch).total_seconds() < AUTO_REFRESH_COOLDOWN_SECONDS:
                 continue
         stale_platforms.append(platform)
@@ -251,6 +243,8 @@ def _get_refresh_state(db: Session, platforms=None) -> dict:
 
     records = db.query(database.CacheRecord).all()
     record_map = {record.platform: record for record in records}
+    # 一次性查询所有已有数据的平台（中文名），供“本次失败但有旧数据”状态判断
+    cached_platforms = {row[0] for row in db.query(News.platform).distinct().all()}
     latest_cache = None
     for record in records:
         if latest_cache is None or (record.last_fetch or datetime.min) > (latest_cache.last_fetch or datetime.min):
@@ -272,6 +266,7 @@ def _get_refresh_state(db: Session, platforms=None) -> dict:
             "last_success_at": format_time(getattr(record, "last_success_at", None)),
             "last_error_at": format_time(getattr(record, "last_error_at", None)),
             "error": getattr(record, "error_msg", ""),
+            "has_cache": PLATFORM_MAP.get(platform) in cached_platforms,
         }
     return {
         "last_refresh": last_refresh_text,

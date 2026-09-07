@@ -380,10 +380,17 @@ function platformStatusText(platform) {
   const src = platformSource(platform)
   if (!src) return lastRefresh.value ? `更新于 ${lastRefresh.value}` : ''
   const fetchTime = formatClockText(src.last_fetch)
-  if (src.status === 'error') return fetchTime ? `更新失败 ${fetchTime}` : '更新失败'
-  if (src.status === 'empty') return fetchTime ? `暂无数据 ${fetchTime}` : '暂无数据'
-  if (src.status === 'missing') return '暂无数据'
   const successTime = formatClockText(src.last_success_at || src.last_fetch)
+  // 本次失败/空结果但库中仍有旧数据：继续展示旧数据，并明确标注“可能滞后”
+  if (src.status === 'error') {
+    if (src.has_cache) return successTime ? `更新失败 · 数据可能滞后（${successTime} 更新）` : '更新失败 · 展示旧数据'
+    return fetchTime ? `更新失败 ${fetchTime}` : '更新失败'
+  }
+  if (src.status === 'empty') {
+    if (src.has_cache) return successTime ? `数据可能滞后 · 更新于 ${successTime}` : '数据可能滞后'
+    return fetchTime ? `暂无数据 ${fetchTime}` : '暂无数据'
+  }
+  if (src.status === 'missing') return '暂无数据'
   return successTime ? `更新于 ${successTime}` : ''
 }
 

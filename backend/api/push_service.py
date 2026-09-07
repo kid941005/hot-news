@@ -209,13 +209,6 @@ def push_to_feishu(webhook: str, content: str) -> bool:
     return PUSHERS["feishu"].push(webhook, content)
 
 
-def push_to_dingtalk(webhook: str, content: str) -> bool:
-    return PUSHERS["dingtalk"].push(webhook, content)
-
-
-def push_to_bark(webhook: str, content: str) -> bool:
-    return PUSHERS["bark"].push(webhook, content)
-
 
 def is_allowed_webhook(channel: str, webhook: str) -> bool:
     pusher = PUSHERS.get(channel)

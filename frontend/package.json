@@ -1,6 +1,6 @@
 {
   "name": "hot-news-frontend",
-  "version": "2.5.67",
+  "version": "2.5.68",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,15 +10,14 @@
   },
   "dependencies": {
     "vue": "^3.4.0",
-    "axios": "^1.6.0",
-    "tailwindcss": "^3.4.0",
-    "@vueuse/core": "^10.7.0"
+    "axios": "^1.6.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
     "vite": "^5.0.0",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32"
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
   },
   "packageManager": "npm@11.16.0+sha1.954286fbc25d74f3c91f402ca8b1e66c8038e861"
 }

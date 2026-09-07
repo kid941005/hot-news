@@ -27,6 +27,9 @@ class RecordingNewsQuery:
         self.platform = None
         self.order = None
 
+    def distinct(self):
+        return self
+
     def filter(self, condition):
         self.platform = condition.right.value
         return self
@@ -90,9 +93,10 @@ class DummyDB:
         self.orders = []
 
     def query(self, model):
-        if model.__name__ == "UserConfig":
+        model_name = getattr(model, "__name__", None)
+        if model_name == "UserConfig":
             return DummyConfigQuery()
-        if model.__name__ == "CacheRecord":
+        if model_name == "CacheRecord":
             return DummyCacheRecordQuery()
         return RecordingNewsQuery(self)
 

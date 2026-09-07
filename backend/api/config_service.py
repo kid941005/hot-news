@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from backend.api.auth import get_current_user_id
 from backend.api.push_service import ALLOWED_PUSH_CHANNELS
+from backend.utils import as_utc_iso
 from backend.db import database
 from backend.db.database import PLATFORM_MAP, REALTIME_PLATFORM_IDS
 from backend.models.models import get_db
@@ -140,14 +141,6 @@ class ConfigRequest(BaseModel):
         return value
 
 
-def _utc_iso(value):
-    """将数据库时间格式化为带 Z 后缀的 UTC ISO 字符串。"""
-    if value is None:
-        return None
-    if value.tzinfo is not None:
-        value = value.astimezone(UTC).replace(tzinfo=None)
-    return value.isoformat() + "Z"
-
 
 @config_router.get("/api/platforms")
 def get_platforms():
@@ -176,7 +169,7 @@ def get_config(user_id: int = Depends(get_current_user_id), db: Session = Depend
             "push_channel": config.push_channel or "feishu",
             "push_webhook": config.push_webhook or "",
             "push_cron": config.push_cron or "0 */4 * * *",
-            "last_push_at": _utc_iso(config.last_push_at),
+            "last_push_at": as_utc_iso(config.last_push_at),
         }
     }
 

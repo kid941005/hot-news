@@ -3,7 +3,8 @@ from unittest.mock import Mock, patch
 from backend.spiders.spiders import ToutiaoSpider, WeiboSpider
 
 
-def test_weibo_does_not_send_hardcoded_cookie_without_env(monkeypatch):
+def test_weibo_sends_fallback_cookie_without_env(monkeypatch):
+    """无 WEIBO_COOKIE 环境变量时使用内置兜底 Cookie，避免微博反爬返回空列表。"""
     session = Mock()
     session.headers = {}
     session.get.return_value.text = ""
@@ -12,7 +13,7 @@ def test_weibo_does_not_send_hardcoded_cookie_without_env(monkeypatch):
     with patch("backend.spiders.spiders.requests.Session", return_value=session):
         assert WeiboSpider().fetch() == []
 
-    assert "Cookie" not in session.headers
+    assert session.headers["Cookie"].startswith("SUB=")
 
 
 def test_weibo_uses_env_cookie_header(monkeypatch):

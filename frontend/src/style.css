@@ -128,36 +128,10 @@ body {
   .safe-area-top {
     padding-top: max(0px, env(safe-area-inset-top));
   }
-
-  .safe-area-bottom {
-    padding-bottom: max(0px, env(safe-area-inset-bottom));
-  }
-
-  .safe-area-left {
-    padding-left: max(0px, env(safe-area-inset-left));
-  }
-
-  .safe-area-right {
-    padding-right: max(0px, env(safe-area-inset-right));
-  }
-}
-
-/* 确保 header 和底部导航不被刘海遮挡 */
-.fixed-header {
-  padding-top: max(0px, env(safe-area-inset-top));
-}
-
-.fixed-footer {
-  padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
 header.safe-area-top {
   padding-top: max(0.75rem, env(safe-area-inset-top));
-}
-
-/* 标签栏跟随 header */
-.sticky.top-14 {
-  top: max(3.5rem, calc(3.5rem + env(safe-area-inset-top)));
 }
 
 /* ---------- 文本色工具 ---------- */
@@ -175,10 +149,6 @@ header.safe-area-top {
 
 .text-tertiary {
   color: var(--lg-text-tertiary);
-}
-
-.text-accent {
-  color: var(--lg-accent);
 }
 
 /* ---------- 分隔线 / 悬停 ---------- */
@@ -309,12 +279,6 @@ header.safe-area-top {
   border: 1px solid var(--lg-border-strong);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.78));
   box-shadow: var(--lg-shadow-sm), inset 0 1px 0 var(--lg-highlight);
-}
-
-.liquid-avatar-sm {
-  border: 1px solid var(--lg-border);
-  background: linear-gradient(180deg, var(--lg-surface-strong), var(--lg-surface));
-  box-shadow: inset 0 1px 0 var(--lg-highlight-soft);
 }
 
 /* ---------- 按钮 / Chip ---------- */

@@ -20,6 +20,9 @@ class DummyQuery:
         self.items = items
         self.platform = None
 
+    def distinct(self):
+        return self
+
     def first(self):
         if self.items is None:
             return self.item
@@ -53,8 +56,9 @@ class DummyDB:
         self.news = []
 
     def query(self, model):
-        if model is News:
-            return DummyQuery(object() if self.has_news else None)
+        if model is News or model is News.platform:
+            # 与真实 News 表形态一致：distinct().all() 产出 (platform,) 元组
+            return DummyQuery(items=[("微博热搜",)] if self.has_news else [])
         if model is CacheRecord:
             return DummyQuery(items=self.cache_records)
         raise AssertionError(model)
@@ -221,7 +225,50 @@ def test_get_refresh_state_uses_cache_record_fallback():
         "last_success_at": "2026-01-01T00:00:00Z",
         "last_error_at": None,
         "error": "",
+        "has_cache": True,
     }
+
+
+def test_get_refresh_state_marks_has_cache_when_old_news_exists():
+    """失败/空结果源只要库中仍有旧数据，就应标记 has_cache 供前端展示旧数据。"""
+    db = DummyDB(has_news=True)
+    for status in ("empty", "error"):
+        db.cache_records = []
+        db.cache_records.append(type("CacheRecord", (), {
+            "platform": "weibo",
+            "last_fetch": datetime(2026, 1, 1, tzinfo=timezone.utc),
+            "last_success_at": datetime(2025, 12, 31, tzinfo=timezone.utc),
+            "last_error_at": datetime(2026, 1, 1, tzinfo=timezone.utc),
+            "last_status": status,
+            "status": status,
+            "error_msg": "boom",
+        })())
+        reset_auto_refresh_state()
+
+        state = api._get_refresh_state(db, ["weibo"])
+
+        assert state["sources"]["weibo"]["status"] == status
+        assert state["sources"]["weibo"]["has_cache"] is True
+        assert state["sources"]["weibo"]["last_success_at"] == "2025-12-31T00:00:00Z"
+
+
+def test_get_refresh_state_marks_no_cache_when_no_news():
+    db = DummyDB(has_news=False)
+    db.cache_records.append(type("CacheRecord", (), {
+        "platform": "weibo",
+        "last_fetch": datetime(2026, 1, 1, tzinfo=timezone.utc),
+        "last_success_at": None,
+        "last_error_at": datetime(2026, 1, 1, tzinfo=timezone.utc),
+        "last_status": "empty",
+        "status": "empty",
+        "error_msg": "",
+    })())
+    reset_auto_refresh_state()
+
+    state = api._get_refresh_state(db, ["weibo"])
+
+    assert state["sources"]["weibo"]["status"] == "empty"
+    assert state["sources"]["weibo"]["has_cache"] is False
 
 
 def test_refresh_news_data_updates_cache_records():

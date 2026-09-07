@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, field_validator
 
 from backend.api.auth import get_current_user_id
+from backend.utils import as_utc_iso
 
 logger = logging.getLogger(__name__)
 
@@ -25,14 +26,6 @@ _job_states = {}   # {job_id: {"last_run": iso, "last_result": {...}}}
 JOB_IDS = ("refresh_job", "push_job", "token_cleanup_job")
 
 
-def _iso_z(value):
-    """datetime -> 带 Z 后缀的 UTC ISO 字符串。"""
-    if value is None:
-        return None
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=UTC)
-    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
-
 
 def configure_scheduler(scheduler) -> None:
     """由应用入口注入 BackgroundScheduler 实例。"""
@@ -43,7 +36,7 @@ def configure_scheduler(scheduler) -> None:
 def mark_job_run(job_id: str, success: bool, message: str = "") -> None:
     """记录任务最近一次执行结果（任务自身在收尾时调用）。"""
     _job_states[job_id] = {
-        "last_run": _iso_z(datetime.now(UTC)),
+        "last_run": as_utc_iso(datetime.now(UTC)),
         "last_result": {"success": bool(success), "message": message},
     }
 
@@ -54,7 +47,7 @@ def _get_job_detail(job_id: str) -> dict:
     if _scheduler is not None:
         try:
             job = _scheduler.get_job(job_id)
-            next_run = _iso_z(job.next_run_time) if job is not None else None
+            next_run = as_utc_iso(job.next_run_time) if job is not None else None
         except Exception:
             logger.warning("读取任务 %s 状态失败", job_id, exc_info=True)
     return {

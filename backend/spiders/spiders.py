@@ -230,13 +230,16 @@ class WeiboSpider(BaseSpider):
     COOKIE_ENV = "WEIBO_COOKIE"
     BASE_URL = "https://s.weibo.com"
     HOT_URL = f"{BASE_URL}/top/summary?cate=realtimehot"
+    # 无登录态时微博会反爬返回空列表；内置兜底 Cookie（来源 newsnow，仅供公开热搜页抓取）
+    FALLBACK_COOKIE = "SUB=_2AkMWIuNSf8NxqwJRmP8dy2rhaoV2ygrEieKgfhKJJRMxHRl-yT9jqk86tRB6PaLNvQZR6zYUcYVT1zSjoSreQHidcUq7"
     
     def fetch(self) -> List[dict]:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "Referer": self.HOT_URL,
         }
-        cookie = os.getenv(self.COOKIE_ENV)
+        # 环境变量优先，未配置时使用内置兜底 Cookie，避免空结果
+        cookie = os.getenv(self.COOKIE_ENV) or self.FALLBACK_COOKIE
         if cookie:
             headers["Cookie"] = cookie
 
@@ -832,13 +835,22 @@ class FastbullSpider(BaseSpider):
 class PcbetaSpider(BaseSpider):
     """远景论坛 Win11"""
     name = "pcbeta"
+    RSS_URLS = [
+        "https://bbs.pcbeta.com/forum.php?mod=rss&fid=563&auth=0",
+        "https://bbs.pcbeta.com/forum.php?mod=rss&fid=521&auth=0",
+    ]
 
     def fetch(self) -> List[dict]:
-        try:
-            return define_rss_source("https://bbs.pcbeta.com/forum.php?mod=rss&fid=563&auth=0", "远景论坛", source_key=self.name)
-        except Exception:
-            logger.exception("❌ 远景论坛")
-            return []
+        # 主 RSS 失败时依次回退备选 RSS，保证至少一个分区可用
+        last_exc = None
+        for url in self.RSS_URLS:
+            try:
+                return define_rss_source(url, "远景论坛", source_key=self.name)
+            except Exception as e:
+                last_exc = e
+                logger.warning("⚠️ 远景论坛 RSS 失败：%s", url, exc_info=True)
+        logger.exception("❌ 远景论坛，全部 RSS 均失败")
+        return []
 
 
 class SolidotSpider(BaseSpider):
@@ -1003,27 +1015,35 @@ class TencentSpider(BaseSpider):
 class KaopuSpider(BaseSpider):
     """靠谱新闻"""
     name = "kaopu"
+    BASE_URL = "https://kaopu.news"
 
     def fetch(self) -> List[dict]:
-        url = "https://kaopustorage.blob.core.windows.net/news-prod/news_list_hans_0.json"
         try:
-            resp = fetch_get(url)
-            data = resp.json()
+            resp = fetch_get(self.BASE_URL)
+            soup = BeautifulSoup(resp.text, "html.parser")
             items = []
-            for item in data[:20]:
-                publisher = item.get("publisher", "")
+            seen = set()
+            for article in soup.select("article"):
+                link = article.select_one('a[href^="/story/"]')
+                title_node = article.find("h2")
+                if not link or not title_node:
+                    continue
+                href = link.get("href") or ""
+                title = title_node.get_text(strip=True)
+                if not href or not title or href in seen:
+                    continue
+                seen.add(href)
+                provenance = article.select_one(".story-provenance")
+                publisher = provenance.get_text(strip=True) if provenance else ""
                 if publisher in {"财新", "公视"}:
                     continue
-                title = item.get("title", "")
-                link = item.get("link", "")
-                if title and link:
-                    items.append({
-                        "platform": "靠谱新闻",
-                        "title": title,
-                        "url": link,
-                        "hot": publisher,
-                        "time": "",
-                    })
+                items.append({
+                    "platform": "靠谱新闻",
+                    "title": title,
+                    "url": f"{self.BASE_URL}{href}" if href.startswith("/") else href,
+                    "hot": publisher,
+                    "time": "",
+                })
             return items
         except Exception as e:
             logger.exception("❌ 靠谱新闻")
