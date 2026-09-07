@@ -104,7 +104,7 @@ const cronPresets = [
   { label: '每天 1 次 (9:00)', value: '0 9 * * *' },
 ]
 
-const defaultPlatformClass = 'bg-slate-100/85 text-slate-700 border border-slate-200'
+const defaultPlatformClass = 'liquid-badge text-primary'
 const platformMeta = {
   '微博热搜': { logo: '微', icon: 'https://www.google.com/s2/favicons?sz=64&domain=weibo.com', class: 'bg-red-100/85 text-red-600 border border-red-200' },
   '微博': { logo: '微', icon: 'https://www.google.com/s2/favicons?sz=64&domain=weibo.com', class: 'bg-red-100/85 text-red-600 border border-red-200' },
@@ -831,41 +831,41 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[linear-gradient(180deg,_#eef4fb_0%,_#d9e4f2_42%,_#b9c9dd_100%)] text-slate-700 relative overflow-hidden pb-[max(1rem,env(safe-area-inset-bottom))]">
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,_rgba(255,255,255,0.78),_transparent_18%),radial-gradient(circle_at_88%_10%,_rgba(59,130,246,0.26),_transparent_24%),radial-gradient(circle_at_48%_36%,_rgba(15,23,42,0.12),_transparent_30%),radial-gradient(circle_at_bottom,_rgba(30,41,59,0.28),_transparent_38%)]"></div>
-    <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,_rgba(255,255,255,0.34),_rgba(255,255,255,0))]"></div>
+  <div class="liquid-app min-h-screen relative overflow-hidden pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div class="liquid-aurora pointer-events-none absolute inset-0"></div>
+    <div class="liquid-top-sheen pointer-events-none absolute inset-x-0 top-0 h-64"></div>
     <!-- 头部 -->
-    <header class="sticky top-0 z-50 safe-area-top border-b border-white/35 bg-[linear-gradient(180deg,_rgba(248,250,252,0.78),_rgba(226,232,240,0.46))] px-5 py-3 text-slate-800 backdrop-blur-2xl shadow-[0_1px_0_rgba(255,255,255,0.75)_inset,0_18px_42px_rgba(51,65,85,0.16)] sm:px-4 sm:py-4">
+    <header class="liquid-header sticky top-0 z-50 safe-area-top px-5 py-3 sm:px-4 sm:py-4">
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
         <div class="min-w-0 flex-1">
-          <h1 class="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">热点资讯</h1>
-          <p class="mt-1 text-xs text-slate-500 sm:text-sm">
+          <h1 class="text-primary-strong text-base font-semibold tracking-tight sm:text-lg">热点资讯</h1>
+          <p class="text-secondary mt-1 text-xs sm:text-sm">
             <span v-if="loading">正在刷新中</span>
             <span v-else-if="refreshState.refreshing">正在后台刷新</span>
             <span v-else-if="refreshState.last_refresh">最后刷新：{{ lastRefresh }}</span>
             <span v-else>暂无刷新记录</span>
-            <span v-if="refreshState.stale" class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-700" :title="'过期平台数：' + (refreshState.stale_platforms || []).length">部分数据已过期</span>
+            <span v-if="refreshState.stale" class="liquid-chip-accent ml-2 rounded-full px-2 py-0.5 text-[11px]" :title="'过期平台数：' + (refreshState.stale_platforms || []).length">部分数据已过期</span>
           </p>
         </div>
         <div class="flex shrink-0 flex-wrap justify-end gap-2">
           <button
             v-if="currentUser" 
             @click="showAccount = true"
-            class="px-3 py-1.5 rounded-full text-sm border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(255,255,255,0.72))] backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.45),0_10px_24px_rgba(148,163,184,0.12)] text-slate-700"
+            class="liquid-chip px-3 py-1.5 rounded-full text-sm text-primary"
           >
             {{ currentUser }}
           </button>
           <button
             v-if="currentUser" 
             @click="logout"
-            class="px-3 py-1.5 rounded-full text-sm border border-red-200/70 bg-[linear-gradient(180deg,_rgba(254,226,226,0.92),_rgba(252,165,165,0.55))] text-red-700 backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.35),0_10px_28px_rgba(248,113,113,0.18)]"
+            class="liquid-chip-danger px-3 py-1.5 rounded-full text-sm"
           >
             退出
           </button>
           <button
             v-if="!currentUser" 
             @click="showLogin = true"
-            class="px-3 py-1.5 rounded-full text-sm border border-white/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(255,255,255,0.72))] backdrop-blur-xl shadow-[0_2px_8px_rgba(255,255,255,0.45),0_10px_24px_rgba(148,163,184,0.12)] text-slate-700"
+            class="liquid-chip px-3 py-1.5 rounded-full text-sm text-primary"
           >
             登录
           </button>
@@ -874,19 +874,19 @@ onUnmounted(() => {
     </header>
 
     <!-- 标签筛选 -->
-    <div v-if="currentUser" class="sticky z-40 safe-area-top border-b border-white/20 bg-[linear-gradient(180deg,_rgba(241,245,249,0.42),_rgba(203,213,225,0.18))] backdrop-blur-2xl" style="top: max(3rem, env(safe-area-inset-top))">
+    <div v-if="currentUser" class="liquid-subheader sticky z-40 safe-area-top" style="top: max(3rem, env(safe-area-inset-top))">
       <div class="glass-scroll max-w-6xl mx-auto px-5 py-1.5 flex gap-2 overflow-x-auto whitespace-nowrap sm:px-4 sm:py-2">
         <button
           @click="selectAllView('hot')"
-            class="px-3.5 py-1.5 rounded-full text-sm font-medium border backdrop-blur-xl transition-all duration-200 shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
-          :class="currentTag === null && allViewMode === 'hot' ? 'bg-[linear-gradient(135deg,_rgba(79,70,229,0.92),_rgba(14,165,233,0.82))] text-white border-white/70 shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_12px_30px_rgba(59,130,246,0.26)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.60),_rgba(255,255,255,0.34))] text-slate-600 border-white/60 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.52))]'"
+            class="px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200"
+          :class="currentTag === null && allViewMode === 'hot' ? 'liquid-chip-active' : 'liquid-chip-inactive'"
         >
           热榜
         </button>
         <button
           @click="selectAllView('realtime')"
-            class="px-3.5 py-1.5 rounded-full text-sm font-medium border backdrop-blur-xl transition-all duration-200 shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
-          :class="currentTag === null && allViewMode === 'realtime' ? 'bg-[linear-gradient(135deg,_rgba(79,70,229,0.92),_rgba(14,165,233,0.82))] text-white border-white/70 shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_12px_30px_rgba(59,130,246,0.26)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.60),_rgba(255,255,255,0.34))] text-slate-600 border-white/60 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.52))]'"
+            class="px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200"
+          :class="currentTag === null && allViewMode === 'realtime' ? 'liquid-chip-active' : 'liquid-chip-inactive'"
         >
           实时
         </button>
@@ -894,8 +894,8 @@ onUnmounted(() => {
           v-for="tag in tags" 
           :key="tag"
           @click="selectTag(tag)"
-            class="px-3.5 py-1.5 rounded-full text-sm font-medium border backdrop-blur-xl transition-all duration-200 shadow-[0_2px_8px_rgba(255,255,255,0.4),0_8px_20px_rgba(148,163,184,0.10)]"
-          :class="currentTag === tag ? 'bg-[linear-gradient(135deg,_rgba(79,70,229,0.92),_rgba(14,165,233,0.82))] text-white border-white/70 shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_12px_30px_rgba(59,130,246,0.26)]' : 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.60),_rgba(255,255,255,0.34))] text-slate-600 border-white/60 hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.52))]'"
+            class="px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200"
+          :class="currentTag === tag ? 'liquid-chip-active' : 'liquid-chip-inactive'"
         >
           {{ tag }}
         </button>
@@ -905,15 +905,15 @@ onUnmounted(() => {
     <!-- 内容 -->
     <main class="relative max-w-6xl mx-auto px-5 py-5 sm:px-4 sm:py-6">
       <!-- 操作栏 -->
-      <div class="mb-5 flex flex-col gap-3 rounded-[1.35rem] border border-white/55 bg-[linear-gradient(135deg,_rgba(255,255,255,0.72),_rgba(226,232,240,0.36))] px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.78)_inset,0_18px_48px_rgba(51,65,85,0.14)] backdrop-blur-2xl sm:flex-row sm:items-center sm:justify-between">
+      <div class="liquid-panel mb-5 flex flex-col gap-3 rounded-[1.35rem] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-slate-700 text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
-          <span v-if="lastRefresh" class="text-xs text-slate-500">上次刷新: {{ lastRefresh }}</span>
+          <span class="text-primary text-sm">{{ newsCount }} 条{{ currentTag ? ` [${currentTag}]` : '' }}</span>
+          <span v-if="lastRefresh" class="text-secondary text-xs">上次刷新: {{ lastRefresh }}</span>
         </div>
         <button
           @click="refresh(true)" 
           :disabled="loading"
-            class="px-4 py-2 rounded-xl text-sm font-medium border border-white/70 bg-[linear-gradient(135deg,_rgba(37,99,235,0.92),_rgba(14,165,233,0.82))] text-white backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.30)_inset,0_14px_34px_rgba(37,99,235,0.25)] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
+            class="liquid-chip-active px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
         >
           {{ loading ? '刷新中...' : '刷新' }}
         </button>
@@ -931,28 +931,28 @@ onUnmounted(() => {
           @dragenter.prevent="movePlatform(platform)"
           @drop.prevent="movePlatform(platform); draggingPlatform = null"
           @dragend="draggingPlatform = null"
-          class="flex h-full flex-col overflow-hidden rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl lg:min-h-[34rem]"
+          class="liquid-surface glass-edge-lines flex h-full flex-col overflow-hidden rounded-[1.4rem] lg:min-h-[34rem]"
           :class="draggingPlatform === platform ? 'opacity-60' : ''"
         >
           <!-- 平台标题 -->
-          <div class="px-4 py-3 bg-[linear-gradient(135deg,_rgba(255,255,255,0.58),_rgba(219,234,254,0.30))] border-b border-white/40 flex justify-between items-center">
+          <div class="liquid-card-header px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2.5 min-w-0">
-              <span class="inline-flex h-10 min-w-[2.5rem] items-center justify-center overflow-hidden rounded-2xl border border-white/75 bg-white/90 px-2.5 text-sm font-bold text-slate-800 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_10px_24px_rgba(51,65,85,0.16)]">
+              <span class="liquid-avatar inline-flex h-10 min-w-[2.5rem] items-center justify-center overflow-hidden rounded-2xl px-2.5 text-sm font-bold">
                 <img v-if="getPlatformLogoUrl(platform)" :src="getPlatformLogoUrl(platform)" :alt="platform" class="h-5 w-5 object-contain" referrerpolicy="no-referrer" />
                 <span v-else>{{ getPlatformLogo(platform) }}</span>
               </span>
               <div class="min-w-0">
-                <div class="text-lg font-bold tracking-tight text-slate-900 truncate">{{ platform }}</div>
-                <div v-if="platformStatusText(platform)" class="text-[11px] text-slate-400">{{ platformStatusText(platform) }}</div>
+                <div class="text-primary-strong text-lg font-bold tracking-tight truncate">{{ platform }}</div>
+                <div v-if="platformStatusText(platform)" class="text-[11px] text-tertiary">{{ platformStatusText(platform) }}</div>
               </div>
             </div>
             <div class="flex shrink-0 items-center gap-2">
-              <span class="rounded-full border border-white/55 bg-white/60 px-2.5 py-1 text-xs font-medium text-slate-600">{{ allViewMode === 'realtime' ? '实时源' : '拖拽排序' }} · {{ platformNews.length }}条</span>
+              <span class="liquid-badge rounded-full px-2.5 py-1 text-xs font-medium">{{ allViewMode === 'realtime' ? '实时源' : '拖拽排序' }} · {{ platformNews.length }}条</span>
               <button
                 type="button"
                 @click.stop="refreshPlatform(platform)"
                 :disabled="refreshingPlatform === platform"
-                class="rounded-full border border-sky-200/70 bg-sky-50/80 px-2.5 py-1 text-xs font-medium text-sky-700 transition hover:bg-sky-100 disabled:opacity-55"
+                class="liquid-chip-accent rounded-full px-2.5 py-1 text-xs font-medium transition disabled:opacity-55"
               >
                 {{ refreshingPlatform === platform ? '刷新中' : '刷新' }}
               </button>
@@ -961,28 +961,28 @@ onUnmounted(() => {
           <!-- 平台新闻列表 -->
           <div class="glass-scroll flex-1 lg:max-h-[28rem] lg:overflow-y-auto">
             <!-- 实时模式：时间线风格 -->
-            <div v-if="allViewMode === 'realtime'" class="border-s border-slate-300/40 flex flex-col ml-3 py-2 gap-1">
+            <div v-if="allViewMode === 'realtime'" class="border-s border-divider flex flex-col ml-3 py-2 gap-1">
               <div v-for="item in platformNews" :key="item.id || item.url" class="flex flex-col">
-                <span class="flex items-center gap-1 text-slate-400 ml-[-1px]">
-                  <span class="text-slate-300">-</span>
-                  <span class="text-xs text-slate-400">{{ formatRelativeTime(item) }}</span>
+                <span class="flex items-center gap-1 text-tertiary ml-[-1px]">
+                  <span class="text-tertiary">-</span>
+                  <span class="text-xs text-tertiary">{{ formatRelativeTime(item) }}</span>
                 </span>
                 <a
                   :href="item.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="ml-3 px-1 py-0.5 text-base text-slate-700 hover:bg-slate-200/30 rounded transition-all visited:text-slate-400"
+                  class="ml-3 px-1 py-0.5 text-base text-primary hover-bg-subtle rounded transition-all visited:text-tertiary"
                 >
                   {{ item.title }}
                 </a>
               </div>
             </div>
             <!-- 热榜模式：序号排名风格 -->
-            <div v-else class="divide-y divide-slate-300/22">
+            <div v-else class="divide-y divide-divider">
               <div
                 v-for="(item, index) in platformNews"
                 :key="item.id || item.url"
-                class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
+                class="group p-4 transition-all duration-300 hover-glass"
               >
               <div class="flex items-start gap-3">
                 <span
@@ -990,10 +990,10 @@ onUnmounted(() => {
                   :class="index === 0
                     ? 'bg-[linear-gradient(180deg,_rgba(254,240,138,0.95),_rgba(250,204,21,0.82))] text-amber-900 border border-amber-200/80'
                     : index === 1
-                      ? 'bg-[linear-gradient(180deg,_rgba(226,232,240,0.98),_rgba(203,213,225,0.85))] text-slate-700 border border-slate-200/80'
+                      ? 'bg-[linear-gradient(180deg,_rgba(226,232,240,0.98),_rgba(203,213,225,0.85))] text-primary border border-slate-200/80'
                       : index === 2
                         ? 'bg-[linear-gradient(180deg,_rgba(253,230,138,0.9),_rgba(251,191,36,0.72))] text-orange-900 border border-orange-200/80'
-                        : 'bg-slate-100/70 text-slate-500 border border-white/65'"
+                        : 'bg-slate-100/70 text-secondary border border-white/65'"
                 >
                   {{ index + 1 }}
                 </span>
@@ -1003,7 +1003,7 @@ onUnmounted(() => {
                       :href="item.url"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="min-w-0 flex-1 text-base font-medium text-slate-800 transition-colors group-hover:text-indigo-600" 
+                      class="min-w-0 flex-1 text-base font-medium text-primary-strong transition-colors group-hover-accent"
                     >
                       {{ item.title }}
                     </a>
@@ -1018,7 +1018,7 @@ onUnmounted(() => {
                         {{ kw }}
                       </span>
                     </div>
-                    <span class="w-fit rounded-full border border-white/55 bg-slate-50/60 px-2.5 py-1 text-[11px] font-medium text-slate-500 sm:ml-2">
+                    <span class="liquid-badge w-fit rounded-full px-2.5 py-1 text-[11px] font-medium text-secondary sm:ml-2">
                       {{ formatHotDisplayTime(item, platformNews) }}
                     </span>
                   </div>
@@ -1035,24 +1035,24 @@ onUnmounted(() => {
         <div 
           v-for="[keyword, keywordNews] in keywordGroupEntries"
           :key="keyword"
-          class="overflow-hidden rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl"
+          class="liquid-surface glass-edge-lines overflow-hidden rounded-[1.4rem]"
         >
-          <div class="px-4 py-3 bg-[linear-gradient(135deg,_rgba(255,255,255,0.58),_rgba(219,234,254,0.30))] border-b border-white/40 flex justify-between items-center">
-            <span class="font-medium text-slate-800">{{ keyword }}</span>
-            <span class="text-xs text-slate-500">{{ keywordNews.length }}条</span>
+          <div class="liquid-card-header px-4 py-3 flex justify-between items-center">
+            <span class="font-medium text-primary-strong">{{ keyword }}</span>
+            <span class="text-secondary text-xs">{{ keywordNews.length }}条</span>
           </div>
           <div class="divide-y divide-white/10">
             <div
               v-for="item in keywordNews"
               :key="item.id || item.url"
-              class="group p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,_rgba(255,255,255,0.42),_rgba(148,163,184,0.16))]"
+              class="group p-4 transition-all duration-300 hover-glass"
             >
               <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <a
                   :href="item.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
+                  class="min-w-0 flex-1 text-base font-medium text-primary transition-colors group-hover-accent"
                 >
                   {{ item.title }}
                 </a>
@@ -1077,7 +1077,7 @@ onUnmounted(() => {
                     {{ kw }}
                   </span>
                 </div>
-                <span class="w-fit rounded-full border border-white/55 bg-slate-50/60 px-2.5 py-1 text-[11px] font-medium text-slate-500 sm:ml-2">
+                <span class="liquid-badge w-fit rounded-full px-2.5 py-1 text-[11px] font-medium text-secondary sm:ml-2">
                   {{ formatDisplayTime(item) }}
                 </span>
               </div>
@@ -1090,14 +1090,14 @@ onUnmounted(() => {
         <div
           v-for="item in news"
           :key="item.id || item.url"
-          class="group rounded-[1.4rem] border border-white/55 bg-[linear-gradient(145deg,_rgba(255,255,255,0.76),_rgba(226,232,240,0.44)_58%,_rgba(203,213,225,0.30))] p-4 shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_22px_56px_rgba(51,65,85,0.16)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-[linear-gradient(145deg,_rgba(255,255,255,0.84),_rgba(219,234,254,0.48))] hover:shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_26px_64px_rgba(51,65,85,0.20)]"
+          class="liquid-surface glass-edge-lines group rounded-[1.4rem] p-4 transition-all duration-300 hover:-translate-y-0.5 hover-glass"
         >
           <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <a
               :href="item.url"
               target="_blank"
               rel="noopener noreferrer"
-              class="min-w-0 flex-1 text-base font-medium text-slate-700 transition-colors group-hover:text-indigo-600"
+              class="min-w-0 flex-1 text-base font-medium text-primary transition-colors group-hover-accent"
             >
               {{ item.title }}
             </a>
@@ -1121,72 +1121,72 @@ onUnmounted(() => {
               </span>
             </div>
             <!-- 发布时间 -->
-            <span class="w-fit rounded-full border border-white/55 bg-slate-50/60 px-2.5 py-1 text-[11px] font-medium text-slate-500 sm:ml-2">
+            <span class="liquid-badge w-fit rounded-full px-2.5 py-1 text-[11px] font-medium text-secondary sm:ml-2">
               {{ formatDisplayTime(item) }}
             </span>
           </div>
         </div>
       </div>
 
-      <div v-if="currentTag !== null && !hasKeywordGroups && news.length === 0 && !loading" class="text-center py-12 text-slate-400">
+      <div v-if="currentTag !== null && !hasKeywordGroups && news.length === 0 && !loading" class="text-center py-12 text-tertiary">
         暂无匹配的热点资讯
       </div>
-      <div v-else-if="currentTag === null && news.length === 0 && Object.keys(newsByPlatform).length === 0 && !loading" class="text-center py-12 text-slate-400">
+      <div v-else-if="currentTag === null && news.length === 0 && Object.keys(newsByPlatform).length === 0 && !loading" class="text-center py-12 text-tertiary">
         暂无匹配的热点资讯
       </div>
     </main>
 
-    <footer class="relative max-w-6xl mx-auto px-4 pb-6 text-center text-xs text-slate-500">
+    <footer class="relative max-w-6xl mx-auto px-4 pb-6 text-center text-secondary text-xs">
       v{{ appVersion }}
     </footer>
 
     <!-- 登录弹窗 -->
-      <div v-if="showLogin" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">
-      <div class="glass-scroll relative max-h-[calc(100vh-max(2rem,env(safe-area-inset-top)+env(safe-area-inset-bottom)))] w-full max-w-sm overflow-y-auto rounded-[28px] border border-white/70 bg-white/90 p-5 text-slate-700 shadow-[0_24px_80px_rgba(148,163,184,0.16)] backdrop-blur-2xl sm:p-6 before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80">
+      <div v-if="showLogin" class="liquid-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="liquid-modal glass-edge-lines glass-scroll relative max-h-[calc(100vh-max(2rem,env(safe-area-inset-top)+env(safe-area-inset-bottom)))] w-full max-w-sm overflow-y-auto rounded-[28px] p-5 text-primary sm:p-6">
         <h2 class="text-lg font-semibold mb-4">登录/注册</h2>
         <input 
           v-model="username" 
           placeholder="用户名" 
-          class="glass-input w-full px-4 py-3 border border-white/60 bg-slate-50/65 rounded-2xl mb-3 text-slate-800 placeholder:text-slate-400"
+          class="liquid-input w-full px-4 py-3 rounded-2xl mb-3 text-primary-strong placeholder:text-tertiary"
         />
         <input 
           v-model="password" 
           type="password" 
           placeholder="密码" 
-          class="glass-input w-full px-4 py-3 border border-white/60 bg-slate-50/65 rounded-2xl mb-4 text-slate-800 placeholder:text-slate-400"
+          class="liquid-input w-full px-4 py-3 rounded-2xl mb-4 text-primary-strong placeholder:text-tertiary"
           @keyup.enter="login"
         />
-        <button @click="login" class="w-full py-3 rounded-2xl border border-white/70 bg-white/75 text-slate-800 backdrop-blur-xl mb-2">
+        <button @click="login" class="liquid-chip-active w-full py-3 rounded-2xl mb-2">
           登录
         </button>
-        <button @click="register" class="w-full py-3 rounded-2xl border border-white/60 bg-white/55 text-slate-700">
+        <button @click="register" class="liquid-chip w-full py-3 rounded-2xl text-primary">
           注册
         </button>
-        <button @click="showLogin = false" class="w-full py-2 mt-2 text-slate-400 text-sm">
+        <button @click="showLogin = false" class="w-full py-2 mt-2 text-tertiary text-sm">
           取消
         </button>
       </div>
     </div>
 
     <!-- 账号管理弹窗 -->
-    <div v-if="showAccount" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">
-      <div class="relative w-full max-w-sm rounded-[30px] border border-white/70 bg-[linear-gradient(145deg,_rgba(255,255,255,0.92),_rgba(226,232,240,0.72))] text-slate-700 shadow-[0_1px_0_rgba(255,255,255,0.86)_inset,0_30px_90px_rgba(15,23,42,0.22)] backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-7 before:top-0 before:h-px before:bg-white/70 after:pointer-events-none after:absolute after:inset-x-7 after:bottom-0 after:h-px after:bg-white/35">
+    <div v-if="showAccount" class="liquid-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="liquid-modal glass-edge-lines relative w-full max-w-sm rounded-[30px] text-primary">
         <div class="glass-scroll max-h-[calc(100vh-max(2rem,env(safe-area-inset-top)+env(safe-area-inset-bottom)))] overflow-y-auto px-5 py-5 pr-4 sm:px-6 sm:py-6 sm:pr-5">
         <div class="mb-4">
-          <div class="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">Workspace Settings</div>
-          <h2 class="mt-1 text-lg font-semibold text-slate-800">账号管理</h2>
-          <div class="mt-1 text-sm text-slate-500">统一管理标签、关键词、平台监控和消息推送。</div>
+          <div class="text-[11px] font-medium uppercase tracking-[0.18em] text-tertiary">Workspace Settings</div>
+          <h2 class="mt-1 text-lg font-semibold text-primary-strong">账号管理</h2>
+          <div class="mt-1 text-sm text-secondary">统一管理标签、关键词、平台监控和消息推送。</div>
         </div>
         
         <!-- 切换账号按钮 -->
-        <button @click="switchAccount" class="w-full py-2 mb-4 rounded-2xl border border-white/60 bg-[linear-gradient(180deg,_rgba(255,255,255,0.82),_rgba(255,255,255,0.54))] text-slate-700 text-sm shadow-[0_8px_20px_rgba(148,163,184,0.08)]">
+        <button @click="switchAccount" class="liquid-chip w-full py-2 mb-4 rounded-2xl text-primary text-sm">
           切换账号
         </button>
         
         <!-- 标签关键词管理 -->
-        <div class="mb-4 rounded-2xl border border-white/55 bg-white/38 p-3 shadow-[0_1px_0_rgba(255,255,255,0.75)_inset,0_14px_34px_rgba(51,65,85,0.08)]">
-          <label class="text-sm font-medium text-slate-700 block mb-2">标签关键词设置</label>
-          <div class="text-xs text-slate-500 mb-2">点击标签设置其关键词</div>
+        <div class="liquid-panel mb-4 rounded-2xl p-3">
+          <label class="text-sm font-medium text-primary block mb-2">标签关键词设置</label>
+          <div class="text-secondary text-xs mb-2">点击标签设置其关键词</div>
           
           <!-- 标签列表 -->
           <div class="space-y-2 mb-3">
@@ -1199,18 +1199,18 @@ onUnmounted(() => {
               @dragenter.prevent="moveTag(tag)"
               @drop.prevent="moveTag(tag); draggingTag = null"
               @dragend="draggingTag = null"
-              class="rounded-2xl border border-white/60 bg-[linear-gradient(145deg,_rgba(255,255,255,0.82),_rgba(226,232,240,0.42))] p-3 shadow-[0_1px_0_rgba(255,255,255,0.82)_inset,0_12px_28px_rgba(51,65,85,0.10)]"
+              class="liquid-surface rounded-2xl p-3"
               :class="draggingTag === tag ? 'opacity-60' : ''"
             >
               <div class="flex justify-between items-center mb-1">
                 <!-- 显示标签名 -->
-                <span v-if="renamingTag !== tag" class="font-medium text-sm text-slate-800">{{ tag }}</span>
+                <span v-if="renamingTag !== tag" class="font-medium text-sm text-primary-strong">{{ tag }}</span>
                 <!-- 重命名输入框 -->
                 <div v-else class="flex items-center gap-1">
                   <input 
                     v-model="tempRenameName"
                     @keyup.enter="confirmRenameTag(tag)"
-                    class="glass-input font-medium text-sm border border-white/60 bg-white/80 rounded px-1 py-0.5 w-20 text-slate-800"
+                    class="liquid-input font-medium text-sm rounded px-1 py-0.5 w-20 text-primary-strong"
                   />
                   <button @click="confirmRenameTag(tag)" class="text-green-500">✓</button>
                   <button @click="cancelRenameTag()" class="text-gray-500">✕</button>
@@ -1242,25 +1242,25 @@ onUnmounted(() => {
                 <textarea 
                   v-model="editingKeywords"
                   :placeholder="`${tag}标签的关键词，用逗号分隔`"
-                  class="glass-input w-full px-2 py-1 border border-white/60 bg-white/80 rounded-xl text-sm text-slate-800 placeholder:text-slate-400"
+                  class="liquid-input w-full px-2 py-1 rounded-xl text-sm text-primary-strong placeholder:text-tertiary"
                   rows="2"
                 ></textarea>
                 <div class="flex gap-2 mt-1">
                   <button
                     @click="saveTagKeywords"
-                    class="text-xs px-2 py-1 rounded-full border border-white/60 bg-white/80 text-slate-700"
+                    class="text-xs px-2 py-1 rounded-full text-primary"
                   >
                     保存
                   </button>
                   <button
                     @click="editingTag = null"
-                    class="text-xs px-2 py-1 rounded-full border border-white/50 bg-white/65 text-slate-500"
+                    class="text-xs px-2 py-1 rounded-full text-secondary"
                   >
                     取消
                   </button>
                 </div>
               </div>
-              <div v-else class="text-xs text-slate-500">
+              <div v-else class="text-secondary text-xs">
                 关键词: {{ (keywordTags[tag] || []).join(', ') || '未设置' }}
               </div>
             </div>
@@ -1271,50 +1271,50 @@ onUnmounted(() => {
             <input 
               v-model="newTag" 
               placeholder="新增标签"
-              class="glass-input flex-1 px-2 py-1 border border-white/60 bg-white/80 rounded-xl text-sm text-slate-800 placeholder:text-slate-400"
+              class="liquid-input flex-1 px-2 py-1 rounded-xl text-sm text-primary-strong placeholder:text-tertiary"
               @keyup.enter="addCustomTag"
             />
-            <button @click="addCustomTag" class="px-3 py-1 rounded-xl border border-white/60 bg-white/78 text-slate-700 text-sm shadow-[0_8px_20px_rgba(148,163,184,0.08)]">
+            <button @click="addCustomTag" class="px-3 py-1 rounded-xl text-primary text-sm shadow-[0_8px_20px_rgba(148,163,184,0.08)]">
               添加
             </button>
           </div>
         </div>
         
-        <div class="mb-4 rounded-2xl border border-white/55 bg-white/34 p-3 shadow-[0_1px_0_rgba(255,255,255,0.72)_inset,0_12px_30px_rgba(51,65,85,0.07)]">
-          <label class="text-sm font-medium text-slate-700 block mb-1">屏蔽关键词</label>
+        <div class="liquid-panel mb-4 rounded-2xl p-3">
+          <label class="text-sm font-medium text-primary block mb-1">屏蔽关键词</label>
           <textarea 
             v-model="config.blocked_keywords" 
             placeholder="不想看到的内容"
-            class="glass-input w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm text-slate-800 placeholder:text-slate-400"
+            class="liquid-input w-full px-3 py-2 rounded-2xl text-sm text-primary-strong placeholder:text-tertiary"
             rows="2"
           ></textarea>
         </div>
         
-        <div class="mb-4 rounded-2xl border border-white/55 bg-white/34 p-3 shadow-[0_1px_0_rgba(255,255,255,0.72)_inset,0_12px_30px_rgba(51,65,85,0.07)]">
-          <label class="text-sm font-medium text-slate-700 block mb-2">监控平台</label>
+        <div class="liquid-panel mb-4 rounded-2xl p-3">
+          <label class="text-sm font-medium text-primary block mb-2">监控平台</label>
           <div class="flex flex-wrap gap-2">
-            <label v-for="p in platformOptions" :key="p.id" class="flex items-center gap-2 border border-white/60 bg-slate-50/65 px-3 py-1.5 rounded-full text-sm text-slate-700 shadow-[0_8px_20px_rgba(148,163,184,0.06)]">
-              <input type="checkbox" :value="p.id" v-model="config.platforms" class="glass-checkbox">
+            <label v-for="p in platformOptions" :key="p.id" class="liquid-chip flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-primary">
+              <input type="checkbox" :value="p.id" v-model="config.platforms" class="liquid-checkbox">
               {{ p.name }}
             </label>
           </div>
         </div>
         
         <!-- 推送设置 -->
-        <div class="mb-4 rounded-2xl border border-white/55 bg-white/34 p-3 shadow-[0_1px_0_rgba(255,255,255,0.72)_inset,0_12px_30px_rgba(51,65,85,0.07)]">
-          <label class="text-sm font-medium text-slate-700 block mb-2">📣 推送设置</label>
+        <div class="liquid-panel mb-4 rounded-2xl p-3">
+          <label class="text-sm font-medium text-primary block mb-2">📣 推送设置</label>
           
           <div class="mb-3">
             <label class="flex items-center gap-2">
-              <input type="checkbox" v-model="config.push_enabled" class="glass-checkbox">
-              <span class="text-sm text-slate-700">启用推送</span>
+              <input type="checkbox" v-model="config.push_enabled" class="liquid-checkbox">
+              <span class="text-sm text-primary">启用推送</span>
             </label>
           </div>
           
           <div v-if="config.push_enabled" class="space-y-3">
             <div>
-              <label class="text-xs text-slate-500 block mb-1">推送渠道</label>
-              <select v-model="config.push_channel" class="glass-select w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm text-slate-800">
+              <label class="text-secondary text-xs block mb-1">推送渠道</label>
+              <select v-model="config.push_channel" class="liquid-select w-full px-3 py-2 rounded-2xl text-sm text-primary-strong">
                 <option value="feishu">飞书</option>
                 <option value="dingtalk">钉钉</option>
                 <option value="bark">Bark</option>
@@ -1322,24 +1322,24 @@ onUnmounted(() => {
             </div>
             
             <div>
-              <label class="text-xs text-slate-500 block mb-1">Webhook地址</label>
+              <label class="text-secondary text-xs block mb-1">Webhook地址</label>
               <input 
                 v-model="config.push_webhook" 
                 type="text" 
                 placeholder="Webhook地址"
-                class="glass-input w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm text-slate-800 placeholder:text-slate-400"
+                class="liquid-input w-full px-3 py-2 rounded-2xl text-sm text-primary-strong placeholder:text-tertiary"
               >
-              <div class="text-xs text-slate-500 mt-1">
+              <div class="text-secondary text-xs mt-1">
                 如何获取？请查看飞书/钉钉/Bark 的 Webhook 配置文档
               </div>
             </div>
 
             <div>
-              <label class="text-xs text-slate-500 block mb-1">推送规则</label>
+              <label class="text-secondary text-xs block mb-1">推送规则</label>
               <select
                 :value="cronPresets.find(p => p.value === config.push_cron)?.value || ''"
                 @change="selectCronPreset"
-                class="glass-select w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm mb-2 text-slate-800"
+                class="liquid-select w-full px-3 py-2 rounded-2xl text-sm mb-2 text-primary-strong"
               >
                 <option value="">自定义</option>
                 <option v-for="p in cronPresets" :key="p.value" :value="p.value">{{ p.label }}</option>
@@ -1348,19 +1348,19 @@ onUnmounted(() => {
                 v-model="config.push_cron"
                 type="text"
                 placeholder="分 时 日 月 周  (如 0 */4 * * *)"
-                class="glass-input w-full px-3 py-2 border border-white/60 bg-white/80 rounded-2xl text-sm font-mono text-slate-800 placeholder:text-slate-400"
+                class="liquid-input w-full px-3 py-2 rounded-2xl text-sm font-mono text-primary-strong placeholder:text-tertiary"
               >
-              <div class="text-xs text-slate-500 mt-1">cron 表达式：自动按设定规则推送</div>
+              <div class="text-secondary text-xs mt-1">cron 表达式：自动按设定规则推送</div>
             </div>
 
-            <div v-if="lastPushTime" class="text-xs text-slate-500 text-center">
+            <div v-if="lastPushTime" class="text-secondary text-xs text-center">
               上次推送：{{ new Date(lastPushTime).toLocaleString('zh-CN') }}
             </div>
             
             <button
               @click="pushNews" 
               :disabled="pushLoading"
-              class="w-full py-2 rounded-2xl border border-emerald-200 bg-emerald-50/85 text-emerald-700 text-sm backdrop-blur-xl shadow-[0_8px_20px_rgba(16,185,129,0.08)]"
+              class="liquid-success w-full py-2 rounded-2xl text-sm"
             >
               {{ pushLoading ? '推送中...' : '📤 立即推送测试' }}
             </button>
@@ -1371,10 +1371,10 @@ onUnmounted(() => {
           </div>
         </div>
         
-        <button @click="saveConfig" class="w-full py-3 rounded-2xl border border-white/65 bg-[linear-gradient(135deg,_rgba(37,99,235,0.94),_rgba(14,165,233,0.84))] text-white mb-2 font-medium shadow-[0_1px_0_rgba(255,255,255,0.32)_inset,0_16px_36px_rgba(37,99,235,0.24)]">
+        <button @click="saveConfig" class="liquid-chip-active w-full py-3 rounded-2xl mb-2 font-medium">
           保存
         </button>
-        <button @click="showAccount = false" class="w-full py-2 text-slate-400 text-sm">
+        <button @click="showAccount = false" class="w-full py-2 text-tertiary text-sm">
           取消
         </button>
         </div>
@@ -1387,8 +1387,8 @@ onUnmounted(() => {
         <div
           v-for="toast in toasts"
           :key="toast.id"
-          class="pointer-events-auto max-w-sm rounded-2xl border px-4 py-2.5 text-sm shadow-lg backdrop-blur-xl"
-          :class="toast.type === 'success' ? 'border-emerald-200 bg-emerald-50/95 text-emerald-700' : toast.type === 'error' ? 'border-red-200 bg-red-50/95 text-red-700' : 'border-slate-200 bg-white/95 text-slate-700'"
+          class="liquid-surface pointer-events-auto max-w-sm rounded-2xl px-4 py-2.5 text-sm"
+          :class="toast.type === 'success' ? 'liquid-success' : toast.type === 'error' ? 'liquid-error' : 'liquid-badge text-primary'"
           @click="removeToast(toast.id)"
         >
           {{ toast.message }}
@@ -1397,238 +1397,3 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-:global(body) {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background:
-    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 55%),
-    radial-gradient(circle at 88% 12%, rgba(219, 234, 254, 0.92) 0%, rgba(219, 234, 254, 0.05) 24%, transparent 48%),
-    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
-  color: #0f172a;
-  min-height: 100vh;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.55) 0, transparent 22%),
-    radial-gradient(circle at 80% 28%, rgba(191, 219, 254, 0.35) 0, transparent 20%),
-    radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.4) 0, transparent 24%);
-  filter: blur(14px);
-  opacity: 0.9;
-}
-
-#app {
-  position: relative;
-  z-index: 1;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 16px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 18px 56px rgba(148, 163, 184, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.84), 0 1px 0 rgba(255, 255, 255, 0.45);
-  position: relative;
-}
-
-.header::after,
-.account-section::after,
-.login-modal::after,
-.news-item::after,
-.tag-item::after,
-.tag-card::after,
-.config-panel::after,
-.push-panel::after,
-.modal-content::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), transparent 38%, rgba(255, 255, 255, 0.08));
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #0f172a;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
-}
-
-.user-info {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.user-info button,
-.refresh-btn,
-.logout-btn,
-.login-btn,
-.action-btn,
-.save-btn,
-.push-btn {
-  border: 1px solid rgba(191, 219, 254, 0.72);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.68));
-  color: #0f172a;
-  box-shadow: 0 10px 24px rgba(148, 163, 184, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.92);
-}
-
-.user-info button:hover,
-.refresh-btn:hover,
-.logout-btn:hover,
-.login-btn:hover,
-.action-btn:hover,
-.save-btn:hover,
-.push-btn:hover {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.82));
-  border-color: rgba(147, 197, 253, 0.92);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(148, 163, 184, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.96);
-}
-
-.glass-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.55) rgba(255, 255, 255, 0.28);
-}
-
-.glass-scroll::-webkit-scrollbar {
-  width: 8px;
-}
-
-.glass-scroll::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
-}
-
-.glass-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(148, 163, 184, 0.42), rgba(203, 213, 225, 0.62));
-  border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.62);
-}
-
-.glass-scroll::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(100, 116, 139, 0.56), rgba(148, 163, 184, 0.74));
-}
-
-@media (max-width: 640px) {
-  .safe-area-top {
-    padding-top: max(1rem, env(safe-area-inset-top));
-  }
-}
-
-@media (orientation: landscape) and (max-height: 520px) {
-  .safe-area-top {
-    padding-top: max(0.5rem, env(safe-area-inset-top));
-  }
-
-  .glass-scroll {
-    max-height: calc(100vh - max(1rem, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
-  }
-
-  header.safe-area-top {
-    padding-top: max(0.5rem, env(safe-area-inset-top));
-    padding-bottom: 0.5rem;
-  }
-}
-
-.account-section,
-.login-modal,
-.news-item,
-.empty-state,
-.tag-item,
-.tag-card,
-.config-panel,
-.push-panel,
-.modal-content {
-  border: 1px solid rgba(255, 255, 255, 0.84);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.62));
-  backdrop-filter: blur(26px) saturate(185%);
-  -webkit-backdrop-filter: blur(26px) saturate(185%);
-  box-shadow: 0 20px 52px rgba(148, 163, 184, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(255, 255, 255, 0.32);
-}
-
-.news-item:hover,
-.tag-item:hover,
-.tag-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 24px 56px rgba(148, 163, 184, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.94), inset 0 -1px 0 rgba(255, 255, 255, 0.34);
-}
-
-.news-meta,
-.news-source,
-.news-time,
-.last-refresh,
-.login-info,
-.tag-meta,
-.empty-state {
-  color: #475569;
-}
-
-.tag,
-.platform-tag,
-.keyword-badge {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.7));
-  color: #334155;
-  border: 1px solid rgba(191, 219, 254, 0.78);
-  box-shadow: 0 8px 20px rgba(148, 163, 184, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-.tag.active {
-  background: linear-gradient(135deg, rgba(239, 246, 255, 0.98), rgba(224, 242, 254, 0.98));
-  color: #1d4ed8;
-  border-color: rgba(96, 165, 250, 0.92);
-  box-shadow: 0 10px 24px rgba(96, 165, 250, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.92);
-}
-
-.modal-content input,
-.modal-content textarea,
-.modal-content select,
-.config-panel input,
-.config-panel textarea,
-.config-panel select {
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(191, 219, 254, 0.78);
-  color: #0f172a;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
-}
-
-.modal-content input:focus,
-.modal-content textarea:focus,
-.modal-content select:focus,
-.config-panel input:focus,
-.config-panel textarea:focus,
-.config-panel select:focus {
-  border-color: rgba(96, 165, 250, 0.98);
-  box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.94);
-}
-
-.toast-enter-active,
-.toast-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-</style>
