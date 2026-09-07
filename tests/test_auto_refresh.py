@@ -172,7 +172,7 @@ def test_auto_refresh_old_success_is_stale():
     db.cache_records.append(type("CacheRecord", (), {
         "platform": "weibo",
         "last_fetch": datetime.now(timezone.utc) - timedelta(seconds=api.AUTO_REFRESH_COOLDOWN_SECONDS + 1),
-        "last_success_at": datetime.now(timezone.utc) - timedelta(seconds=api.STALE_AFTER_SECONDS + 1),
+        "last_success_at": datetime.now(timezone.utc) - timedelta(seconds=api.SOURCE_TTL_SECONDS + 1),
     })())
 
     with patch("threading.Thread") as thread:
@@ -189,7 +189,7 @@ def test_auto_refresh_failed_source_skips_retry_during_cooldown():
     db.cache_records.append(type("CacheRecord", (), {
         "platform": "weibo",
         "last_fetch": datetime.now(timezone.utc),
-        "last_success_at": datetime.now(timezone.utc) - timedelta(seconds=api.STALE_AFTER_SECONDS + 1),
+        "last_success_at": datetime.now(timezone.utc) - timedelta(seconds=api.SOURCE_TTL_SECONDS + 1),
     })())
 
     with patch("threading.Thread") as thread:
@@ -226,6 +226,8 @@ def test_get_refresh_state_uses_cache_record_fallback():
         "last_error_at": None,
         "error": "",
         "has_cache": True,
+        "interval_seconds": 120,
+        "next_refresh_at": "2026-01-01T00:02:00Z",
     }
 
 

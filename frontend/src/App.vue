@@ -391,7 +391,8 @@ function platformStatusText(platform) {
     return fetchTime ? `暂无数据 ${fetchTime}` : '暂无数据'
   }
   if (src.status === 'missing') return '暂无数据'
-  return successTime ? `更新于 ${successTime}` : ''
+  const intervalText = src.interval_seconds ? ` · 每 ${Math.round(src.interval_seconds / 60)} 分钟更新` : ''
+  return successTime ? `更新于 ${successTime}${intervalText}` : ''
 }
 
 async function loadNews(silent = false) {

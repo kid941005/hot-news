@@ -1341,6 +1341,45 @@ SPIDERS = {
     "tieba": TiebaSpider,
 }
 
+# 各源缓存复用间隔（秒）：interval 内即使请求也不抓取，直接返回缓存。
+# 未列出的源使用 settings.stale_after_seconds（默认 10 分钟）。
+# 分级对标 newsnow：Realtime=2min、Fast=5min、Default=10min、Common=30min。
+SOURCE_INTERVALS = {
+    # 实时热搜（2 分钟）
+    "weibo": 120,
+    "baidu": 120,
+    "bilibili": 120,
+    "bilibili-hot-video": 120,
+    "bilibili-ranking": 120,
+    "douyin": 120,
+    "zhihu": 120,
+    "toutiao": 120,
+    "xueqiu-hotstock": 120,
+    "kuaishou": 120,
+    # 快速快讯（5 分钟）
+    "cls": 300,
+    "jin10": 300,
+    "wallstreetcn": 300,
+    "aihot": 300,
+    # 慢速更新（30 分钟）
+    "zaobao": 1800,
+    "thepaper": 1800,
+    "cankaoxiaoxi": 1800,
+    "pcbeta": 1800,
+    "chongbuluo": 1800,
+    "tencent": 1800,
+    "solidot": 1800,
+    "sspai": 1800,
+    "ithome": 1800,
+    "ifeng": 1800,
+    "github": 1800,
+    "producthunt": 1800,
+    "36kr": 1800,
+    "36kr-renqi": 1800,
+    "hupu": 1800,
+    "tieba": 1800,
+}
+
 
 SPIDER_CONCURRENCY = settings.spider_concurrency
 SPIDER_FETCH_TIMEOUT_SECONDS = settings.spider_fetch_timeout_seconds

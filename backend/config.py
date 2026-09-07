@@ -22,7 +22,10 @@ class Settings(BaseSettings):
     refresh_interval_minutes: int = Field(15, ge=1, le=1440)
     refresh_cooldown_seconds: int = Field(300, ge=0, le=86400)
     auto_refresh_cooldown_seconds: int = Field(30, ge=5, le=3600)
+    # 各源默认缓存复用间隔：interval 内即使请求也不抓取（对标 newsnow Interval 10min）
     stale_after_seconds: int = Field(600, ge=30, le=86400)
+    # 全局强制刷新阈值：超过 TTL 必须重新抓取（对标 newsnow TTL 30min）
+    source_ttl_seconds: int = Field(1800, ge=60, le=86400)
 
     # ---- 爬虫 ----
     spider_concurrency: int = Field(5, ge=1, le=20)

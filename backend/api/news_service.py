@@ -6,7 +6,7 @@ import asyncio
 import json
 import logging
 import threading
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
@@ -28,6 +28,7 @@ news_router = APIRouter()
 REFRESH_COOLDOWN_SECONDS = settings.refresh_cooldown_seconds
 AUTO_REFRESH_COOLDOWN_SECONDS = settings.auto_refresh_cooldown_seconds
 STALE_AFTER_SECONDS = settings.stale_after_seconds
+SOURCE_TTL_SECONDS = settings.source_ttl_seconds
 
 LAST_REFRESH_TIME = None
 REFRESH_LOCK = asyncio.Lock()
@@ -189,11 +190,34 @@ def _normalize_platforms(platforms=None):
     return [reverse_map.get(platform, platform) for platform in platforms if platform]
 
 
-def _is_cache_stale(record) -> bool:
-    """判断平台数据是否过期：
+def _source_interval_seconds(platform: str) -> int:
+    """返回平台缓存复用间隔（秒）：interval 内即使请求也不抓取。"""
+    return spiders.SOURCE_INTERVALS.get(platform, STALE_AFTER_SECONDS)
+
+
+def _is_cache_stale(record, platform: str = None) -> bool:
+    """判断平台数据是否可能滞后（超过该源 interval）：
     - 无缓存记录：视为过期（尚未抓到数据）
     - 从未成功过：距上次尝试超过冷却时间才视为过期，避免失败源被反复重试
-    - 最近成功过：超过 STALE_AFTER_SECONDS 视为过期
+    - 最近成功过：超过该源 interval_seconds 视为过期
+    """
+    if record is None:
+        return True
+    now = datetime.now(timezone.utc)
+    last_success = as_utc(getattr(record, "last_success_at", None))
+    last_fetch = as_utc(getattr(record, "last_fetch", None))
+    interval = _source_interval_seconds(platform)
+    if last_success is None:
+        if last_fetch is None:
+            return True
+        return (now - last_fetch).total_seconds() >= AUTO_REFRESH_COOLDOWN_SECONDS
+    return (now - last_success).total_seconds() >= interval
+
+
+def _is_cache_expired(record, platform: str = None) -> bool:
+    """判断平台数据是否达到强制刷新阈值（超过全局 TTL）：
+    - 从未成功过：距上次尝试超过冷却时间即视为需要刷新
+    - 最近成功过：超过 SOURCE_TTL_SECONDS 视为需要刷新
     """
     if record is None:
         return True
@@ -204,7 +228,7 @@ def _is_cache_stale(record) -> bool:
         if last_fetch is None:
             return True
         return (now - last_fetch).total_seconds() >= AUTO_REFRESH_COOLDOWN_SECONDS
-    return (now - last_success).total_seconds() >= STALE_AFTER_SECONDS
+    return (now - last_success).total_seconds() >= SOURCE_TTL_SECONDS
 
 
 def _get_stale_platforms(db: Session, platforms=None, records=None, for_refresh: bool = False):
@@ -223,7 +247,9 @@ def _get_stale_platforms(db: Session, platforms=None, records=None, for_refresh:
         if record is None:
             stale_platforms.append(platform)
             continue
-        if not _is_cache_stale(record):
+        # for_refresh=True（实际抓取）以全局 TTL 为阈值；否则（状态展示）以源 interval 为阈值
+        check = _is_cache_expired if for_refresh else _is_cache_stale
+        if not check(record, platform):
             continue
         if for_refresh:
             last_fetch = as_utc(getattr(record, "last_fetch", None))
@@ -260,6 +286,11 @@ def _get_refresh_state(db: Session, platforms=None) -> dict:
         if not record:
             sources[platform] = {"status": "missing"}
             continue
+        interval = _source_interval_seconds(platform)
+        next_refresh = None
+        last_success_dt = as_utc(getattr(record, "last_success_at", None))
+        if last_success_dt is not None:
+            next_refresh = format_time(last_success_dt + timedelta(seconds=interval))
         sources[platform] = {
             "status": getattr(record, "last_status", None) or getattr(record, "status", ""),
             "last_fetch": format_time(getattr(record, "last_fetch", None)),
@@ -267,6 +298,8 @@ def _get_refresh_state(db: Session, platforms=None) -> dict:
             "last_error_at": format_time(getattr(record, "last_error_at", None)),
             "error": getattr(record, "error_msg", ""),
             "has_cache": PLATFORM_MAP.get(platform) in cached_platforms,
+            "interval_seconds": interval,
+            "next_refresh_at": next_refresh,
         }
     return {
         "last_refresh": last_refresh_text,
@@ -367,13 +400,18 @@ def refresh_news_data(db: Session, results: dict = None, platforms=None):
 
 
 def scheduled_refresh():
-    """独立定时刷新新闻数据"""
+    """独立定时任务：仅刷新超过全局 TTL 的过期源（请求驱动为主，定时任务兜底）。"""
     global LAST_REFRESH_TIME
     db = SessionLocal()
     try:
-        saved_count, _ = refresh_news_data(db)
+        stale = _get_stale_platforms(db, for_refresh=True)
+        if not stale:
+            logger.info("🔄 定时刷新：无过期源，跳过")
+            scheduler_service.mark_job_run("refresh_job", True, "无过期源，跳过")
+            return
+        saved_count, _ = refresh_news_data(db, platforms=stale)
         LAST_REFRESH_TIME = datetime.now(timezone.utc)
-        logger.info("🔄 定时刷新完成，共保存 %s 条新闻", saved_count)
+        logger.info("🔄 定时刷新完成，共保存 %s 条新闻（%s）", saved_count, ",".join(stale))
         scheduler_service.mark_job_run("refresh_job", True, f"共保存 {saved_count} 条新闻")
     except Exception:
         logger.exception("❌ 定时刷新失败")
