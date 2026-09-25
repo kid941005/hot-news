@@ -1,0 +1,5460 @@
+{
+  "date": "2026-09-26",
+  "generated_at": "2026-09-25T20:05:10.062762Z",
+  "platforms": {
+    "weibo": [
+      {
+        "platform": "微博热搜",
+        "title": "中美两国元首夫妇参观美国国家档案馆",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%B8%AD%E7%BE%8E%E4%B8%A4%E5%9B%BD%E5%85%83%E9%A6%96%E5%A4%AB%E5%A6%87%E5%8F%82%E8%A7%82%E7%BE%8E%E5%9B%BD%E5%9B%BD%E5%AE%B6%E6%A1%A3%E6%A1%88%E9%A6%86%23&t=31&band_rank=1&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "王楚钦说和孙颖莎配了很多年混双",
+        "url": "https://s.weibo.com/weibo?q=%23%E7%8E%8B%E6%A5%9A%E9%92%A6%E8%AF%B4%E5%92%8C%E5%AD%99%E9%A2%96%E8%8E%8E%E9%85%8D%E4%BA%86%E5%BE%88%E5%A4%9A%E5%B9%B4%E6%B7%B7%E5%8F%8C%23&t=31&band_rank=2&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "从一撇一捺看中美青年双向奔赴",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%BB%8E%E4%B8%80%E6%92%87%E4%B8%80%E6%8D%BA%E7%9C%8B%E4%B8%AD%E7%BE%8E%E9%9D%92%E5%B9%B4%E5%8F%8C%E5%90%91%E5%A5%94%E8%B5%B4%23&t=31&band_rank=3&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "国乒包揽冠亚军庆祝中秋",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%9B%BD%E4%B9%92%E5%8C%85%E6%8F%BD%E5%86%A0%E4%BA%9A%E5%86%9B%E5%BA%86%E7%A5%9D%E4%B8%AD%E7%A7%8B%23&t=31&band_rank=4&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "月饼",
+        "url": "https://s.weibo.com/weibo?q=%E6%9C%88%E9%A5%BC&t=31&band_rank=5&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "戚薇造型 致敬蔡明",
+        "url": "https://s.weibo.com/weibo?q=%E6%88%9A%E8%96%87%E9%80%A0%E5%9E%8B%20%E8%87%B4%E6%95%AC%E8%94%A1%E6%98%8E&t=31&band_rank=6&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "陈妤颉100米夺金",
+        "url": "https://s.weibo.com/weibo?q=%23%E9%99%88%E5%A6%A4%E9%A2%89100%E7%B1%B3%E5%A4%BA%E9%87%91%23&t=31&band_rank=7&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "芭莎之夜",
+        "url": "https://s.weibo.com/weibo?q=%E8%8A%AD%E8%8E%8E%E4%B9%8B%E5%A4%9C&t=31&band_rank=8&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "特朗普演讲中秀中文",
+        "url": "https://s.weibo.com/weibo?q=%23%E7%89%B9%E6%9C%97%E6%99%AE%E6%BC%94%E8%AE%B2%E4%B8%AD%E7%A7%80%E4%B8%AD%E6%96%87%23&t=31&band_rank=9&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "赵星棠下线了",
+        "url": "https://s.weibo.com/weibo?q=%23%E8%B5%B5%E6%98%9F%E6%A3%A0%E4%B8%8B%E7%BA%BF%E4%BA%86%23&t=31&band_rank=10&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "新华社为王楚钦发声",
+        "url": "https://s.weibo.com/weibo?q=%E6%96%B0%E5%8D%8E%E7%A4%BE%E4%B8%BA%E7%8E%8B%E6%A5%9A%E9%92%A6%E5%8F%91%E5%A3%B0&t=31&band_rank=11&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "男子输液后自尽留观室监控曝光",
+        "url": "https://s.weibo.com/weibo?q=%23%E7%94%B7%E5%AD%90%E8%BE%93%E6%B6%B2%E5%90%8E%E8%87%AA%E5%B0%BD%E7%95%99%E8%A7%82%E5%AE%A4%E7%9B%91%E6%8E%A7%E6%9B%9D%E5%85%89%23&t=31&band_rank=12&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "王楚钦不该承受恶劣舆论环境",
+        "url": "https://s.weibo.com/weibo?q=%23%E7%8E%8B%E6%A5%9A%E9%92%A6%E4%B8%8D%E8%AF%A5%E6%89%BF%E5%8F%97%E6%81%B6%E5%8A%A3%E8%88%86%E8%AE%BA%E7%8E%AF%E5%A2%83%23&t=31&band_rank=13&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "井柏然刘雯去看李荣浩演唱会",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%BA%95%E6%9F%8F%E7%84%B6%E5%88%98%E9%9B%AF%E5%8E%BB%E7%9C%8B%E6%9D%8E%E8%8D%A3%E6%B5%A9%E6%BC%94%E5%94%B1%E4%BC%9A%23&t=31&band_rank=14&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "国家出手调控油价了",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%9B%BD%E5%AE%B6%E5%87%BA%E6%89%8B%E8%B0%83%E6%8E%A7%E6%B2%B9%E4%BB%B7%E4%BA%86%23&t=31&band_rank=15&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "多家金店下架金豆",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%A4%9A%E5%AE%B6%E9%87%91%E5%BA%97%E4%B8%8B%E6%9E%B6%E9%87%91%E8%B1%86%23&t=31&band_rank=16&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "杨舒予 宫鲁鸣",
+        "url": "https://s.weibo.com/weibo?q=%E6%9D%A8%E8%88%92%E4%BA%88%20%E5%AE%AB%E9%B2%81%E9%B8%A3&t=31&band_rank=17&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "国乒男团 排兵布阵质疑",
+        "url": "https://s.weibo.com/weibo?q=%E5%9B%BD%E4%B9%92%E7%94%B7%E5%9B%A2%20%E6%8E%92%E5%85%B5%E5%B8%83%E9%98%B5%E8%B4%A8%E7%96%91&t=31&band_rank=18&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "刘国梁看台静坐目睹失冠",
+        "url": "https://s.weibo.com/weibo?q=%E5%88%98%E5%9B%BD%E6%A2%81%E7%9C%8B%E5%8F%B0%E9%9D%99%E5%9D%90%E7%9B%AE%E7%9D%B9%E5%A4%B1%E5%86%A0&t=31&band_rank=19&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "倪妮让宋威龙田曦薇文淇开心点",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%80%AA%E5%A6%AE%E8%AE%A9%E5%AE%8B%E5%A8%81%E9%BE%99%E7%94%B0%E6%9B%A6%E8%96%87%E6%96%87%E6%B7%87%E5%BC%80%E5%BF%83%E7%82%B9%23&t=31&band_rank=20&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "网友710万卖房签合同瞬间泪崩",
+        "url": "https://s.weibo.com/weibo?q=%E7%BD%91%E5%8F%8B710%E4%B8%87%E5%8D%96%E6%88%BF%E7%AD%BE%E5%90%88%E5%90%8C%E7%9E%AC%E9%97%B4%E6%B3%AA%E5%B4%A9&t=31&band_rank=21&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "兰香如故BE",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%85%B0%E9%A6%99%E5%A6%82%E6%95%85BE%23&t=31&band_rank=22&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "小黄豆报警",
+        "url": "https://s.weibo.com/weibo?q=%E5%B0%8F%E9%BB%84%E8%B1%86%E6%8A%A5%E8%AD%A6&t=31&band_rank=23&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "宁波小孩姐陈妤颉成亚洲女子飞人",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%AE%81%E6%B3%A2%E5%B0%8F%E5%AD%A9%E5%A7%90%E9%99%88%E5%A6%A4%E9%A2%89%E6%88%90%E4%BA%9A%E6%B4%B2%E5%A5%B3%E5%AD%90%E9%A3%9E%E4%BA%BA%23&t=31&band_rank=24&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "英国母子游中国后想定居",
+        "url": "https://s.weibo.com/weibo?q=%E8%8B%B1%E5%9B%BD%E6%AF%8D%E5%AD%90%E6%B8%B8%E4%B8%AD%E5%9B%BD%E5%90%8E%E6%83%B3%E5%AE%9A%E5%B1%85&t=31&band_rank=25&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "张继科说国乒根本就不能输",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%BC%A0%E7%BB%A7%E7%A7%91%E8%AF%B4%E5%9B%BD%E4%B9%92%E6%A0%B9%E6%9C%AC%E5%B0%B1%E4%B8%8D%E8%83%BD%E8%BE%93%23&t=31&band_rank=26&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "全身为什么面部皮肤看起来最差",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%85%A8%E8%BA%AB%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9D%A2%E9%83%A8%E7%9A%AE%E8%82%A4%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%9C%80%E5%B7%AE%23&t=31&band_rank=27&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "第一个想到这么拍月亮的人真是天才",
+        "url": "https://s.weibo.com/weibo?q=%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%83%B3%E5%88%B0%E8%BF%99%E4%B9%88%E6%8B%8D%E6%9C%88%E4%BA%AE%E7%9A%84%E4%BA%BA%E7%9C%9F%E6%98%AF%E5%A4%A9%E6%89%8D&t=31&band_rank=28&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "王楚钦孙颖莎 混双半决赛",
+        "url": "https://s.weibo.com/weibo?q=%E7%8E%8B%E6%A5%9A%E9%92%A6%E5%AD%99%E9%A2%96%E8%8E%8E%20%E6%B7%B7%E5%8F%8C%E5%8D%8A%E5%86%B3%E8%B5%9B&t=31&band_rank=29&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "龚俊芭莎King",
+        "url": "https://s.weibo.com/weibo?q=%23%E9%BE%9A%E4%BF%8A%E8%8A%AD%E8%8E%8EKing%23&t=31&band_rank=30&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "中美元首夫妇茶叙高清大图",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%B8%AD%E7%BE%8E%E5%85%83%E9%A6%96%E5%A4%AB%E5%A6%87%E8%8C%B6%E5%8F%99%E9%AB%98%E6%B8%85%E5%A4%A7%E5%9B%BE%23&t=31&band_rank=31&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "梅姨案被拐孩子钟彬被养父拉黑",
+        "url": "https://s.weibo.com/weibo?q=%23%E6%A2%85%E5%A7%A8%E6%A1%88%E8%A2%AB%E6%8B%90%E5%AD%A9%E5%AD%90%E9%92%9F%E5%BD%AC%E8%A2%AB%E5%85%BB%E7%88%B6%E6%8B%89%E9%BB%91%23&t=31&band_rank=32&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "王楚钦说团体失利心情低落",
+        "url": "https://s.weibo.com/weibo?q=%23%E7%8E%8B%E6%A5%9A%E9%92%A6%E8%AF%B4%E5%9B%A2%E4%BD%93%E5%A4%B1%E5%88%A9%E5%BF%83%E6%83%85%E4%BD%8E%E8%90%BD%23&t=31&band_rank=33&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "中美两国元首夫妇茶叙",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%B8%AD%E7%BE%8E%E4%B8%A4%E5%9B%BD%E5%85%83%E9%A6%96%E5%A4%AB%E5%A6%87%E8%8C%B6%E5%8F%99%23&t=31&band_rank=34&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "苏炳添9秒83的含金量还在上升",
+        "url": "https://s.weibo.com/weibo?q=%23%E8%8B%8F%E7%82%B3%E6%B7%BB9%E7%A7%9283%E7%9A%84%E5%90%AB%E9%87%91%E9%87%8F%E8%BF%98%E5%9C%A8%E4%B8%8A%E5%8D%87%23&t=31&band_rank=35&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "中国篮球从4块金牌到全军覆没",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%B8%AD%E5%9B%BD%E7%AF%AE%E7%90%83%E4%BB%8E4%E5%9D%97%E9%87%91%E7%89%8C%E5%88%B0%E5%85%A8%E5%86%9B%E8%A6%86%E6%B2%A1%23&t=31&band_rank=36&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "化妆师这个眼妆教学在海外火了",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%8C%96%E5%A6%86%E5%B8%88%E8%BF%99%E4%B8%AA%E7%9C%BC%E5%A6%86%E6%95%99%E5%AD%A6%E5%9C%A8%E6%B5%B7%E5%A4%96%E7%81%AB%E4%BA%86%23&t=31&band_rank=37&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "中国游泳30金13银11铜收官",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%B8%AD%E5%9B%BD%E6%B8%B8%E6%B3%B330%E9%87%9113%E9%93%B611%E9%93%9C%E6%94%B6%E5%AE%98%23&t=31&band_rank=38&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "F1",
+        "url": "https://s.weibo.com/weibo?q=F1&t=31&band_rank=39&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "台湾最低月薪首破3万新台币",
+        "url": "https://s.weibo.com/weibo?q=%E5%8F%B0%E6%B9%BE%E6%9C%80%E4%BD%8E%E6%9C%88%E8%96%AA%E9%A6%96%E7%A0%B43%E4%B8%87%E6%96%B0%E5%8F%B0%E5%B8%81&t=31&band_rank=40&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "亚运会 吴艳妮",
+        "url": "https://s.weibo.com/weibo?q=%E4%BA%9A%E8%BF%90%E4%BC%9A%20%E5%90%B4%E8%89%B3%E5%A6%AE&t=31&band_rank=41&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "国乒混双提前锁定金牌",
+        "url": "https://s.weibo.com/weibo?q=%23%E5%9B%BD%E4%B9%92%E6%B7%B7%E5%8F%8C%E6%8F%90%E5%89%8D%E9%94%81%E5%AE%9A%E9%87%91%E7%89%8C%23&t=31&band_rank=42&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "亚运会游泳",
+        "url": "https://s.weibo.com/weibo?q=%E4%BA%9A%E8%BF%90%E4%BC%9A%E6%B8%B8%E6%B3%B3&t=31&band_rank=43&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "南枝 淑柔",
+        "url": "https://s.weibo.com/weibo?q=%E5%8D%97%E6%9E%9D%20%E6%B7%91%E6%9F%94&t=31&band_rank=44&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "月亮",
+        "url": "https://s.weibo.com/weibo?q=%E6%9C%88%E4%BA%AE&t=31&band_rank=45&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "魏大勋一半一半好听",
+        "url": "https://s.weibo.com/weibo?q=%23%E9%AD%8F%E5%A4%A7%E5%8B%8B%E4%B8%80%E5%8D%8A%E4%B8%80%E5%8D%8A%E5%A5%BD%E5%90%AC%23&t=31&band_rank=46&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "鞠婧祎 来战",
+        "url": "https://s.weibo.com/weibo?q=%E9%9E%A0%E5%A9%A7%E7%A5%8E%20%E6%9D%A5%E6%88%98&t=31&band_rank=47&Refer=top",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "微博热搜",
+        "title": "中秋文案",
+        "url": "https://s.weibo.com/weibo?q=%23%E4%B8%AD%E7%A7%8B%E6%96%87%E6%A1%88%23&t=31&band_rank=48&Refer=top",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "baidu": [
+      {
+        "platform": "百度",
+        "title": "习近平圆满结束对美国的国事访问",
+        "url": "https://www.baidu.com/s?wd=%E4%B9%A0%E8%BF%91%E5%B9%B3%E5%9C%86%E6%BB%A1%E7%BB%93%E6%9D%9F%E5%AF%B9%E7%BE%8E%E5%9B%BD%E7%9A%84%E5%9B%BD%E4%BA%8B%E8%AE%BF%E9%97%AE",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "进一步丰富中美关系定位的内涵",
+        "url": "https://www.baidu.com/s?wd=%E8%BF%9B%E4%B8%80%E6%AD%A5%E4%B8%B0%E5%AF%8C%E4%B8%AD%E7%BE%8E%E5%85%B3%E7%B3%BB%E5%AE%9A%E4%BD%8D%E7%9A%84%E5%86%85%E6%B6%B5",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "平陆运河首条外贸航线首艘货船抵越",
+        "url": "https://www.baidu.com/s?wd=%E5%B9%B3%E9%99%86%E8%BF%90%E6%B2%B3%E9%A6%96%E6%9D%A1%E5%A4%96%E8%B4%B8%E8%88%AA%E7%BA%BF%E9%A6%96%E8%89%98%E8%B4%A7%E8%88%B9%E6%8A%B5%E8%B6%8A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "中美元首夫妇参观美国国家档案馆",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%AD%E7%BE%8E%E5%85%83%E9%A6%96%E5%A4%AB%E5%A6%87%E5%8F%82%E8%A7%82%E7%BE%8E%E5%9B%BD%E5%9B%BD%E5%AE%B6%E6%A1%A3%E6%A1%88%E9%A6%86",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "17岁陈妤颉 百米飞人大战金牌",
+        "url": "https://www.baidu.com/s?wd=17%E5%B2%81%E9%99%88%E5%A6%A4%E9%A2%89+%E7%99%BE%E7%B1%B3%E9%A3%9E%E4%BA%BA%E5%A4%A7%E6%88%98%E9%87%91%E7%89%8C",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "泰国选手打破苏炳添亚运会纪录",
+        "url": "https://www.baidu.com/s?wd=%E6%B3%B0%E5%9B%BD%E9%80%89%E6%89%8B%E6%89%93%E7%A0%B4%E8%8B%8F%E7%82%B3%E6%B7%BB%E4%BA%9A%E8%BF%90%E4%BC%9A%E7%BA%AA%E5%BD%95",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "一代人有一代人的月饼",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%80%E4%BB%A3%E4%BA%BA%E6%9C%89%E4%B8%80%E4%BB%A3%E4%BA%BA%E7%9A%84%E6%9C%88%E9%A5%BC",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "男乒新老交替阵痛期",
+        "url": "https://www.baidu.com/s?wd=%E7%94%B7%E4%B9%92%E6%96%B0%E8%80%81%E4%BA%A4%E6%9B%BF%E9%98%B5%E7%97%9B%E6%9C%9F",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "低糖月饼、文创月饼走俏",
+        "url": "https://www.baidu.com/s?wd=%E4%BD%8E%E7%B3%96%E6%9C%88%E9%A5%BC%E3%80%81%E6%96%87%E5%88%9B%E6%9C%88%E9%A5%BC%E8%B5%B0%E4%BF%8F",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "中秋都在刷《武林外传》第40集",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%AD%E7%A7%8B%E9%83%BD%E5%9C%A8%E5%88%B7%E3%80%8A%E6%AD%A6%E6%9E%97%E5%A4%96%E4%BC%A0%E3%80%8B%E7%AC%AC40%E9%9B%86",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "月饼和螃蟹一起吃会中毒？假的",
+        "url": "https://www.baidu.com/s?wd=%E6%9C%88%E9%A5%BC%E5%92%8C%E8%9E%83%E8%9F%B9%E4%B8%80%E8%B5%B7%E5%90%83%E4%BC%9A%E4%B8%AD%E6%AF%92%EF%BC%9F%E5%81%87%E7%9A%84",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "毛晓彤中秋晚会造型好美",
+        "url": "https://www.baidu.com/s?wd=%E6%AF%9B%E6%99%93%E5%BD%A4%E4%B8%AD%E7%A7%8B%E6%99%9A%E4%BC%9A%E9%80%A0%E5%9E%8B%E5%A5%BD%E7%BE%8E",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "刚死不久的螃蟹还能吃吗",
+        "url": "https://www.baidu.com/s?wd=%E5%88%9A%E6%AD%BB%E4%B8%8D%E4%B9%85%E7%9A%84%E8%9E%83%E8%9F%B9%E8%BF%98%E8%83%BD%E5%90%83%E5%90%97",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "我怕咬缺了它 爸爸找不到回家的路",
+        "url": "https://www.baidu.com/s?wd=%E6%88%91%E6%80%95%E5%92%AC%E7%BC%BA%E4%BA%86%E5%AE%83+%E7%88%B8%E7%88%B8%E6%89%BE%E4%B8%8D%E5%88%B0%E5%9B%9E%E5%AE%B6%E7%9A%84%E8%B7%AF",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "特朗普：这次访问富有成效",
+        "url": "https://www.baidu.com/s?wd=%E7%89%B9%E6%9C%97%E6%99%AE%EF%BC%9A%E8%BF%99%E6%AC%A1%E8%AE%BF%E9%97%AE%E5%AF%8C%E6%9C%89%E6%88%90%E6%95%88",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "小孩姐能飞",
+        "url": "https://www.baidu.com/s?wd=%E5%B0%8F%E5%AD%A9%E5%A7%90%E8%83%BD%E9%A3%9E",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "央视boys秋晚合唱燃爆了",
+        "url": "https://www.baidu.com/s?wd=%E5%A4%AE%E8%A7%86boys%E7%A7%8B%E6%99%9A%E5%90%88%E5%94%B1%E7%87%83%E7%88%86%E4%BA%86",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "中国女篮不敌韩国无缘决赛",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E5%A5%B3%E7%AF%AE%E4%B8%8D%E6%95%8C%E9%9F%A9%E5%9B%BD%E6%97%A0%E7%BC%98%E5%86%B3%E8%B5%9B",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "“莎头”组合顾不上吃月饼",
+        "url": "https://www.baidu.com/s?wd=%E2%80%9C%E8%8E%8E%E5%A4%B4%E2%80%9D%E7%BB%84%E5%90%88%E9%A1%BE%E4%B8%8D%E4%B8%8A%E5%90%83%E6%9C%88%E9%A5%BC",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "扎克伯格跃升为全球第四大富豪",
+        "url": "https://www.baidu.com/s?wd=%E6%89%8E%E5%85%8B%E4%BC%AF%E6%A0%BC%E8%B7%83%E5%8D%87%E4%B8%BA%E5%85%A8%E7%90%83%E7%AC%AC%E5%9B%9B%E5%A4%A7%E5%AF%8C%E8%B1%AA",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "女演员王朱悦紧急道歉",
+        "url": "https://www.baidu.com/s?wd=%E5%A5%B3%E6%BC%94%E5%91%98%E7%8E%8B%E6%9C%B1%E6%82%A6%E7%B4%A7%E6%80%A5%E9%81%93%E6%AD%89",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "万岁山中秋节2米超大五仁月饼",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%87%E5%B2%81%E5%B1%B1%E4%B8%AD%E7%A7%8B%E8%8A%822%E7%B1%B3%E8%B6%85%E5%A4%A7%E4%BA%94%E4%BB%81%E6%9C%88%E9%A5%BC",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "陈妤颉跑出11秒06",
+        "url": "https://www.baidu.com/s?wd=%E9%99%88%E5%A6%A4%E9%A2%89%E8%B7%91%E5%87%BA11%E7%A7%9206",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "前TVB花旦唐宁被经纪公司起诉",
+        "url": "https://www.baidu.com/s?wd=%E5%89%8DTVB%E8%8A%B1%E6%97%A6%E5%94%90%E5%AE%81%E8%A2%AB%E7%BB%8F%E7%BA%AA%E5%85%AC%E5%8F%B8%E8%B5%B7%E8%AF%89",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "粤港澳大湾区中秋晚会",
+        "url": "https://www.baidu.com/s?wd=%E7%B2%A4%E6%B8%AF%E6%BE%B3%E5%A4%A7%E6%B9%BE%E5%8C%BA%E4%B8%AD%E7%A7%8B%E6%99%9A%E4%BC%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "湖南卫视中秋晚会猴比艺人镜头多",
+        "url": "https://www.baidu.com/s?wd=%E6%B9%96%E5%8D%97%E5%8D%AB%E8%A7%86%E4%B8%AD%E7%A7%8B%E6%99%9A%E4%BC%9A%E7%8C%B4%E6%AF%94%E8%89%BA%E4%BA%BA%E9%95%9C%E5%A4%B4%E5%A4%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "基辅再次发生剧烈爆炸",
+        "url": "https://www.baidu.com/s?wd=%E5%9F%BA%E8%BE%85%E5%86%8D%E6%AC%A1%E5%8F%91%E7%94%9F%E5%89%A7%E7%83%88%E7%88%86%E7%82%B8",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "“中国天眼”十岁了",
+        "url": "https://www.baidu.com/s?wd=%E2%80%9C%E4%B8%AD%E5%9B%BD%E5%A4%A9%E7%9C%BC%E2%80%9D%E5%8D%81%E5%B2%81%E4%BA%86",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "张远的提词器全是拼音",
+        "url": "https://www.baidu.com/s?wd=%E5%BC%A0%E8%BF%9C%E7%9A%84%E6%8F%90%E8%AF%8D%E5%99%A8%E5%85%A8%E6%98%AF%E6%8B%BC%E9%9F%B3",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "四条高铁将开通",
+        "url": "https://www.baidu.com/s?wd=%E5%9B%9B%E6%9D%A1%E9%AB%98%E9%93%81%E5%B0%86%E5%BC%80%E9%80%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "湖南卫视中秋晚会",
+        "url": "https://www.baidu.com/s?wd=%E6%B9%96%E5%8D%97%E5%8D%AB%E8%A7%86%E4%B8%AD%E7%A7%8B%E6%99%9A%E4%BC%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "周深鸟巢演唱会花篮阵容",
+        "url": "https://www.baidu.com/s?wd=%E5%91%A8%E6%B7%B1%E9%B8%9F%E5%B7%A2%E6%BC%94%E5%94%B1%E4%BC%9A%E8%8A%B1%E7%AF%AE%E9%98%B5%E5%AE%B9",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "孙楠谭维维一开口鸡皮疙瘩起来了",
+        "url": "https://www.baidu.com/s?wd=%E5%AD%99%E6%A5%A0%E8%B0%AD%E7%BB%B4%E7%BB%B4%E4%B8%80%E5%BC%80%E5%8F%A3%E9%B8%A1%E7%9A%AE%E7%96%99%E7%98%A9%E8%B5%B7%E6%9D%A5%E4%BA%86",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "中国女篮三分球13投0中",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E5%A5%B3%E7%AF%AE%E4%B8%89%E5%88%86%E7%90%8313%E6%8A%950%E4%B8%AD",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "网友称为抢票下5个候补订单 花1万多",
+        "url": "https://www.baidu.com/s?wd=%E7%BD%91%E5%8F%8B%E7%A7%B0%E4%B8%BA%E6%8A%A2%E7%A5%A8%E4%B8%8B5%E4%B8%AA%E5%80%99%E8%A1%A5%E8%AE%A2%E5%8D%95+%E8%8A%B11%E4%B8%87%E5%A4%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "加克波绝平 荷兰1-1德国",
+        "url": "https://www.baidu.com/s?wd=%E5%8A%A0%E5%85%8B%E6%B3%A2%E7%BB%9D%E5%B9%B3+%E8%8D%B7%E5%85%B01-1%E5%BE%B7%E5%9B%BD",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "北京卫视中秋晚会",
+        "url": "https://www.baidu.com/s?wd=%E5%8C%97%E4%BA%AC%E5%8D%AB%E8%A7%86%E4%B8%AD%E7%A7%8B%E6%99%9A%E4%BC%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "Z世代爱上养蛇",
+        "url": "https://www.baidu.com/s?wd=Z%E4%B8%96%E4%BB%A3%E7%88%B1%E4%B8%8A%E5%85%BB%E8%9B%87",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "第一批中秋月亮出片了",
+        "url": "https://www.baidu.com/s?wd=%E7%AC%AC%E4%B8%80%E6%89%B9%E4%B8%AD%E7%A7%8B%E6%9C%88%E4%BA%AE%E5%87%BA%E7%89%87%E4%BA%86",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "国歌响起 张雨霏当场落泪",
+        "url": "https://www.baidu.com/s?wd=%E5%9B%BD%E6%AD%8C%E5%93%8D%E8%B5%B7+%E5%BC%A0%E9%9B%A8%E9%9C%8F%E5%BD%93%E5%9C%BA%E8%90%BD%E6%B3%AA",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "中秋晚会 AI歌曲",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%AD%E7%A7%8B%E6%99%9A%E4%BC%9A+AI%E6%AD%8C%E6%9B%B2",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "天安门广场大花篮亮灯",
+        "url": "https://www.baidu.com/s?wd=%E5%A4%A9%E5%AE%89%E9%97%A8%E5%B9%BF%E5%9C%BA%E5%A4%A7%E8%8A%B1%E7%AF%AE%E4%BA%AE%E7%81%AF",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "新华社评国乒男团无缘亚运九连冠",
+        "url": "https://www.baidu.com/s?wd=%E6%96%B0%E5%8D%8E%E7%A4%BE%E8%AF%84%E5%9B%BD%E4%B9%92%E7%94%B7%E5%9B%A2%E6%97%A0%E7%BC%98%E4%BA%9A%E8%BF%90%E4%B9%9D%E8%BF%9E%E5%86%A0",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "张展硕 亚运第7金",
+        "url": "https://www.baidu.com/s?wd=%E5%BC%A0%E5%B1%95%E7%A1%95+%E4%BA%9A%E8%BF%90%E7%AC%AC7%E9%87%91",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "马宁傅明等入选亚洲杯裁判阵容",
+        "url": "https://www.baidu.com/s?wd=%E9%A9%AC%E5%AE%81%E5%82%85%E6%98%8E%E7%AD%89%E5%85%A5%E9%80%89%E4%BA%9A%E6%B4%B2%E6%9D%AF%E8%A3%81%E5%88%A4%E9%98%B5%E5%AE%B9",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "中国女足1比0击败越南女足 晋级四强",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E5%A5%B3%E8%B6%B31%E6%AF%940%E5%87%BB%E8%B4%A5%E8%B6%8A%E5%8D%97%E5%A5%B3%E8%B6%B3+%E6%99%8B%E7%BA%A7%E5%9B%9B%E5%BC%BA",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "十五的月亮",
+        "url": "https://www.baidu.com/s?wd=%E5%8D%81%E4%BA%94%E7%9A%84%E6%9C%88%E4%BA%AE",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "多地立法明确艾滋感染者须告知配偶",
+        "url": "https://www.baidu.com/s?wd=%E5%A4%9A%E5%9C%B0%E7%AB%8B%E6%B3%95%E6%98%8E%E7%A1%AE%E8%89%BE%E6%BB%8B%E6%84%9F%E6%9F%93%E8%80%85%E9%A1%BB%E5%91%8A%E7%9F%A5%E9%85%8D%E5%81%B6",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "特朗普致辞专门提到一个中文词",
+        "url": "https://www.baidu.com/s?wd=%E7%89%B9%E6%9C%97%E6%99%AE%E8%87%B4%E8%BE%9E%E4%B8%93%E9%97%A8%E6%8F%90%E5%88%B0%E4%B8%80%E4%B8%AA%E4%B8%AD%E6%96%87%E8%AF%8D",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度",
+        "title": "中国篮球各项均无缘亚运决赛",
+        "url": "https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E7%AF%AE%E7%90%83%E5%90%84%E9%A1%B9%E5%9D%87%E6%97%A0%E7%BC%98%E4%BA%9A%E8%BF%90%E5%86%B3%E8%B5%9B",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "bilibili": [
+      {
+        "platform": "B站",
+        "title": "习近平主席夫妇同特朗普总统夫妇茶叙",
+        "url": "https://search.bilibili.com/all?keyword=%E4%B9%A0%E8%BF%91%E5%B9%B3%E4%B8%BB%E5%B8%AD%E5%A4%AB%E5%A6%87%E5%90%8C%E7%89%B9%E6%9C%97%E6%99%AE%E6%80%BB%E7%BB%9F%E5%A4%AB%E5%A6%87%E8%8C%B6%E5%8F%99",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "中美两国元首夫妇参观美国国家档案馆",
+        "url": "https://search.bilibili.com/all?keyword=%E4%B8%AD%E7%BE%8E%E4%B8%A4%E5%9B%BD%E5%85%83%E9%A6%96%E5%A4%AB%E5%A6%87%E5%8F%82%E8%A7%82%E7%BE%8E%E5%9B%BD%E5%9B%BD%E5%AE%B6%E6%A1%A3%E6%A1%88%E9%A6%86",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "陈妤颉亚运会100米夺冠",
+        "url": "https://search.bilibili.com/all?keyword=%E9%99%88%E5%A6%A4%E9%A2%89%E4%BA%9A%E8%BF%90%E4%BC%9A100%E7%B1%B3%E5%A4%BA%E5%86%A0",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "KC战胜XLG VCT冠军赛",
+        "url": "https://search.bilibili.com/all?keyword=KC+XLG",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "网红长蛋挞能火多久",
+        "url": "https://search.bilibili.com/all?keyword=%E7%BD%91%E7%BA%A2%E9%95%BF%E8%9B%8B%E6%8C%9E%E8%83%BD%E7%81%AB%E5%A4%9A%E4%B9%85",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "NRG MADA冠军赛专访",
+        "url": "https://search.bilibili.com/all?keyword=NRG+MADA%E5%86%A0%E5%86%9B%E8%B5%9B%E4%B8%93%E8%AE%BF",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "对谈一饭封神2总冠军邓华东",
+        "url": "https://search.bilibili.com/all?keyword=%E5%AF%B9%E8%B0%88%E4%B8%80%E9%A5%AD%E5%B0%81%E7%A5%9E2%E6%80%BB%E5%86%A0%E5%86%9B%E9%82%93%E5%8D%8E%E4%B8%9C",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "琵琶曲但是纯手绘",
+        "url": "https://search.bilibili.com/all?keyword=%E7%90%B5%E7%90%B6%E6%9B%B2%E4%BD%86%E6%98%AF%E7%BA%AF%E6%89%8B%E7%BB%98",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "飙马野郎片尾曲动画上线",
+        "url": "https://search.bilibili.com/all?keyword=%E9%A3%99%E9%A9%AC%E9%87%8E%E9%83%8E%E7%89%87%E5%B0%BE%E6%9B%B2%E5%8A%A8%E7%94%BB%E4%B8%8A%E7%BA%BF",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "下一个是谁幕后揭秘",
+        "url": "https://search.bilibili.com/all?keyword=%E4%B8%8B%E4%B8%80%E4%B8%AA%E6%98%AF%E8%B0%81%E5%B9%95%E5%90%8E%E6%8F%AD%E7%A7%98",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "亚运会哪些LCK选手能免服兵役",
+        "url": "https://search.bilibili.com/all?keyword=%E4%BA%9A%E8%BF%90%E4%BC%9A%E5%93%AA%E4%BA%9BLCK%E9%80%89%E6%89%8B%E8%83%BD%E5%85%8D%E6%9C%8D%E5%85%B5%E5%BD%B9",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "日本亚运会因何被吐槽",
+        "url": "https://search.bilibili.com/all?keyword=%E6%97%A5%E6%9C%AC%E4%BA%9A%E8%BF%90%E4%BC%9A%E5%9B%A0%E4%BD%95%E8%A2%AB%E5%90%90%E6%A7%BD",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "外国UP主在中国的人狗友谊",
+        "url": "https://search.bilibili.com/all?keyword=%E5%A4%96%E5%9B%BDUP%E4%B8%BB%E5%9C%A8%E4%B8%AD%E5%9B%BD%E7%9A%84%E4%BA%BA%E7%8B%97%E5%8F%8B%E8%B0%8A",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "复联4重映有哪些新内容",
+        "url": "https://search.bilibili.com/all?keyword=%E5%A4%8D%E8%81%944%E9%87%8D%E6%98%A0%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B0%E5%86%85%E5%AE%B9",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "挑战带蜡像回家睡觉",
+        "url": "https://search.bilibili.com/all?keyword=%E6%8C%91%E6%88%98%E5%B8%A6%E8%9C%A1%E5%83%8F%E5%9B%9E%E5%AE%B6%E7%9D%A1%E8%A7%89",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "葡萄牙1-0威尔士",
+        "url": "https://search.bilibili.com/all?keyword=%E8%91%A1%E8%90%84%E7%89%991-0%E5%A8%81%E5%B0%94%E5%A3%AB",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "中国麻辣烫凭什么火到国外",
+        "url": "https://search.bilibili.com/all?keyword=%E4%B8%AD%E5%9B%BD%E9%BA%BB%E8%BE%A3%E7%83%AB%E5%87%AD%E4%BB%80%E4%B9%88%E7%81%AB%E5%88%B0%E5%9B%BD%E5%A4%96",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "当小猫来做月饼",
+        "url": "https://search.bilibili.com/all?keyword=%E5%BD%93%E5%B0%8F%E7%8C%AB%E6%9D%A5%E5%81%9A%E6%9C%88%E9%A5%BC",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "央视财经专访马斯克",
+        "url": "https://search.bilibili.com/all?keyword=%E5%A4%AE%E8%A7%86%E8%B4%A2%E7%BB%8F%E4%B8%93%E8%AE%BF%E9%A9%AC%E6%96%AF%E5%85%8B",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "管泽元邓亚萍聊亚运",
+        "url": "https://search.bilibili.com/all?keyword=%E7%AE%A1%E6%B3%BD%E5%85%83%E9%82%93%E4%BA%9A%E8%90%8D%E8%81%8A%E4%BA%9A%E8%BF%90",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "UP主AI自制封神2",
+        "url": "https://search.bilibili.com/all?keyword=UP%E4%B8%BBAI%E8%87%AA%E5%88%B6%E5%B0%81%E7%A5%9E2",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "papi酱热烈欢迎易立竞",
+        "url": "https://search.bilibili.com/all?keyword=papi%E9%85%B1%E7%83%AD%E7%83%88%E6%AC%A2%E8%BF%8E%E6%98%93%E7%AB%8B%E7%AB%9E",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "吃月饼也有三十六计",
+        "url": "https://search.bilibili.com/all?keyword=%E5%90%83%E6%9C%88%E9%A5%BC%E4%B9%9F%E6%9C%89%E4%B8%89%E5%8D%81%E5%85%AD%E8%AE%A1",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "假如西天取经走直线",
+        "url": "https://search.bilibili.com/all?keyword=%E5%81%87%E5%A6%82%E8%A5%BF%E5%A4%A9%E5%8F%96%E7%BB%8F%E8%B5%B0%E7%9B%B4%E7%BA%BF",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "万字解析复联4重映版新增片段",
+        "url": "https://search.bilibili.com/all?keyword=%E4%B8%87%E5%AD%97%E8%A7%A3%E6%9E%90%E5%A4%8D%E8%81%944%E9%87%8D%E6%98%A0%E7%89%88%E6%96%B0%E5%A2%9E%E7%89%87%E6%AE%B5",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "陈楚生唱了阿嬷插曲",
+        "url": "https://search.bilibili.com/all?keyword=%E9%99%88%E6%A5%9A%E7%94%9F%E5%94%B1%E4%BA%86%E9%98%BF%E5%AC%B7%E6%8F%92%E6%9B%B2",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "原神千星奇域中秋祝歌",
+        "url": "https://search.bilibili.com/all?keyword=%E5%8E%9F%E7%A5%9E%E5%8D%83%E6%98%9F%E5%A5%87%E5%9F%9F%E4%B8%AD%E7%A7%8B%E7%A5%9D%E6%AD%8C",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "UP主雀巢爆改美少女",
+        "url": "https://search.bilibili.com/all?keyword=UP%E4%B8%BB%E9%9B%80%E5%B7%A2%E7%88%86%E6%94%B9%E7%BE%8E%E5%B0%91%E5%A5%B3",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "解读苹果商业逻辑",
+        "url": "https://search.bilibili.com/all?keyword=%E8%A7%A3%E8%AF%BB%E8%8B%B9%E6%9E%9C%E5%95%86%E4%B8%9A%E9%80%BB%E8%BE%91",
+        "hot": "0.0",
+        "time": ""
+      },
+      {
+        "platform": "B站",
+        "title": "琵琶VS曲",
+        "url": "https://search.bilibili.com/all?keyword=%E7%90%B5%E7%90%B6VS%E6%9B%B2",
+        "hot": "0.0",
+        "time": ""
+      }
+    ],
+    "bilibili-hot-video": [
+      {
+        "platform": "B站热门视频",
+        "title": "今天抄家 人民的兔娘",
+        "url": "https://www.bilibili.com/video/BV1y6au6UEJp",
+        "hot": "1375864观看",
+        "time": "12:56"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "弹丸论破，但是真人版",
+        "url": "https://www.bilibili.com/video/BV1mXaM6DErh",
+        "hot": "732286观看",
+        "time": "12:05"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "每百年一次深渊血战，恶魔世界会如何发展？",
+        "url": "https://www.bilibili.com/video/BV1JBaA6oEmA",
+        "hot": "2062321观看",
+        "time": "17:21"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "【纪录片】生命奇观2 02 黄渤海湿地",
+        "url": "https://www.bilibili.com/video/BV1SxhW6hEK3",
+        "hot": "1797248观看",
+        "time": "20:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "《小杨有约30#》：杨迪",
+        "url": "https://www.bilibili.com/video/BV1JFaN6hEL9",
+        "hot": "889918观看",
+        "time": "12:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "【官方中字】尼古喵喵 第12集",
+        "url": "https://www.bilibili.com/video/BV1ucaK6UEHR",
+        "hot": "751326观看",
+        "time": "11:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "【非AI】这可能是全网最全实拍冷兵器合集！",
+        "url": "https://www.bilibili.com/video/BV1a2h46yE8m",
+        "hot": "1889387观看",
+        "time": "10:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "糟糕！我的粮食被勋宗抢走了！【神奇组织54】",
+        "url": "https://www.bilibili.com/video/BV1WhaA6hE7s",
+        "hot": "1334783观看",
+        "time": "11:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "希望你们也可以吃到月饼",
+        "url": "https://www.bilibili.com/video/BV1LCac6yEBy",
+        "hot": "2080395观看",
+        "time": "12:09"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "【剧情】长生契（2026）02【方逸伦 / 谢可寅】",
+        "url": "https://www.bilibili.com/video/BV13Dem6VEhn",
+        "hot": "798372观看",
+        "time": "12:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "最能吃的皮肤转场——大虫子",
+        "url": "https://www.bilibili.com/video/BV1D2aM6REtv",
+        "hot": "464373观看",
+        "time": "06:03"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "为了钓冰川变异蓝鳟，我在北极被800只苍蝇追了两天",
+        "url": "https://www.bilibili.com/video/BV1FbaM6MEFE",
+        "hot": "355319观看",
+        "time": "06:53"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "徒步1357公里，我后悔了？",
+        "url": "https://www.bilibili.com/video/BV1Pwhx6dExc",
+        "hot": "896093观看",
+        "time": "18:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "今年石油危机为何没毁灭世界？埋头苦干讲奉献还适应当代打工人吗？或许都得聊聊这座中国城市【笔行东北①】",
+        "url": "https://www.bilibili.com/video/BV1ySaP6TEMx",
+        "hot": "479130观看",
+        "time": "10:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "什么叫武直下边挂了一头猪猪？它还捞起来了？？【解说全覆盖46期】",
+        "url": "https://www.bilibili.com/video/BV1pJaM65Epa",
+        "hot": "509004观看",
+        "time": "10:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "这是蜜月vlog吗？？？【一雨季#07】",
+        "url": "https://www.bilibili.com/video/BV1KuaK6VEFc",
+        "hot": "594498观看",
+        "time": "11:05"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "我记录下了妹妹的最后7天...【自制伪纪录片电影】",
+        "url": "https://www.bilibili.com/video/BV1Deht6rEpZ",
+        "hot": "3796088观看",
+        "time": "17:30"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "峰哥亡命越南，胡志明一日吃逛vlog",
+        "url": "https://www.bilibili.com/video/BV1Lfau6iEYQ",
+        "hot": "752381观看",
+        "time": "11:08"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "【独家】《罗小黑战记 学前篇》定档10月30日",
+        "url": "https://www.bilibili.com/video/BV1eNaA6EEmi",
+        "hot": "408184观看",
+        "time": "12:00"
+      },
+      {
+        "platform": "B站热门视频",
+        "title": "当顾客说我的饭难以下咽",
+        "url": "https://www.bilibili.com/video/BV1gQhf6hEPH",
+        "hot": "971202观看",
+        "time": "17:10"
+      }
+    ],
+    "bilibili-ranking": [
+      {
+        "platform": "B站排行榜",
+        "title": "游本昌爷爷，一路走好！我们会继续向前",
+        "url": "https://www.bilibili.com/video/BV17Eaw6DEMi",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "《柯洁围棋入门课》",
+        "url": "https://www.bilibili.com/video/BV1YDhJ6ZEL6",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "在机场当志愿者用六门语言帮助老外是什么体验？！",
+        "url": "https://www.bilibili.com/video/BV1F5h86PEUH",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "《崩坏：星穹铁道》即兴巡演PV——「至此，已成艺术」",
+        "url": "https://www.bilibili.com/video/BV1yvhW6sEzi",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "我记录下了妹妹的最后7天...【自制伪纪录片电影】",
+        "url": "https://www.bilibili.com/video/BV1Deht6rEpZ",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "每百年一次深渊血战，恶魔世界会如何发展？",
+        "url": "https://www.bilibili.com/video/BV1JBaA6oEmA",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "超市里已经……没有人类了……",
+        "url": "https://www.bilibili.com/video/BV18fhb65EGs",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "『飙马野郎 JOJO的奇妙冒险』 OP Kroi 「SPIN」",
+        "url": "https://www.bilibili.com/video/BV1e6h46UEfG",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "比电影更夸张？专业保镖到底在做什么？",
+        "url": "https://www.bilibili.com/video/BV1J7hE6aEDQ",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "【非AI】这可能是全网最全实拍冷兵器合集！",
+        "url": "https://www.bilibili.com/video/BV1a2h46yE8m",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "热搜上逆天的“后备箱礼物”事件：多少神人，正在把惊喜变成羞辱",
+        "url": "https://www.bilibili.com/video/BV1bdh46BE2z",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "赴一场星河之约，守一段洲年荣光。三角洲二洲年快乐！",
+        "url": "https://www.bilibili.com/video/BV1Pwhx6dETi",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "还在肝破译点数？究极焚决！直接送1w破译点！挟持哈夫克网站！拿满奖励！",
+        "url": "https://www.bilibili.com/video/BV16XaF6UETJ",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "绷不住就死",
+        "url": "https://www.bilibili.com/video/BV19ee86cEae",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "糟糕！我的粮食被勋宗抢走了！【神奇组织54】",
+        "url": "https://www.bilibili.com/video/BV1WhaA6hE7s",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "欢迎来到我的频道!",
+        "url": "https://www.bilibili.com/video/BV1N9hp6WExy",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "我买下了15万的船票，踏上了前往世界尽头的旅行…..",
+        "url": "https://www.bilibili.com/video/BV19naF66Ezb",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "《未眠野》18分钟实机演示",
+        "url": "https://www.bilibili.com/video/BV1Mohb61Em9",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "“世事起伏多折，历尽方得华章.”【Shadow Of The Sun-降调】【坚韧不拔の小曲】",
+        "url": "https://www.bilibili.com/video/BV1gZhk6pERK",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "狼王传奇系列1-11集合集【AI全民制作人】",
+        "url": "https://www.bilibili.com/video/BV1BreB6tEWT",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "中秋節快樂",
+        "url": "https://www.bilibili.com/video/BV1FThx6pEiY",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "解决不了问题就解决提出问题的人？“怒斥导航乱跳转”博主多个平台账号被封",
+        "url": "https://www.bilibili.com/video/BV1NvhW6xEeS",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "今天这套服装谁要的，这么多服装以来最贵的一套",
+        "url": "https://www.bilibili.com/video/BV1Puh86qE8M",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "复仇者联盟",
+        "url": "https://www.bilibili.com/video/BV1pYhJ63EA7",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "热烈欢迎易立竞！看看高智感的易老师在工作中和工作外的好东西！（期待我的笔上易老师的节目🙏",
+        "url": "https://www.bilibili.com/video/BV1qdhx6UESM",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "有这样的爸爸你就认了吧",
+        "url": "https://www.bilibili.com/video/BV1PEhi6REfA",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "叮咚，您的好友发来语音——真珠的「金嗓子生成器」",
+        "url": "https://www.bilibili.com/video/BV1RHaw6mEDR",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "好久不见啊，佐助",
+        "url": "https://www.bilibili.com/video/BV1B1hJ6wEwe",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "送别“济公”爷爷！",
+        "url": "https://www.bilibili.com/video/BV1oWaw67EM9",
+        "hot": "0观看",
+        "time": ""
+      },
+      {
+        "platform": "B站排行榜",
+        "title": "《小杨有约30#》：杨迪",
+        "url": "https://www.bilibili.com/video/BV1JFaN6hEL9",
+        "hot": "0观看",
+        "time": ""
+      }
+    ],
+    "douyin": [
+      {
+        "platform": "抖音",
+        "title": "中美元首会谈",
+        "url": "https://www.douyin.com/hot/2665423",
+        "hot": "12098623",
+        "time": "00:19"
+      },
+      {
+        "platform": "抖音",
+        "title": "习近平夫妇出席欢迎宴会",
+        "url": "https://www.douyin.com/hot/2665462",
+        "hot": "11997329",
+        "time": "06:36"
+      },
+      {
+        "platform": "抖音",
+        "title": "中美青年“双向奔赴”",
+        "url": "https://www.douyin.com/hot/2667003",
+        "hot": "11401549",
+        "time": "20:30"
+      },
+      {
+        "platform": "抖音",
+        "title": "月满中秋所愿皆圆",
+        "url": "https://www.douyin.com/hot/2666516",
+        "hot": "11214493",
+        "time": "16:06"
+      },
+      {
+        "platform": "抖音",
+        "title": "中秋文案",
+        "url": "https://www.douyin.com/hot/2665776",
+        "hot": "10546519",
+        "time": "10:31"
+      },
+      {
+        "platform": "抖音",
+        "title": "一起来看中秋晚会吧",
+        "url": "https://www.douyin.com/hot/2665897",
+        "hot": "10487635",
+        "time": "11:25"
+      },
+      {
+        "platform": "抖音",
+        "title": "张展硕的抖音bgm是山东王",
+        "url": "https://www.douyin.com/hot/2667214",
+        "hot": "9370283",
+        "time": "22:19"
+      },
+      {
+        "platform": "抖音",
+        "title": "陈妤颉亚运会百米夺冠",
+        "url": "https://www.douyin.com/hot/2667119",
+        "hot": "9340735",
+        "time": "21:26"
+      },
+      {
+        "platform": "抖音",
+        "title": "中秋消费新风向",
+        "url": "https://www.douyin.com/hot/2667006",
+        "hot": "9319160",
+        "time": "20:32"
+      },
+      {
+        "platform": "抖音",
+        "title": "国庆假期小客车上高速免通行费",
+        "url": "https://www.douyin.com/hot/2666521",
+        "hot": "9204774",
+        "time": "16:07"
+      },
+      {
+        "platform": "抖音",
+        "title": "天眼核心阵要来了",
+        "url": "https://www.douyin.com/hot/2665756",
+        "hot": "9198122",
+        "time": "10:24"
+      },
+      {
+        "platform": "抖音",
+        "title": "陈妤颉：妈妈我有出息了",
+        "url": "https://www.douyin.com/hot/2667277",
+        "hot": "9153229",
+        "time": "23:26"
+      },
+      {
+        "platform": "抖音",
+        "title": "假期我将严肃学习闪身步",
+        "url": "https://www.douyin.com/hot/2666196",
+        "hot": "8783848",
+        "time": "14:19"
+      },
+      {
+        "platform": "抖音",
+        "title": "张展硕收获本届亚运第七金",
+        "url": "https://www.douyin.com/hot/2665913",
+        "hot": "8301443",
+        "time": "11:33"
+      },
+      {
+        "platform": "抖音",
+        "title": "周杰伦南京演唱会",
+        "url": "https://www.douyin.com/hot/2665472",
+        "hot": "7921690",
+        "time": "07:04"
+      },
+      {
+        "platform": "抖音",
+        "title": "中秋晒月亮大赛",
+        "url": "https://www.douyin.com/hot/2665207",
+        "hot": "7826847",
+        "time": "20:59"
+      },
+      {
+        "platform": "抖音",
+        "title": "央视中秋晚会",
+        "url": "https://www.douyin.com/hot/2666313",
+        "hot": "7818844",
+        "time": "14:51"
+      },
+      {
+        "platform": "抖音",
+        "title": "孙颖莎王楚钦晋级混双决赛",
+        "url": "https://www.douyin.com/hot/2665683",
+        "hot": "7807299",
+        "time": "09:41"
+      },
+      {
+        "platform": "抖音",
+        "title": "华晨宇南京演唱会",
+        "url": "https://www.douyin.com/hot/2666139",
+        "hot": "7786700",
+        "time": "13:53"
+      },
+      {
+        "platform": "抖音",
+        "title": "今天我对月亮许愿",
+        "url": "https://www.douyin.com/hot/2666449",
+        "hot": "7772354",
+        "time": "15:38"
+      },
+      {
+        "platform": "抖音",
+        "title": "张雪机车再冲冠",
+        "url": "https://www.douyin.com/hot/2666971",
+        "hot": "7762700",
+        "time": "20:14"
+      },
+      {
+        "platform": "抖音",
+        "title": "三角洲烽火明星表演赛",
+        "url": "https://www.douyin.com/hot/2666167",
+        "hot": "7760352",
+        "time": "14:09"
+      },
+      {
+        "platform": "抖音",
+        "title": "明星版闪身步好爱看",
+        "url": "https://www.douyin.com/hot/2666738",
+        "hot": "7750243",
+        "time": "18:01"
+      },
+      {
+        "platform": "抖音",
+        "title": "游本昌遗体告别仪式9月30日举行",
+        "url": "https://www.douyin.com/hot/2666013",
+        "hot": "7745223",
+        "time": "12:48"
+      },
+      {
+        "platform": "抖音",
+        "title": "中秋和马嘉祺吃羊肉烩面",
+        "url": "https://www.douyin.com/hot/2666672",
+        "hot": "7740128",
+        "time": "17:23"
+      },
+      {
+        "platform": "抖音",
+        "title": "所有美好都藏在对月亮的别称里",
+        "url": "https://www.douyin.com/hot/2666148",
+        "hot": "7735021",
+        "time": "13:58"
+      },
+      {
+        "platform": "抖音",
+        "title": "东部战区发布中秋重磅海报",
+        "url": "https://www.douyin.com/hot/2665733",
+        "hot": "7717199",
+        "time": "10:10"
+      },
+      {
+        "platform": "抖音",
+        "title": "陈楚生潮汕方言唱月下煮茶",
+        "url": "https://www.douyin.com/hot/2667171",
+        "hot": "7710573",
+        "time": "21:45"
+      },
+      {
+        "platform": "抖音",
+        "title": "holymoly亚运冠军进行曲",
+        "url": "https://www.douyin.com/hot/2666660",
+        "hot": "7708973",
+        "time": "17:16"
+      },
+      {
+        "platform": "抖音",
+        "title": "中秋请自己吃一只帝王蟹",
+        "url": "https://www.douyin.com/hot/2666059",
+        "hot": "7705363",
+        "time": "13:12"
+      }
+    ],
+    "zhihu": [
+      {
+        "platform": "知乎",
+        "title": "美方称中美「贸易休战」延长至明年 1 月，这对世界局势有何影响？",
+        "url": "https://www.zhihu.com/question/2086393162981979290",
+        "hot": "1614 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "亚运女子 100 米短跑决赛，陈妤颉夺冠，跑出 11.06 秒​​​​刷新亚运会纪录，如何评价本场对决？",
+        "url": "https://www.zhihu.com/question/2086885798066878405",
+        "hot": "617 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "中国游泳队亚运会 30 金收官，创历史最好成绩，为何中国队游泳队这几年有如此强劲的上升势头？",
+        "url": "https://www.zhihu.com/question/2086877886196052068",
+        "hot": "450 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "全国牛肉批发均价涨至一公斤 71 元，创两年来新高，受哪些因素影响？",
+        "url": "https://www.zhihu.com/question/2086609964114634301",
+        "hot": "425 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "韩国奥委会主席柳承敏「如果给本届亚运会打分，那只能是不及格，非常失望，组委会极其无能」，对此你怎么看？",
+        "url": "https://www.zhihu.com/question/2086475888606930529",
+        "hot": "218 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "2 岁女童站「独立洗澡神器」上被父母独留浴室，误触 70℃ 热水致重度烫伤，如何避免此类悲剧？",
+        "url": "https://www.zhihu.com/question/2084210073728041046",
+        "hot": "194 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "怎么评价 DeepSeek Harness 桌面版源码正式上线？",
+        "url": "https://www.zhihu.com/question/2086771082363778021",
+        "hot": "171 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "如何看待各平台所谓「团体赛没有一人两分的义务」「一人一分是本分」「团体赛不能只靠一人」这种说法？",
+        "url": "https://www.zhihu.com/question/2086757964514161040",
+        "hot": "164 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "如何看待 10 后学生走红的 「呆毛」发型，头顶剪一小撮炸起来像海胆？一代人有一代人的发型潮流吗？",
+        "url": "https://www.zhihu.com/question/2083240636430414973",
+        "hot": "157 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "如果没有《繁花》爷叔这个角色，游本昌会不会就慢慢被遗忘了？",
+        "url": "https://www.zhihu.com/question/2086419048779051366",
+        "hot": "144 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "王楚钦 4-2 战胜泰国选手普里查扬，晋级亚运会乒乓男单 16 强，如何评价本场比赛？",
+        "url": "https://www.zhihu.com/question/2086801312062992642",
+        "hot": "140 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "国乒男团 36 年来首次无缘亚运会金牌，客观来看，你认为最大的问题出在哪？",
+        "url": "https://www.zhihu.com/question/2086533829968098988",
+        "hot": "138 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "患者投保 10 年后患结肠癌，泰康人寿以「遗传性疾病」拒赔，合理吗？保险公司能仅凭家族患癌史认定遗传性吗？",
+        "url": "https://www.zhihu.com/question/2086141127287994218",
+        "hot": "136 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "你拍过最美的月亮照片是怎样的？",
+        "url": "https://www.zhihu.com/question/2077862548670628536",
+        "hot": "125 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "为什么清华不把打酱油的院系砍掉，专注于理工科?",
+        "url": "https://www.zhihu.com/question/2028895979387069729",
+        "hot": "114 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "苹果反复强调 iPhone Duo 的标准读音，中国人想读成「iPhone 多」不行吗？",
+        "url": "https://www.zhihu.com/question/2084425616397426894",
+        "hot": "112 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "如何看待王皓回应男团丢金，称要把坏事变好事，给年轻运动员试错空间？",
+        "url": "https://www.zhihu.com/question/2086743751020345201",
+        "hot": "112 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "那些家里一夜破产，且负债千万的家庭，最后都怎么样了?",
+        "url": "https://www.zhihu.com/question/338189995",
+        "hot": "112 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "现在买月饼的是买来自己吃的人多，还是买来送人的多？",
+        "url": "https://www.zhihu.com/question/2081289454325589339",
+        "hot": "111 万热度",
+        "time": ""
+      },
+      {
+        "platform": "知乎",
+        "title": "员工态度好，但悟性差，长期业绩不达标，要不要辞退？",
+        "url": "https://www.zhihu.com/question/2084101400494084295",
+        "hot": "110 万热度",
+        "time": ""
+      }
+    ],
+    "toutiao": [
+      {
+        "platform": "头条",
+        "title": "中美两国元首夫妇茶叙",
+        "url": "https://www.toutiao.com/trending/7689024369510665791/",
+        "hot": "29215963",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "白宫欢迎国宴上喝的酒不简单",
+        "url": "https://www.toutiao.com/trending/7688809346276261915/",
+        "hot": "26435697",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "共同浇灌中美友谊的美丽花朵",
+        "url": "https://www.toutiao.com/trending/7689146312432418852/",
+        "hot": "23920008",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "特朗普赠中方雕像：我亲自参与设计",
+        "url": "https://www.toutiao.com/trending/7689271303358152723/",
+        "hot": "21643718",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "中国45小时连发4枚火箭 印媒直呼看懵",
+        "url": "https://www.toutiao.com/trending/7689095772238217262/",
+        "hot": "19584046",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "17岁陈妤颉女子百米夺冠",
+        "url": "https://www.toutiao.com/trending/7688791634830082074/",
+        "hot": "17720377",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "特朗普听到大熊猫将落户美国笑了",
+        "url": "https://www.toutiao.com/trending/7689262718079028745/",
+        "hot": "16034060",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "三分球13投0中凸显女篮高快结合困境",
+        "url": "https://www.toutiao.com/trending/7689477961749106214/",
+        "hot": "14508218",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "明月映中秋 家国共此声",
+        "url": "https://www.toutiao.com/trending/7689449001585790515/",
+        "hot": "13127578",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "日本选手被张展硕7枚金牌惊出表情包",
+        "url": "https://www.toutiao.com/trending/7688863275731353650/",
+        "hot": "11878324",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "月饼和螃蟹一起吃会中毒？假",
+        "url": "https://www.toutiao.com/trending/7689038155554541119/",
+        "hot": "10747952",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "张雪包机带200人赴意大利观赛",
+        "url": "https://www.toutiao.com/trending/7689266384802709550/",
+        "hot": "9725149",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "泰国选手打破苏炳添亚运会纪录",
+        "url": "https://www.toutiao.com/trending/7688954157013155883/",
+        "hot": "8799679",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "赛考斯回应出现在欢迎宴会致辞中",
+        "url": "https://www.toutiao.com/trending/7688875459861495862/",
+        "hot": "7962279",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "特朗普会中文的外孙女出席欢迎仪式",
+        "url": "https://www.toutiao.com/trending/7688663315194809910/",
+        "hot": "7204568",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "合肥一小区4栋楼悬挂800面国旗",
+        "url": "https://www.toutiao.com/trending/7688679343232466970/",
+        "hot": "6518962",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "评论员：中国在台湾问题上立场坚定",
+        "url": "https://www.toutiao.com/trending/7689401348293034025/",
+        "hot": "5898601",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "白宫墙上悬挂中美元首握手照片",
+        "url": "https://www.toutiao.com/trending/7689241070403587594/",
+        "hot": "5337275",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "刚死不久的螃蟹还能吃吗",
+        "url": "https://www.toutiao.com/trending/7689446709818654758/",
+        "hot": "4829366",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "男乒亚运丢冠有何警示",
+        "url": "https://www.toutiao.com/trending/7689472089731894847/",
+        "hot": "4369791",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "宫鲁鸣：会总结为什么三分颗粒无收",
+        "url": "https://www.toutiao.com/trending/7689432287271898650/",
+        "hot": "3953950",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "特朗普：这是一次伟大的会晤",
+        "url": "https://www.toutiao.com/trending/7689240553585954350/",
+        "hot": "3577682",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "周锡玮：台湾只要不搞“台独”就没事",
+        "url": "https://www.toutiao.com/trending/7688995348076888102/",
+        "hot": "3237221",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "中国篮球从亚运4金到全军覆没",
+        "url": "https://www.toutiao.com/trending/7689362294299541523/",
+        "hot": "2929158",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "日本财务大臣：高市并非再通胀主义者",
+        "url": "https://www.toutiao.com/trending/7689295803541848106/",
+        "hot": "2650412",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "沙特如何绕过胡塞封锁出售1亿桶石油",
+        "url": "https://www.toutiao.com/trending/7689465275476872767/",
+        "hot": "2398192",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "博主：高市把政治表演刻进骨子里",
+        "url": "https://www.toutiao.com/trending/7689452570657426998/",
+        "hot": "2169974",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "特朗普展示白宫翻修成果",
+        "url": "https://www.toutiao.com/trending/7688231467637489710/",
+        "hot": "1963473",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "月饼第一股广州酒家有多赚钱",
+        "url": "https://www.toutiao.com/trending/7689282692264788004/",
+        "hot": "1776624",
+        "time": ""
+      },
+      {
+        "platform": "头条",
+        "title": "亚运会中国队再获多枚金牌",
+        "url": "https://www.toutiao.com/trending/7688992496042672678/",
+        "hot": "1607556",
+        "time": ""
+      }
+    ],
+    "wallstreetcn": [
+      {
+        "platform": "华尔街见闻",
+        "title": "Bloom Energy Corp.收涨8.27%，报288.70美元，创6月份以来收盘新高。",
+        "url": "https://wallstreetcn.com/livenews/3170900",
+        "hot": "",
+        "time": "04:03"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "Zscaler Inc.收跌10%，创5月27日以来最大单日跌幅，该公司任命Ross Tackett为首席营收官（CRO）。",
+        "url": "https://wallstreetcn.com/livenews/3170899",
+        "hot": "",
+        "time": "04:02"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "纳斯达克金龙中国指数初步收跌0.5%，本周累跌约1.6%。\n\n热门中概股里，文远知行初步收跌4.3%，小米跌2.3%，理想跌2.1%，网易跌1.8%，比亚迪跌1%，拼多多跌0.8%。",
+        "url": "https://wallstreetcn.com/livenews/3170898",
+        "hot": "",
+        "time": "04:00"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "本周，标普累涨1.1%，道指累涨0.3%，纳斯达克100指数累涨3.3%，半导体指数累涨6.4%，存储芯片指数涨4.9%，科技股七巨头指数涨1.9%、超大市值科技股指数涨3.2%。\n\n周五当天，标普500指数初步收涨0.5%，科技板块涨1%，能源板块跌0.9%。\n\n纳斯达克100指数初步收涨0.4%，成分股中，微芯科技初步收涨5.4%，高通涨4.1%，微软、恩智浦至少涨3.6%，Strategy跌1.8%，Nebius Group跌2.4%，CoreWeave、CrowdStrike、英特尔至多跌3.2%，Meta跌3.3%，派拓网络PANW跌3.9%。",
+        "url": "https://wallstreetcn.com/livenews/3170897",
+        "hot": "",
+        "time": "04:00"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "巴基斯坦军方：《麦加联合防务协定》各缔约国国防军参谋长及陆军参谋长会议在利雅得举行、",
+        "url": "https://wallstreetcn.com/livenews/3170896",
+        "hot": "",
+        "time": "03:57"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "纽约联储博客：美联储采用“证券主导”的储备管理方式",
+        "url": "https://wallstreetcn.com/livenews/3170894",
+        "hot": "",
+        "time": "03:53"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "Meta在剑桥分析丑闻相关新墨西哥州诉讼中败诉",
+        "url": "https://wallstreetcn.com/livenews/3170893",
+        "hot": "",
+        "time": "03:53"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "特朗普要求泽连斯基赴莫斯科与普京会谈，泽连斯基回复：“坐导弹去”",
+        "url": "https://wallstreetcn.com/livenews/3170892",
+        "hot": "",
+        "time": "03:51"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "伊朗国家电视台评论员、今年早些时候参与巴基斯坦斡旋的伊美谈判代表团成员穆罕默德·马兰迪周五表示，伊美间接谈判未取得任何进展，地区局势正朝着进一步升级的方向发展。",
+        "url": "https://wallstreetcn.com/livenews/3170891",
+        "hot": "",
+        "time": "03:47"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "日元周五涨1%，本周呈现出V形走势",
+        "url": "https://wallstreetcn.com/livenews/3170890",
+        "hot": "",
+        "time": "03:44"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美元指数本周涨超0.3%",
+        "url": "https://wallstreetcn.com/livenews/3170889",
+        "hot": "",
+        "time": "03:41"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "OpenAI：本公司多个模型与政府运营的多个网站出现互动。\n\n正在通知受影响的网站运营机构，但这并不意味着相关网站发生了（网络）安全事故。",
+        "url": "https://wallstreetcn.com/livenews/3170888",
+        "hot": "",
+        "time": "03:39"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美国商品期货交易委员会（CFTC）：9月22日当周，投机者将芝加哥期货交易所（CBOT）美国国债期货净空头头寸减少47,352手，至155,805手。",
+        "url": "https://wallstreetcn.com/livenews/3170885",
+        "hot": "",
+        "time": "03:33"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美国商品期货交易委员会（CFTC）数据显示，截至2026年9月22日当周，比特币净多头持仓为2756手合约。",
+        "url": "https://wallstreetcn.com/livenews/3170884",
+        "hot": "",
+        "time": "03:31"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美国商品期货交易委员会（CFTC）数据显示，在截至2026年9月22日的当周，日元净多头头寸为71982手合约；欧元净空头头寸为52,334手合约。",
+        "url": "https://wallstreetcn.com/livenews/3170883",
+        "hot": "",
+        "time": "03:30"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美国商品期货交易委员会（CFTC）：9月22日当周，投机者所持NYMEX WTI原油净多头头寸增加5,820手合约，至142,588手合约，创大约五个月新高。\n\n所持布伦特与WTI原油净多头头寸降低至371,006手合约，创四周新低。\n\n所持NYMEX汽油净多头头寸增加至96,163手合约，创大约10个月新高。\n\n所持NYMEX柴油净多头头寸减少至9,732手合约，创11周新低。\n\n所持NYMEX天然气净空头头寸降低至37,080手合约，创11周新低。",
+        "url": "https://wallstreetcn.com/livenews/3170882",
+        "hot": "",
+        "time": "03:30"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美国商品期货交易委员会（CFTC）：9月22日当周，投机者所持COMEX黄金净多头头寸减少5,726手合约，至131,334手合约。\n\n所持COMEX白银净多头头寸增加至13,016手合约。\n\n所持COMEX铜净多头头寸增加17,108手合约，至82,649手合约，创逾五年来新高。\n\n所持NYMEX铂金净多头头寸增加至9,789手合约，创四周新高。\n\n所持NYMEX钯金净空头头寸增加至5,984手合约，创八周新高。",
+        "url": "https://wallstreetcn.com/livenews/3170881",
+        "hot": "",
+        "time": "03:30"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "OpenAI的CEO Altman：Hugging Face事件仍是目前发现的性质最严重的一起。\n\n对于智能体所发现的其他公司安全漏洞，是否对外披露由相关企业自行决定，在此前提下，我们会尽可能保持信息透明。",
+        "url": "https://wallstreetcn.com/livenews/3170880",
+        "hot": "",
+        "time": "03:29"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "OpenAI在Hugging Face事件后开展范围更广的审查 预计耗时数月",
+        "url": "https://wallstreetcn.com/livenews/3170879",
+        "hot": "",
+        "time": "03:29"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "芝加哥小麦期货本周跌超1.4%，大豆涨约1.3%",
+        "url": "https://wallstreetcn.com/livenews/3170878",
+        "hot": "",
+        "time": "03:26"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美国SEC拟投票放宽私募市场准入，扩大合格投资者范围",
+        "url": "https://wallstreetcn.com/livenews/3170877",
+        "hot": "",
+        "time": "03:25"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "美国国防部长：已确认AnthropicAI存在供应链风险。国防部将做出符合国家与军人利益的选择。",
+        "url": "https://wallstreetcn.com/livenews/3170875",
+        "hot": "",
+        "time": "03:17"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "习近平向全球发展倡议5周年高级别对话会致贺信。（新华社）",
+        "url": "https://wallstreetcn.com/livenews/3170874",
+        "hot": "",
+        "time": "03:16"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "英国国家电网：获美国能源部拨款，将在新英格兰输电网部署先进技术。",
+        "url": "https://wallstreetcn.com/livenews/3170873",
+        "hot": "",
+        "time": "03:07"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "伊朗总统：支持恢复谅解备忘录，将为实质性谈判创造条件",
+        "url": "https://wallstreetcn.com/livenews/3170871",
+        "hot": "",
+        "time": "03:04"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "报道：美国正拟定柴油出口禁令方案，以压低油价缓解中期选举压力",
+        "url": "https://wallstreetcn.com/livenews/3170870",
+        "hot": "",
+        "time": "03:03"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "欧盟能源专员致函各成员国部长：我们正面临一场由供给危机引发的能源价格危机。\n\n欧盟天然气库存处于异常低位，形势严峻，但暂无即时供应风险。\n\n得益于新增液化天然气产能、可再生能源以及天然气需求下降，欧盟准备情况优于2021年冬季。\n\n我提议各方考虑额外措施，以维持天然气库存注气或削减天然气与电力需求。\n\n需求削减措施包括禁止户外供暖、限制公共建筑温度。\n\n任何能源价格调控措施都应具有针对性，避免推高天然气需求。",
+        "url": "https://wallstreetcn.com/livenews/3170869",
+        "hot": "",
+        "time": "03:01"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "恒生指数主连夜盘收跌0.09%，报24501点。\n\n恒生科技指数主连夜盘收涨0.12%，报4320点。",
+        "url": "https://wallstreetcn.com/livenews/3170867",
+        "hot": "",
+        "time": "03:00"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "伊朗否认美伊谈判进展 称相关报道不实",
+        "url": "https://wallstreetcn.com/livenews/3170866",
+        "hot": "",
+        "time": "02:37"
+      },
+      {
+        "platform": "华尔街见闻",
+        "title": "WTI 11月原油期货收跌2.20美元，跌幅超过2.32%，报92.41美元/桶，本周累计下跌将近3.82%。\n\n布伦特11月原油期货收跌2.28美元，跌幅将近2.14%，报104.32美元/桶，本周累跌超0.43%。\n\n中东Abu Dhabi Murban原油期货跌4.79%，报111.97美元/桶，本周累跌5.05%。\n\nNYMEX 10月天然气期货收报3.1960美元/百万英热单位。\n\nNYMEX 10月汽油期货收报3.3934美元/加仑，NYMEX 10月取暖油期货收报4.6847美元/加仑。",
+        "url": "https://wallstreetcn.com/livenews/3170865",
+        "hot": "",
+        "time": "02:31"
+      }
+    ],
+    "thepaper": [
+      {
+        "platform": "澎湃",
+        "title": "习近平同美国总统特朗普会谈",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34147373",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "“平平”“福双”将赴美，助力深化新一轮大熊猫保护国际合作",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34146662",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "新华社：亚运失利再度暴露中国男乒过度依赖王楚钦，阵容深度不足",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34148949",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "菲方在中方节日期间采取挑衅行径并煽宣炒作，中国海警局回应",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34149665",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "多家企业开启13天长假：有6人小公司，也有“民企500强”",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34142205",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "联大发言遭多国代表离场抗议，内塔尼亚胡急了：懦夫！",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34148350",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "一文读懂｜北京出台商品住房销售制度改革细则，将带来哪些新变化？",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34143901",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "广东明确：电动自行车违规停放充电起火，可能被拘留",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34149093",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "县级医院招博士研究生是不是浪费？浙江永嘉回应：有现实必要性",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34149922",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "共此明月，中秋快乐",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34140505",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "球迷“输球思振东”，媒体：不能用“年轻”二字把所有问题轻轻带过",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34149789",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "中国女篮半决赛不敌韩国，本届亚运会中国篮球各项均无缘决赛",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34149676",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "中国足协党委书记：坚决杜绝国家队建设急功近利，防范职业足球领域重蹈金元足球覆辙",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34148484",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "马琳：中日女队水平已在伯仲之间，未来十年“中日对决”不可避免",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34147999",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "大外交·现场｜访美第二日：从“五军仪仗队”到国宴的历史细节",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34148411",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "大国外交进行时丨特朗普：这是一次“伟大的会晤”",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34147964",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "白宫欢迎国宴，哪些企业家坐主桌？",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34148989",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "宫鲁鸣回应三分球颗粒无收：时间长了什么情况都可能遇到",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34149921",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "观察｜以战略稳定应对外部不确定性，中美关系“重中之重”的背后",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34143275",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "澎湃",
+        "title": "澎湃读报丨主要央媒头版聚焦“中美元首华盛顿会晤”",
+        "url": "https://www.thepaper.cn/newsDetail_forward_34147905",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "ifeng": [
+      {
+        "platform": "凤凰",
+        "title": "中美元首夫妇茶叙，两个关键细节值得关注",
+        "url": "https://original.ifeng.com/c/8wiW7tyDx3e",
+        "hot": "",
+        "time": "2026-09-25 23:40:49"
+      },
+      {
+        "platform": "凤凰",
+        "title": "中美元首华盛顿会晤，为何规格罕见？",
+        "url": "https://news.ifeng.com/c/8wiL9lkFhVQ",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "吴心伯：稳定中美关系，是特朗普的“大利所在”",
+        "url": "https://news.ifeng.com/c/8wiO7CsXvep",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "马斯克、贝索斯等高管出席白宫国宴，企业市值超美国去年GDP",
+        "url": "https://news.ifeng.com/c/8wi6LE06sKZ",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "中美元首不到半年实现互访，“前所未有”",
+        "url": "https://news.ifeng.com/c/8wi2N7H72uq",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "中美元首互访为何均安排参观历史地标？凤凰探访美国国家档案馆",
+        "url": "https://original.ifeng.com/c/8weS2rPyX6F",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "荷兰首相游说美方：别再限制ASML对华出口",
+        "url": "https://news.ifeng.com/c/8wiBtIoGJu4",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "克宫：俄美乌三方会晤或近期举行",
+        "url": "https://news.ifeng.com/c/8wiDJxKXSwI",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "伊朗总统：不想拥有核武器，愿推进与美谈判",
+        "url": "https://news.ifeng.com/c/8wi7oaRXQ6L",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "马克龙宣布：出兵",
+        "url": "https://news.ifeng.com/c/8whQrypjJCs",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "美称对台军售仍在评估，蓝营提醒赖清德当局",
+        "url": "https://news.ifeng.com/c/8wherrY97rC",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "凤凰",
+        "title": "柯文哲组建骑行队辅选：没有财力只能靠体力",
+        "url": "https://news.ifeng.com/c/8wi6cbaFnMz",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "sspai": [
+      {
+        "platform": "少数派",
+        "title": "可定制、更出彩，头戴式耳机新选择：Beats 360 首发体验",
+        "url": "https://sspai.com/post/114878",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "少数派独家｜泡泡骚 Low Pro 碳纹黑款，把握持与支撑收进 2.6mm",
+        "url": "https://sspai.com/post/114823",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "一台主机，多重角色：新款 Mac mini 首发体验",
+        "url": "https://sspai.com/post/114829",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "派评 | 近期值得关注的 App",
+        "url": "https://sspai.com/post/114815",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "给电话加上「辅助驾驶」？我们想听听你的意见",
+        "url": "https://sspai.com/post/114717",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "你的脸红是什么红：了解玫瑰痤疮",
+        "url": "https://sspai.com/post/114641",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "本周看什么 | 最近值得一看的 9 部作品",
+        "url": "https://sspai.com/post/114716",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "8月音乐精选：有限的生命里，要听得再任性一点！",
+        "url": "https://sspai.com/post/114555",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "具透 | 细数 watchOS 27 中你值得了解的新变化：动态应用网格、智能叠放……",
+        "url": "https://sspai.com/post/114670",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "具透 | macOS 27 正式版来了，这些是你值得了解新细节",
+        "url": "https://sspai.com/post/114643",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "怀旧手记｜25 年前的笔记本，如何兼顾轻薄、时尚与性能？",
+        "url": "https://sspai.com/post/114551",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "具透 | Liquid Glass 设计改进、性能提升……iPadOS 27 中值得一瞥的新特性",
+        "url": "https://sspai.com/post/114607",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "当 AI 让执行力变得廉价，我们该拿什么脱颖而出？",
+        "url": "https://sspai.com/post/114519",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "社区速递 158 | 便宜耐造的副厂手柄与大学宿舍里那些相见恨晚的装备",
+        "url": "https://sspai.com/post/114613",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "具透 | 精心优化， 体验感愉悦升华：iOS 27 中值得关注的新特性",
+        "url": "https://sspai.com/post/114565",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "Coast：用十年经验，给记账这件事一个「终点」",
+        "url": "https://sspai.com/post/114479",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "探秘柬埔寨，千年吴哥窟",
+        "url": "https://sspai.com/post/114454",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "派评｜近期值得关注的 App",
+        "url": "https://sspai.com/post/114577",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "城市漫步指南｜威海初秋，看海玩沙",
+        "url": "https://sspai.com/post/114557",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "少数派",
+        "title": "众测招募｜泡泡骚 Low Pro：给新 iPhone 添一件极简「背心」",
+        "url": "https://sspai.com/post/114410",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "github": [
+      {
+        "platform": "GitHub",
+        "title": "paperclipai/paperclip",
+        "url": "https://github.com/paperclipai/paperclip",
+        "hot": "84,521",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "anthropics/claude-plugins-official",
+        "url": "https://github.com/anthropics/claude-plugins-official",
+        "hot": "36,860",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "vectorize-io/hindsight",
+        "url": "https://github.com/vectorize-io/hindsight",
+        "hot": "29,677",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "obra/superpowers",
+        "url": "https://github.com/obra/superpowers",
+        "hot": "291,584",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "mattpocock/skills",
+        "url": "https://github.com/mattpocock/skills",
+        "hot": "269,631",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "dream-num/univer",
+        "url": "https://github.com/dream-num/univer",
+        "hot": "18,336",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "anthropics/skills",
+        "url": "https://github.com/anthropics/skills",
+        "hot": "178,232",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "androoAGI/starnet",
+        "url": "https://github.com/androoAGI/starnet",
+        "hot": "417",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "derv82/wifit3",
+        "url": "https://github.com/derv82/wifit3",
+        "hot": "851",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "kelseyhightower/kubernetes-the-hard-way",
+        "url": "https://github.com/kelseyhightower/kubernetes-the-hard-way",
+        "hot": "50,095",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "rohitg00/ai-engineering-from-scratch",
+        "url": "https://github.com/rohitg00/ai-engineering-from-scratch",
+        "hot": "57,361",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "shy3130/tick-stock-panel",
+        "url": "https://github.com/shy3130/tick-stock-panel",
+        "hot": "5,111",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "google/ax",
+        "url": "https://github.com/google/ax",
+        "hot": "11,378",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "NVIDIA/Model-Optimizer",
+        "url": "https://github.com/NVIDIA/Model-Optimizer",
+        "hot": "4,401",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "pbakaus/impeccable",
+        "url": "https://github.com/pbakaus/impeccable",
+        "hot": "71,104",
+        "time": ""
+      },
+      {
+        "platform": "GitHub",
+        "title": "openbao/openbao",
+        "url": "https://github.com/openbao/openbao",
+        "hot": "7,657",
+        "time": ""
+      }
+    ],
+    "cls": [
+      {
+        "platform": "财联社",
+        "title": "财联社9月26日电，利弗莫尔中概股龙头指数收跌0.24%。",
+        "url": "https://api3.cls.cn/share/article/2493178?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "04:00"
+      },
+      {
+        "platform": "财联社",
+        "title": "美股高开高走三大指数集体收涨 苹果再创历史收盘新高",
+        "url": "https://api3.cls.cn/share/article/2493177?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "04:00"
+      },
+      {
+        "platform": "财联社",
+        "title": "美股走高 道指涨逾1%",
+        "url": "https://api3.cls.cn/share/article/2493176?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:50"
+      },
+      {
+        "platform": "财联社",
+        "title": "财联社9月26日电，OpenAI称，公司多个模型与政府运营的多个网站出现互动。正在通知受影响的网站运营机构，但这并不意味着相关网站发生了（网络）安全事故。",
+        "url": "https://api3.cls.cn/share/article/2493175?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:45"
+      },
+      {
+        "platform": "财联社",
+        "title": "CFTC：截至9月22日当周 COMEX黄金投机净多头减少5,727手",
+        "url": "https://api3.cls.cn/share/article/2493174?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:34"
+      },
+      {
+        "platform": "财联社",
+        "title": "CFTC：截至9月22日当周 WTI原油投机净多头增加8,952手",
+        "url": "https://api3.cls.cn/share/article/2493173?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:33"
+      },
+      {
+        "platform": "财联社",
+        "title": "CFTC：截至9月22日当周 10年期美债期货净空头减少9,484手",
+        "url": "https://api3.cls.cn/share/article/2493172?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:32"
+      },
+      {
+        "platform": "财联社",
+        "title": "CFTC：截至9月22日当周 基金经理将标普500期货净多头增加35,280手",
+        "url": "https://api3.cls.cn/share/article/2493171?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:32"
+      },
+      {
+        "platform": "财联社",
+        "title": "特朗普将于下周二推出AI驱动的新网站America.gov",
+        "url": "https://api3.cls.cn/share/article/2493170?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:29"
+      },
+      {
+        "platform": "财联社",
+        "title": "习近平向全球发展倡议5周年高级别对话会致贺信",
+        "url": "https://api3.cls.cn/share/article/2493169?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:19"
+      },
+      {
+        "platform": "财联社",
+        "title": "欧盟能源专员致函各成员国部长：正面临一场由供给危机引发的能源价格危机",
+        "url": "https://api3.cls.cn/share/article/2493168?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:15"
+      },
+      {
+        "platform": "财联社",
+        "title": "财联社9月26日电，伊朗总统表示，德黑兰愿意恢复《伊斯兰堡谅解》，并履行相关承诺。",
+        "url": "https://api3.cls.cn/share/article/2493167?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "03:04"
+      },
+      {
+        "platform": "财联社",
+        "title": "美联储哈玛克：债券收益率上升受多种因素驱动",
+        "url": "https://api3.cls.cn/share/article/2493166?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "02:57"
+      },
+      {
+        "platform": "财联社",
+        "title": "财联社9月26日电，据报道，白宫考虑将柴油问题交由各州处理。",
+        "url": "https://api3.cls.cn/share/article/2493164?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "02:42"
+      },
+      {
+        "platform": "财联社",
+        "title": "伊朗否认美伊谈判进展 称相关报道不实",
+        "url": "https://api3.cls.cn/share/article/2493163?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "02:38"
+      },
+      {
+        "platform": "财联社",
+        "title": "国际原油期货结算价收跌超2%",
+        "url": "https://api3.cls.cn/share/article/2493162?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "02:31"
+      },
+      {
+        "platform": "财联社",
+        "title": "财联社9月26日电，据报道，黑石集团全球私募股权主管约瑟夫·巴拉塔正准备离开公司。",
+        "url": "https://api3.cls.cn/share/article/2493161?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "02:30"
+      },
+      {
+        "platform": "财联社",
+        "title": "财联社9月26日电，美联储哈玛克表示，潜在通胀可能高于目标。",
+        "url": "https://api3.cls.cn/share/article/2493160?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "02:24"
+      },
+      {
+        "platform": "财联社",
+        "title": "美联储哈玛克：美联储需要确保货币政策处于限制性立场 以降低通胀",
+        "url": "https://api3.cls.cn/share/article/2493159?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "02:07"
+      },
+      {
+        "platform": "财联社",
+        "title": "ICE：截至9月22日当周 布伦特原油投机者净多头持仓减少64,543手",
+        "url": "https://api3.cls.cn/share/article/2493158?os=web&sv=7.7.5&app=",
+        "hot": "",
+        "time": "01:51"
+      }
+    ],
+    "jin10": [
+      {
+        "platform": "金十数据",
+        "title": "道琼斯指数9月25日（周五）收盘上涨478.61点，涨幅0.93%，报51828.59点；<br/>标普500指数9月25日（周五）收盘上涨39.38点，涨幅0.51%，报7743.51点；<br/>纳斯达克综合指数9月25日（周五）收盘上涨129.34点，涨幅0.48%，报27068.72点。",
+        "url": "https://flash.jin10.com/detail/20260926040449861800",
+        "hot": "",
+        "time": "04:04"
+      },
+      {
+        "platform": "金十数据",
+        "title": "截止至9月22日当周CFTC外汇类非商业持仓报告在金十数据中心更新啦！欢迎点击查看>>",
+        "url": "https://flash.jin10.com/detail/20260926040320792800",
+        "hot": "",
+        "time": "04:03"
+      },
+      {
+        "platform": "金十数据",
+        "title": "截止至9月22日当周CFTC外汇类商业持仓报告在金十数据中心更新啦！欢迎点击查看>>",
+        "url": "https://flash.jin10.com/detail/20260926040318504800",
+        "hot": "",
+        "time": "04:03"
+      },
+      {
+        "platform": "金十数据",
+        "title": "截止至9月22日当周CFTC商品类非商业持仓报告在金十数据中心更新啦！欢迎点击查看>>",
+        "url": "https://flash.jin10.com/detail/20260926040316940800",
+        "hot": "",
+        "time": "04:03"
+      },
+      {
+        "platform": "金十数据",
+        "title": "截止至9月22日当周CFTC商品类商业持仓报告在金十数据中心更新啦！欢迎点击查看>>",
+        "url": "https://flash.jin10.com/detail/20260926040314103800",
+        "hot": "",
+        "time": "04:03"
+      },
+      {
+        "platform": "金十数据",
+        "title": "美股收盘：三大股指收涨 戴尔涨超5%",
+        "url": "https://flash.jin10.com/detail/20260926040204274800",
+        "hot": "✰",
+        "time": "04:02"
+      },
+      {
+        "platform": "金十数据",
+        "title": "巴基斯坦军方：巴基斯坦、沙特阿拉伯和土耳其军方首脑审议安全形势及沙特阿拉伯面临的威胁。",
+        "url": "https://flash.jin10.com/detail/20260926040018281800",
+        "hot": "",
+        "time": "04:00"
+      },
+      {
+        "platform": "金十数据",
+        "title": "巴基斯坦军方：巴基斯坦、沙特阿拉伯和土耳其的军事首脑讨论加强情报共享、军事协调和能力整合。",
+        "url": "https://flash.jin10.com/detail/20260926040009280800",
+        "hot": "",
+        "time": "04:00"
+      },
+      {
+        "platform": "金十数据",
+        "title": "巴基斯坦军方：巴基斯坦、沙特阿拉伯和土耳其军方首脑重申对集体防御的承诺。",
+        "url": "https://flash.jin10.com/detail/20260926035925447800",
+        "hot": "",
+        "time": "03:59"
+      },
+      {
+        "platform": "金十数据",
+        "title": "巴基斯坦军方：巴基斯坦、沙特阿拉伯和土耳其的军方首脑承诺将麦加防御协议的承诺转化为有效合作。",
+        "url": "https://flash.jin10.com/detail/20260926035919902800",
+        "hot": "",
+        "time": "03:59"
+      },
+      {
+        "platform": "金十数据",
+        "title": "巴基斯坦军方：与会各方讨论了进一步推进巴基斯坦、沙特阿拉伯和土耳其三国武装力量之间合作的方式。",
+        "url": "https://flash.jin10.com/detail/20260926035825541800",
+        "hot": "",
+        "time": "03:58"
+      },
+      {
+        "platform": "金十数据",
+        "title": "巴基斯坦军方：在利雅得举行了参与麦加联合防御协议的国家防务首席会议和总参谋长会议。",
+        "url": "https://flash.jin10.com/detail/20260926035625073800",
+        "hot": "",
+        "time": "03:56"
+      },
+      {
+        "platform": "金十数据",
+        "title": "以色列国防军：关于今天（周五）早些时候向黎巴嫩南部一处可疑空中目标发射拦截弹的声明，初步评估显示，该拦截弹系因误判而发射。事件正在调查中。",
+        "url": "https://flash.jin10.com/detail/20260926035302990800",
+        "hot": "",
+        "time": "03:53"
+      },
+      {
+        "platform": "金十数据",
+        "title": "据相关法院文件：美国上诉法院裁定Kalshi败诉，称各州可以监管其事件合约。",
+        "url": "https://flash.jin10.com/detail/20260926034719884800",
+        "hot": "",
+        "time": "03:47"
+      },
+      {
+        "platform": "金十数据",
+        "title": "阿根廷国有石油公司YPF宣布，旗下燃油价格平均上涨1%。",
+        "url": "https://flash.jin10.com/detail/20260926034234194800",
+        "hot": "",
+        "time": "03:42"
+      },
+      {
+        "platform": "金十数据",
+        "title": "美元指数25日下跌",
+        "url": "https://flash.jin10.com/detail/20260926033717766800",
+        "hot": "",
+        "time": "03:37"
+      },
+      {
+        "platform": "金十数据",
+        "title": "OpenAI：此次涉及AI模型行为异常或不符合预期的事件中的网站是由政府、大学、公共机构等运营。",
+        "url": "https://flash.jin10.com/detail/20260926033556441800",
+        "hot": "",
+        "time": "03:35"
+      }
+    ],
+    "zaobao": [
+      {
+        "platform": "联合早报",
+        "title": "分析：习特二会各取所需 高规格礼遇难掩核心分歧",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581995.html",
+        "hot": "",
+        "time": "23:01"
+      },
+      {
+        "platform": "联合早报",
+        "title": "分析：习特二会各取所需 高规格礼遇难掩核心分歧",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581994.html",
+        "hot": "",
+        "time": "23:01"
+      },
+      {
+        "platform": "联合早报",
+        "title": "习近平：中美应探索一条大国正确相处新路",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581993.html",
+        "hot": "",
+        "time": "22:57"
+      },
+      {
+        "platform": "联合早报",
+        "title": "美贸易代表：美中就部分非敏感商品达成协议 下周一公布细节",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581990.html",
+        "hot": "",
+        "time": "22:50"
+      },
+      {
+        "platform": "联合早报",
+        "title": "接连公布落马官员政绩工程　中国官方释放严查信号",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581989.html",
+        "hot": "",
+        "time": "22:50"
+      },
+      {
+        "platform": "联合早报",
+        "title": "习特同谈二战各有侧重 中美战略稳定仍存分歧",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581987.html",
+        "hot": "",
+        "time": "22:50"
+      },
+      {
+        "platform": "联合早报",
+        "title": "中国驻澳大使：中国发展进步 对澳是红利和机遇",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581980.html",
+        "hot": "",
+        "time": "22:50"
+      },
+      {
+        "platform": "联合早报",
+        "title": "印尼前外长马蒂：不能期望一次峰会即可改善中美元首互信",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581970.html",
+        "hot": "",
+        "time": "21:57"
+      },
+      {
+        "platform": "联合早报",
+        "title": "习近平访美未带中国企业高管 专家解读原因不一",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581968.html",
+        "hot": "",
+        "time": "21:56"
+      },
+      {
+        "platform": "联合早报",
+        "title": "习近平白宫国宴直接点名日本军国主义 日高官：不置评",
+        "url": "https://www.zaochenbao.com/news/china/202609/2581965.html",
+        "hot": "",
+        "time": "21:56"
+      },
+      {
+        "platform": "联合早报",
+        "title": "白宫国宴名单首披露 中共中央警卫局长周洪许已兼任中办副主任",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2581966.html",
+        "hot": "",
+        "time": "21:56"
+      },
+      {
+        "platform": "联合早报",
+        "title": "刘洪建连任昆明市委书记 强调以“头雁”姿态严守政治纪律",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2581952.html",
+        "hot": "",
+        "time": "16:36"
+      },
+      {
+        "platform": "联合早报",
+        "title": "倪岳峰辞去河北省人大常委会主任职务",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2581936.html",
+        "hot": "",
+        "time": "14:20"
+      },
+      {
+        "platform": "联合早报",
+        "title": "安徽省委常委、副省长蔚盛斌已任省政府党组副书记",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2581935.html",
+        "hot": "",
+        "time": "14:20"
+      },
+      {
+        "platform": "联合早报",
+        "title": "“习特会”国宴菜单：芝麻脆皮海鲈鱼和爽脆嫩白菜",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2581918.html",
+        "hot": "",
+        "time": "11:00"
+      },
+      {
+        "platform": "联合早报",
+        "title": "时报出版人：175年、1500万篇报道讲述的美国故事",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2581914.html",
+        "hot": "",
+        "time": "10:54"
+      },
+      {
+        "platform": "联合早报",
+        "title": "秘鲁交通部长：中国金兆明年将在秘鲁南部动工建设港口",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2581912.html",
+        "hot": "",
+        "time": "10:51"
+      },
+      {
+        "platform": "联合早报",
+        "title": "河南省委副书记王陆进任代省长",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2481827.html",
+        "hot": "",
+        "time": "14:15"
+      },
+      {
+        "platform": "联合早报",
+        "title": "原河北省委副书记 王陆进任河南省代省长",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2481821.html",
+        "hot": "",
+        "time": "13:58"
+      },
+      {
+        "platform": "联合早报",
+        "title": "梁言顺辞去安徽省人大常委会主任职务",
+        "url": "https://www.zaochenbao.com/news/Chronicles/202609/2481820.html",
+        "hot": "",
+        "time": "12:59"
+      },
+      {
+        "platform": "联合早报",
+        "title": "评论：中美关系正步入一个新时代",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2581916.html",
+        "hot": "",
+        "time": "10:58"
+      },
+      {
+        "platform": "联合早报",
+        "title": "社论：中美互动反映追求稳定的积极意义",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2581892.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "蔡恩泽：习近平访美不靠豪华企业家代表团壮声威",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2581891.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "伍国：中国英语教学再掀激辩的背后",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2581890.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "丁波：算法时代的种族融合政策",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2581889.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "卡尔・约翰・达尔高、马克・梅迪什：西方“衰落论”的虚伪政治",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2481800.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "祁冬涛：从多极化到有序多极化",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2481799.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "陈留俊：美国“控制”了格陵兰？",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2481798.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "刘惟诚：纳吉居家服刑，谁得谁失？",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2481797.html",
+        "hot": "",
+        "time": "08:10"
+      },
+      {
+        "platform": "联合早报",
+        "title": "朱锋：新一轮中美首脑会晤值得期待",
+        "url": "https://www.zaochenbao.com/news/opinion/202609/2381710.html",
+        "hot": "",
+        "time": "08:10"
+      }
+    ],
+    "gelonghui": [
+      {
+        "platform": "格隆汇",
+        "title": "归创通桥(02190.HK)9月25日耗资115.7万港元回购5.4万股",
+        "url": "https://www.gelonghui.com/news/5318196",
+        "hot": "",
+        "time": "22:50"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "吉辉控股(08027.HK)：林智深获委任为独立非执行董事",
+        "url": "https://www.gelonghui.com/news/5318195",
+        "hot": "",
+        "time": "22:33"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "阿卡迈盘初飙升超16%，Anthropic大单引爆股价",
+        "url": "https://www.gelonghui.com/news/5318194",
+        "hot": "",
+        "time": "21:54"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "美银：将AMD目标价上调至720美元",
+        "url": "https://www.gelonghui.com/news/5318193",
+        "hot": "",
+        "time": "21:50"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "齐合环保(00976.HK)董事会会议延期 继续停牌",
+        "url": "https://www.gelonghui.com/news/5318192",
+        "hot": "",
+        "time": "21:35"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "世纪娱乐国际(00959.HK)2026年纯利约860万港元 同比扭亏为盈",
+        "url": "https://www.gelonghui.com/news/5318191",
+        "hot": "",
+        "time": "21:33"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "嘉高达资本(01468.HK)近期合共售出250枚ETH",
+        "url": "https://www.gelonghui.com/news/5318190",
+        "hot": "",
+        "time": "21:27"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "罗博特科(03757.HK)发售价厘定为每股H股436.00港元",
+        "url": "https://www.gelonghui.com/news/5318189",
+        "hot": "",
+        "time": "21:24"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "高伟电子(01415.HK)9月25日耗资567万港元回购25万股",
+        "url": "https://www.gelonghui.com/news/5318188",
+        "hot": "",
+        "time": "21:11"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "MONGOL MINING(00975.HK)9月25日耗资262.1万港元回购30万股",
+        "url": "https://www.gelonghui.com/news/5318187",
+        "hot": "",
+        "time": "21:00"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "5100藏冰川(01115.HK)：张春龙获委任为提名委员会主席",
+        "url": "https://www.gelonghui.com/news/5318186",
+        "hot": "",
+        "time": "20:42"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "和誉－Ｂ(02256.HK)9月25日耗资44.5万港元回购5万股",
+        "url": "https://www.gelonghui.com/news/5318185",
+        "hot": "",
+        "time": "20:40"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "首佳科技(00103.HK)9月25日耗资17.6万港元回购8.4万股",
+        "url": "https://www.gelonghui.com/news/5318184",
+        "hot": "",
+        "time": "20:39"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "美因基因(06667.HK)9月25日耗资65.9万港元回购9.42万股",
+        "url": "https://www.gelonghui.com/news/5318183",
+        "hot": "",
+        "time": "20:38"
+      },
+      {
+        "platform": "格隆汇",
+        "title": "极兔速递-W(01519.HK)9月25日耗资2748.2万港元回购315.8万股",
+        "url": "https://www.gelonghui.com/news/5318182",
+        "hot": "",
+        "time": "20:33"
+      }
+    ],
+    "fastbull": [
+      {
+        "platform": "法布财经",
+        "title": "GBP/USD Faces Strong Resistance at 1.3244: Can the Downtrend Extend?",
+        "url": "https://www.fastbull.com/cn/news-detail/gbpusd-faces-strong-resistance-at-13244-can-the-4386742_0",
+        "hot": "64",
+        "time": "22:59"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Gold Defends $4,250: Can XAU/USD Reclaim $4,300 on an M15 Rebound?",
+        "url": "https://www.fastbull.com/cn/news-detail/gold-defends-4250-can-xauusd-reclaim-4300-on-4386740_0",
+        "hot": "1102",
+        "time": "22:56"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Bitcoin Holds $84K: Can BTC Rebound After the September 25 Options Expiry?",
+        "url": "https://www.fastbull.com/cn/news-detail/bitcoin-holds-84k-can-btc-rebound-after-the-4386738_0",
+        "hot": "510",
+        "time": "22:55"
+      },
+      {
+        "platform": "法布财经",
+        "title": "How Share Buybacks Affect EPS: Accretion Is Not Value Creation",
+        "url": "https://www.fastbull.com/cn/news-detail/calculation-of-the-cost-of-capital-per-share-4386737_0",
+        "hot": "",
+        "time": "19:41"
+      },
+      {
+        "platform": "法布财经",
+        "title": "USD/CHF Gains as SNB Holds Rates While Fed Expectations Tighten",
+        "url": "https://www.fastbull.com/cn/news-detail/usdchf-gains-as-snb-holds-rates-while-fed-4386735_0",
+        "hot": "38",
+        "time": "19:17"
+      },
+      {
+        "platform": "法布财经",
+        "title": "GBP/USD Near Three-Month Low as BoE Hike Expectations Lose Support",
+        "url": "https://www.fastbull.com/cn/news-detail/gbpusd-near-threemonth-low-as-boe-hike-expectations-4386733_0",
+        "hot": "4",
+        "time": "18:48"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Bond Yield to Maturity vs Actual Return: Coupons, Reinvestment and Early Sales",
+        "url": "https://www.fastbull.com/cn/news-detail/calculation-of-bond-yield-to-maturity-actual-return-4386732_0",
+        "hot": "",
+        "time": "18:36"
+      },
+      {
+        "platform": "法布财经",
+        "title": "GBP/JPY Slips as US-Japan Intervention Fears Support Yen",
+        "url": "https://www.fastbull.com/cn/news-detail/gbpjpy-slips-as-usjapan-intervention-fears-support-yen-4386730_0",
+        "hot": "",
+        "time": "18:32"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Does Portfolio Rebalancing Improve Returns? Calculate Drift, Trades and Costs",
+        "url": "https://www.fastbull.com/cn/news-detail/portfolio-rebalancing-asset-allocation-and-rebalancing-cost-calculation-4386729_0",
+        "hot": "",
+        "time": "17:36"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Protective Put vs Stop Loss: Calculate the Floor, Premium and Expiry Risk",
+        "url": "https://www.fastbull.com/cn/news-detail/calculation-of-maximum-loss-for-protective-put-option-4386728_0",
+        "hot": "",
+        "time": "16:27"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Volatile Pullback Amid US-EU Policy Divergence",
+        "url": "https://www.fastbull.com/cn/news-detail/volatile-pullback-amid-useu-policy-divergence-4386726_0",
+        "hot": "",
+        "time": "16:03"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Why a Foreign Investment Can Rise While Your Account Loses Money",
+        "url": "https://www.fastbull.com/cn/news-detail/calculation-of-exchange-rate-hedging-for-local-currency-4386723_0",
+        "hot": "",
+        "time": "15:12"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Broad-Wide Oscillations in the Macro Game",
+        "url": "https://www.fastbull.com/cn/news-detail/broadwide-oscillations-in-the-macro-game-4386721_0",
+        "hot": "",
+        "time": "14:22"
+      },
+      {
+        "platform": "法布财经",
+        "title": "How to Calculate DV01: Bond Duration in Money Terms",
+        "url": "https://www.fastbull.com/cn/news-detail/calculation-of-the-modified-duration-basis-point-value-4386718_0",
+        "hot": "",
+        "time": "14:06"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Why an Index Can Rise While Most Stocks Fall",
+        "url": "https://www.fastbull.com/cn/news-detail/index-weighting-contributes-to-market-breadth-and-the-4386717_0",
+        "hot": "",
+        "time": "13:05"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Maximum Drawdown: How Deposits and Withdrawals Distort the Chart",
+        "url": "https://www.fastbull.com/cn/news-detail/maximum-drawdown-calculation-of-net-inflow-and-outflow-4386716_0",
+        "hot": "",
+        "time": "11:52"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Leveraged ETF Returns: Daily Resets, Compounding and Actual P&L",
+        "url": "https://www.fastbull.com/cn/news-detail/leveraged-etfs-with-daily-reset-compound-interest-true-4386715_0",
+        "hot": "",
+        "time": "10:17"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Energy Supply Risks Compound Inflationary Pressures as Rate-Hike Expectations Rise in the US and Europe",
+        "url": "https://www.fastbull.com/cn/news-detail/energy-supply-risks-compound-inflationary-pressures-as-ratehike-4386714_0",
+        "hot": "",
+        "time": "09:23"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Reclaiming Support Could Trigger a New Upside Leg",
+        "url": "https://www.fastbull.com/cn/news-detail/reclaiming-support-could-trigger-a-new-upside-leg-4386711_0",
+        "hot": "",
+        "time": "07:42"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Upside Pressure Builds Following Strong Support Rebound",
+        "url": "https://www.fastbull.com/cn/news-detail/upside-pressure-builds-following-strong-support-rebound-4386709_0",
+        "hot": "253",
+        "time": "07:27"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Bitcoin Rejected at $87K: Can BTC Resume Its Pullback Below $85,000?",
+        "url": "https://www.fastbull.com/cn/news-detail/bitcoin-rejected-at-87k-can-btc-resume-its-4386707_0",
+        "hot": "15000",
+        "time": "03:19"
+      },
+      {
+        "platform": "法布财经",
+        "title": "EUR/USD Tests 1.1370 Support: Can Oversold Conditions Trigger an M15 Rebound?",
+        "url": "https://www.fastbull.com/cn/news-detail/eurusd-tests-11370-support-can-oversold-conditions-trigger-4386705_0",
+        "hot": "200",
+        "time": "03:16"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Gold Drops to $4,250: Can XAU/USD Stage an M15 Rebound?",
+        "url": "https://www.fastbull.com/cn/news-detail/gold-drops-to-4250-can-xauusd-stage-an-4386703_0",
+        "hot": "",
+        "time": "03:14"
+      },
+      {
+        "platform": "法布财经",
+        "title": "USD/CAD Breaks Above 1.4100 as US Yields Surge",
+        "url": "https://www.fastbull.com/cn/news-detail/usdcad-breaks-above-14100-as-us-yields-surge-4386700_0",
+        "hot": "256",
+        "time": "20:08"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Gold Faces Fresh Selling as Fed Tightening Expectations Intensify",
+        "url": "https://www.fastbull.com/cn/news-detail/gold-faces-fresh-selling-as-fed-tightening-expectations-4386698_0",
+        "hot": "3145",
+        "time": "19:44"
+      },
+      {
+        "platform": "法布财经",
+        "title": "DXY Advances for Fourth Day on Hawkish Fed Outlook",
+        "url": "https://www.fastbull.com/cn/news-detail/dxy-advances-for-fourth-day-on-hawkish-fed-4386697_0",
+        "hot": "240",
+        "time": "19:16"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Ex-Dividend Price Drops: Calculate Your Real Total Return",
+        "url": "https://www.fastbull.com/cn/news-detail/total-return-on-exdividend-dividends-taxes-and-reinvestment-4386696_0",
+        "hot": "",
+        "time": "10:17"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Expanded Treasury Buybacks as Strong Economic Activity Fuels Inflation Concerns",
+        "url": "https://www.fastbull.com/cn/news-detail/expanded-treasury-buybacks-as-strong-economic-activity-fuels-4386695_0",
+        "hot": "",
+        "time": "09:27"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Bullish Rebound Could Emerge from Deep Oversold Conditions",
+        "url": "https://www.fastbull.com/cn/news-detail/bullish-rebound-could-emerge-from-deep-oversold-conditions-4386692_0",
+        "hot": "296",
+        "time": "08:39"
+      },
+      {
+        "platform": "法布财经",
+        "title": "Rebound Scenario Remains in Focus from Key Technical Levels",
+        "url": "https://www.fastbull.com/cn/news-detail/rebound-scenario-remains-in-focus-from-key-technical-4386690_0",
+        "hot": "299",
+        "time": "08:02"
+      }
+    ],
+    "pcbeta": [],
+    "solidot": [
+      {
+        "platform": "Solidot",
+        "title": "大象使用药用植物治疗自己",
+        "url": "https://www.solidot.org/story?sid=85477",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "全球平均气温每上升 1C 德国夏天气温上升 2.62C",
+        "url": "https://www.solidot.org/story?sid=85476",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "中国各地推动 AI 视频产业化",
+        "url": "https://www.solidot.org/story?sid=85475",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "F-Droid 2.0 发布",
+        "url": "https://www.solidot.org/story?sid=85474",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "蝙蝠起源于欧洲",
+        "url": "https://www.solidot.org/story?sid=85473",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "部分三星智能冰箱在升级固件之后停止工作",
+        "url": "https://www.solidot.org/story?sid=85472",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "微软放弃封禁 Microslop",
+        "url": "https://www.solidot.org/story?sid=85471",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "阿根廷生育率十年内下降五成",
+        "url": "https://www.solidot.org/story?sid=85470",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "arXiv 项目获得 1720 万美元的捐赠承诺",
+        "url": "https://www.solidot.org/story?sid=85469",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "2025 年全台每 46 名新生儿就有 1 个是台积电宝宝",
+        "url": "https://www.solidot.org/story?sid=85468",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "年检显示高里程电动车比汽油车更可靠",
+        "url": "https://www.solidot.org/story?sid=85467",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "不要被 AI 炒作愚弄",
+        "url": "https://www.solidot.org/story?sid=85466",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "英国准备施压 Google 向 Android 和 Chrome 用户展示 AI 助手选择屏",
+        "url": "https://www.solidot.org/story?sid=85465",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "全球陆地热浪更早到来、发展得更快",
+        "url": "https://www.solidot.org/story?sid=85464",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "美国准备再次制裁 ICC",
+        "url": "https://www.solidot.org/story?sid=85463",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "八种常用食品防腐剂与高血压相关",
+        "url": "https://www.solidot.org/story?sid=85462",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "丰田命令员工训练人形机器人，否认会替代人类员工",
+        "url": "https://www.solidot.org/story?sid=85461",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "地热变形虫能在 63 摄氏度下生存",
+        "url": "https://www.solidot.org/story?sid=85460",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "Adobe 推出 Android 版免费视频编辑工具 Premiere",
+        "url": "https://www.solidot.org/story?sid=85459",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "Solidot",
+        "title": "黑客声称入侵了 FBI 窃取雇员信息",
+        "url": "https://www.solidot.org/story?sid=85457",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "aihot": [
+      {
+        "platform": "AIHOT",
+        "title": "Qwen 团队发布 Qwen3.8-Omni-Flash 报告：面向原生全模态智能体",
+        "url": "https://x.com/dair_ai/status/2103573552611926373",
+        "hot": "X：DAIR.AI (@dair_ai) · paper",
+        "time": "03:53"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Arena：GPT-6 Sol （Max） 以 +7.7% 净改进重塑 Agent Arena Pareto 前沿",
+        "url": "https://x.com/arena/status/2103572481206538439",
+        "hot": "X：Arena (@arena) · paper",
+        "time": "03:48"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "GPT-6 Sol （Max） 登陆 Arena Agent Arena 排行榜第 6 名，净提升 +7.7%",
+        "url": "https://x.com/arena/status/2103571568467288451",
+        "hot": "X：Arena (@arena) · ai-models",
+        "time": "03:45"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "TypeSafe Jevelopers Discord 首周",
+        "url": "https://x.com/typesafeai/status/2103569575061451137",
+        "hot": "@typesafeai",
+        "time": "03:37"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Sam Altman 谈 OpenAI 智能体训练期联网行为审查进展",
+        "url": "https://x.com/sama/status/2103567198690349362",
+        "hot": "X：Sam Altman (@sama) · tip",
+        "time": "03:27"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "OpenAI 披露 Hugging Face 事件后续模型行为审查进展",
+        "url": "https://x.com/OpenAI/status/2103566736356458911",
+        "hot": "X：OpenAI (@OpenAI) · tip",
+        "time": "03:26"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Suno 发布新曲《Take Me Back》",
+        "url": "https://x.com/suno/status/2103563987963011148",
+        "hot": "X：Suno (@suno)",
+        "time": "03:15"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Qwen 团队发布 Qwen3.8-Omni-Flash 全模态智能体模型报告",
+        "url": "https://x.com/dair_ai/status/2103563695381209417",
+        "hot": "X：DAIR.AI (@dair_ai) · paper",
+        "time": "03:14"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Anthropic 与 Akamai 达成七年 116 亿美元云协议，附带最高约 5% 股份认股权证",
+        "url": "https://techcrunch.com/2026/09/25/anthropic-to-pay-akamai-11-6-billion-over-seven-years-in-cloud-deal",
+        "hot": "TechCrunch：AI（RSS） · industry",
+        "time": "03:13"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "LangGraph 如何编排 TypeSafe AI 决策模型 Jev 构建生产级智能体",
+        "url": "https://www.langchain.com/blog/building-prod-with-jev-and-langgraph",
+        "hot": "LangChain：Blog（RSS）",
+        "time": "03:11"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "CESifo 工作论文：数据未显示 AI 冲击应届大学毕业生就业",
+        "url": "https://arstechnica.com/ai/2026/09/ai-was-supposed-to-hit-new-grads-hard-so-far-unemployment-data-says-otherwise",
+        "hot": "Ars Technica：AI（RSS） · paper",
+        "time": "03:11"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Claude Code 达限时优雅收尾",
+        "url": "https://x.com/ClaudeDevs/status/2103561342057943314",
+        "hot": "X：Claude Devs (@ClaudeDevs)",
+        "time": "03:04"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Viggle Turbo v0.2 发布：6 步出图",
+        "url": "https://x.com/ViggleAI/status/2103560675255853318",
+        "hot": "X：Viggle AI (@ViggleAI)",
+        "time": "03:02"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Kev 4B 开源模型上线 OpenRouter",
+        "url": "https://x.com/OpenRouter/status/2103560670205886744",
+        "hot": "X：OpenRouter (@OpenRouter)",
+        "time": "03:02"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Replit 周末前喊你来构建",
+        "url": "https://x.com/Replit/status/2103560573975687301",
+        "hot": "X：Replit (@Replit)",
+        "time": "03:01"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Topcoat v0.9 发布：Rust 全栈框架加入客户端响应式与服务端流式 UI",
+        "url": "https://tokio.rs/blog/2026-09-24-topcoat-server-applications",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译）",
+        "time": "02:59"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "AI 智能体 token 消耗或 2030 年增长 24 倍",
+        "url": "https://x.com/rohanpaul_ai/status/2103560058395320468",
+        "hot": "X：Rohan Paul (@rohanpaul_ai)",
+        "time": "02:59"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Claude 将粒子物理散射振幅计算从 8 环推进到 9 环，Lance Dixon 独立验证",
+        "url": "https://x.com/rohanpaul_ai/status/2103558769984860287",
+        "hot": "X：Rohan Paul (@rohanpaul_ai) · paper",
+        "time": "02:54"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Claude 浏览器使用失败案例征集",
+        "url": "https://x.com/trq212/status/2103555690463965552",
+        "hot": "X：Thariq (@trq212)",
+        "time": "02:42"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "联邦上诉法院维持五角大楼将 Anthropic 列为国家安全供应链风险的决定",
+        "url": "https://the-decoder.com/pentagon-was-right-to-slap-anthropic-with-a-security-supply-chain-risk-label-federal-court-says",
+        "hot": "The Decoder：AI News（RSS） · industry",
+        "time": "02:40"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "美国上诉法院 2 比 1 维持五角大楼将 Anthropic 列为供应链风险的决定",
+        "url": "https://www.cnbc.com/2026/09/25/pentagon-anthropic-ai-risk-appeals-court.html",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译） · industry",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "机密预算显示美国国家安全局今年斥资数十亿美元测试前沿 AI 模型",
+        "url": "https://www.washingtonsun.com/technology/classified-estimates-nsa-paying-billions-to-test-ai-models",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译） · industry",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "第一性原理思维：资深工程师如何在智能体时代保持动量",
+        "url": "https://sunilsadasivan.com/writing/first-principles-thinking",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译）",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "黄仁勋称\"不知道自家地址\"：科技大佬的怪诞言论是一场服从性测试",
+        "url": "https://tante.cc/2026/09/24/the-test",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译）",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Go 1.26/1.27 推出平台无关的实验性 SIMD 接口",
+        "url": "https://go.dev/blog/simd-experiment",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译） · ai-products",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Ink & Switch 推出十周年互动艺术项目 Tenfold",
+        "url": "https://www.inkandswitch.com/",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译）",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "在 M6 Mac Mini 上通过 86Box 模拟运行 600MHz 奔腾 II 与 Voodoo 3",
+        "url": "https://nyaa.sh/reviews/mac-mini-m6-emulation",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译）",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Rails 作者评论 DHH 在 Rails World 2026 主题演讲：Hey 弃用 Rails 而愿景缺席",
+        "url": "https://jardo.dev/what-about-rails",
+        "hot": "Hacker News 热门（buzzing.cc 中文翻译） · tip",
+        "time": "02:36"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "英国 AI 云厂商 Nscale 美国上市前完成 33.6 亿美元可转债融资",
+        "url": "https://techcrunch.com/2026/09/25/ahead-of-u-s-ipo-british-ai-neocloud-nscale-secures-3-36b-in-convertible-finacing",
+        "hot": "TechCrunch：AI（RSS） · industry",
+        "time": "02:33"
+      },
+      {
+        "platform": "AIHOT",
+        "title": "Grok Bot 上线 X API 工程师",
+        "url": "https://x.com/ericzakariasson/status/2103552345342922799",
+        "hot": "X：Eric Zakariasson (@ericzakariasson)",
+        "time": "02:28"
+      }
+    ],
+    "producthunt": [
+      {
+        "platform": "Product Hunt",
+        "title": "10xJoy",
+        "url": "https://www.producthunt.com/products/10xjoy",
+        "hot": "",
+        "time": "14:47"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Quiver GTM",
+        "url": "https://www.producthunt.com/products/quiver-gtm",
+        "hot": "",
+        "time": "09:50"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Bleetz Network",
+        "url": "https://www.producthunt.com/products/bleetz-network",
+        "hot": "",
+        "time": "02:37"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "PixVerse R2",
+        "url": "https://www.producthunt.com/products/pixverse-r2",
+        "hot": "",
+        "time": "17:26"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "RemoteConsole",
+        "url": "https://www.producthunt.com/products/remoteconsole",
+        "hot": "",
+        "time": "17:20"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "SocialGPT",
+        "url": "https://www.producthunt.com/products/socialgpt",
+        "hot": "",
+        "time": "08:50"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Kapshot",
+        "url": "https://www.producthunt.com/products/kapshot",
+        "hot": "",
+        "time": "18:25"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Basedash MCP write",
+        "url": "https://www.producthunt.com/products/basedash",
+        "hot": "",
+        "time": "06:20"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Kaiku",
+        "url": "https://www.producthunt.com/products/kaiku",
+        "hot": "",
+        "time": "09:58"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Jango",
+        "url": "https://www.producthunt.com/products/jango",
+        "hot": "",
+        "time": "10:16"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Donna",
+        "url": "https://www.producthunt.com/products/donna-4",
+        "hot": "",
+        "time": "03:59"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "ShroomPen",
+        "url": "https://www.producthunt.com/products/shroompen",
+        "hot": "",
+        "time": "10:41"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Squints",
+        "url": "https://www.producthunt.com/products/squints",
+        "hot": "",
+        "time": "06:46"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Promptic",
+        "url": "https://www.producthunt.com/products/promptic-3",
+        "hot": "",
+        "time": "20:06"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Wand",
+        "url": "https://www.producthunt.com/products/wand-6",
+        "hot": "",
+        "time": "10:17"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Designeer",
+        "url": "https://www.producthunt.com/products/designeer",
+        "hot": "",
+        "time": "02:06"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Howseen AI",
+        "url": "https://www.producthunt.com/products/howseen-ai",
+        "hot": "",
+        "time": "23:29"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "DEV·TV",
+        "url": "https://www.producthunt.com/products/dev-tv",
+        "hot": "",
+        "time": "22:29"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "14 gentle mornings by Small WIns",
+        "url": "https://www.producthunt.com/products/14-gentle-mornings-by-small-wins",
+        "hot": "",
+        "time": "18:35"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "TourKit",
+        "url": "https://www.producthunt.com/products/tourkit",
+        "hot": "",
+        "time": "18:04"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "GitHub statistics · Velocity Radar",
+        "url": "https://www.producthunt.com/products/github-statistics-velocity-radar",
+        "hot": "",
+        "time": "17:51"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Polyglot",
+        "url": "https://www.producthunt.com/products/polyglot-5",
+        "hot": "",
+        "time": "04:31"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "shadow-planner",
+        "url": "https://www.producthunt.com/products/shadow-planner",
+        "hot": "",
+        "time": "18:08"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Cutsio",
+        "url": "https://www.producthunt.com/products/cutsio",
+        "hot": "",
+        "time": "01:05"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "LaterOn v2: The agentic email plaftform",
+        "url": "https://www.producthunt.com/products/lateron-email",
+        "hot": "",
+        "time": "12:57"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Dictoterix",
+        "url": "https://www.producthunt.com/products/dictoterix",
+        "hot": "",
+        "time": "04:08"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Markly",
+        "url": "https://www.producthunt.com/products/markly-3",
+        "hot": "",
+        "time": "18:20"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "DemoScreen",
+        "url": "https://www.producthunt.com/products/demoscreen",
+        "hot": "",
+        "time": "18:35"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Token Forecaster",
+        "url": "https://www.producthunt.com/products/token-forecaster",
+        "hot": "",
+        "time": "12:40"
+      },
+      {
+        "platform": "Product Hunt",
+        "title": "Meta VR Glasses",
+        "url": "https://www.producthunt.com/products/meta-vr-glasses",
+        "hot": "",
+        "time": "11:53"
+      }
+    ],
+    "chongbuluo": [
+      {
+        "platform": "虫部落",
+        "title": "线上在哪里可以买到正宗的不被宰的港版手机?",
+        "url": "https://www.chongbuluo.com/thread-25210-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "给家里老人做了一个吃药提醒小程序，希望能帮到同样有需要的人",
+        "url": "https://www.chongbuluo.com/thread-25209-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "有小伙伴出过书吗",
+        "url": "https://www.chongbuluo.com/thread-25208-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "关于AI漫剧",
+        "url": "https://www.chongbuluo.com/thread-25207-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "知识科普丨交互式蜥形纲、两栖纲、哺乳纲演化树",
+        "url": "https://www.chongbuluo.com/thread-25206-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "昆虫纲科级、脊索动物科级、昆虫纲科级等知识图谱",
+        "url": "https://www.chongbuluo.com/thread-25203-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "我不敢太高兴，可我真的很想说说这个28岁",
+        "url": "https://www.chongbuluo.com/thread-25202-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "一个县 2500 个飞手，跑到 11 个省找活：飞机进了国家文件，开飞机的人还没有",
+        "url": "https://www.chongbuluo.com/thread-25201-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "程序员现在都用什么AIcoding啊",
+        "url": "https://www.chongbuluo.com/thread-25200-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "告别低效，从拥有一个全能AI助手开始",
+        "url": "https://www.chongbuluo.com/thread-25199-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "学考真的分离了吗",
+        "url": "https://www.chongbuluo.com/thread-25198-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "《西游记》知识库——人物、章节、地理、法宝、台词一站式查询",
+        "url": "https://www.chongbuluo.com/thread-25197-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "《通用规范汉字表》8105 个规范字的网页版检索工具",
+        "url": "https://www.chongbuluo.com/thread-25196-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "有虫友知道Shuake邀请码怎么获得吗？",
+        "url": "https://www.chongbuluo.com/thread-25195-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "马上要面试了，感觉好紧张",
+        "url": "https://www.chongbuluo.com/thread-25194-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "分享一个自用工具：在闲鱼商品页让 AI 帮你估价、挑毛病、写砍价话术",
+        "url": "https://www.chongbuluo.com/thread-25193-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "有买过流量卡的伙伴么",
+        "url": "https://www.chongbuluo.com/thread-25192-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "新人的第一个长期帖，给虫友们提供些财税法的干货支持，啥都可以咨询",
+        "url": "https://www.chongbuluo.com/thread-25191-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "一个好用的资源聚合网站",
+        "url": "https://www.chongbuluo.com/thread-25190-1-1.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虫部落",
+        "title": "突然，被自己治愈了！！！",
+        "url": "https://www.chongbuluo.com/thread-25189-1-1.html",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "ithome": [
+      {
+        "platform": "IT之家",
+        "title": "比尔 · 盖茨呼吁美国立法监管 AI 开发：没有人会认为只靠行业自律就够了",
+        "url": "https://www.ithome.com/1/007/253.htm",
+        "hot": "",
+        "time": "2026-09-25 23:48:28"
+      },
+      {
+        "platform": "IT之家",
+        "title": "畅销小说被指用 AI 创作，法国最有名文学奖龚古尔奖将其移出初选名单",
+        "url": "https://www.ithome.com/1/007/252.htm",
+        "hot": "",
+        "time": "2026-09-25 23:33:07"
+      },
+      {
+        "platform": "IT之家",
+        "title": "首个入驻纽约时代广场的中国影像品牌，影石首家美国旗舰店开业",
+        "url": "https://www.ithome.com/1/007/251.htm",
+        "hot": "",
+        "time": "2026-09-25 23:23:52"
+      },
+      {
+        "platform": "IT之家",
+        "title": "前 R 星开发者哈特维克：《GTA 6》登陆任天堂 Switch 2“没什么意义”",
+        "url": "https://www.ithome.com/1/007/250.htm",
+        "hot": "",
+        "time": "2026-09-25 23:22:22"
+      },
+      {
+        "platform": "IT之家",
+        "title": "2026 WSBK 意大利站超级杆位赛：张雪机车德比斯排第八",
+        "url": "https://www.ithome.com/1/007/249.htm",
+        "hot": "",
+        "time": "2026-09-25 23:16:31"
+      },
+      {
+        "platform": "IT之家",
+        "title": "Counterpoint：2025-2030 年间，全球 200 美元以下智能手机年出货将减少超 2.3 亿部",
+        "url": "https://www.ithome.com/1/007/248.htm",
+        "hot": "",
+        "time": "2026-09-25 23:05:33"
+      },
+      {
+        "platform": "IT之家",
+        "title": "罗永浩回应交个朋友代销劣质溜溜凳：2022 年 5 月已退出管理层，承认严重质量管理事故",
+        "url": "https://www.ithome.com/1/007/247.htm",
+        "hot": "",
+        "time": "2026-09-25 22:38:53"
+      },
+      {
+        "platform": "IT之家",
+        "title": "曝特斯拉 Optimus 产量扩至原有规模约 10 倍，规模化量产难题仍未解决",
+        "url": "https://www.ithome.com/1/007/246.htm",
+        "hot": "",
+        "time": "2026-09-25 22:29:55"
+      },
+      {
+        "platform": "IT之家",
+        "title": "德国柏林警方借助人工智能监控摄像头打击犯罪，自动识别暴力和破坏行为",
+        "url": "https://www.ithome.com/1/007/245.htm",
+        "hot": "",
+        "time": "2026-09-25 22:20:46"
+      },
+      {
+        "platform": "IT之家",
+        "title": "小米 18 Fold 中折叠首销情况曝光：9 月 7 日-13 日约 3.97 万台",
+        "url": "https://www.ithome.com/1/007/244.htm",
+        "hot": "",
+        "time": "2026-09-25 21:43:30"
+      },
+      {
+        "platform": "IT之家",
+        "title": "北京越野 BJ40 增程 15.6 英寸联屏车型首次 OTA 推送，新增苹果 CarPlay 等",
+        "url": "https://www.ithome.com/1/007/243.htm",
+        "hot": "",
+        "time": "2026-09-25 21:27:38"
+      },
+      {
+        "platform": "IT之家",
+        "title": "世界第一辆汽车专利申请 140 周年“献礼作”，AMG 首款纯电专属架构 SUV 谍照再曝",
+        "url": "https://www.ithome.com/1/007/242.htm",
+        "hot": "",
+        "time": "2026-09-25 21:12:41"
+      },
+      {
+        "platform": "IT之家",
+        "title": "高盛：美国五大云巨头每年 AI 收入 3000 亿美元，才可盈亏平衡",
+        "url": "https://www.ithome.com/1/007/232.htm",
+        "hot": "",
+        "time": "2026-09-25 20:56:25"
+      },
+      {
+        "platform": "IT之家",
+        "title": "聊天、编程、智能体三合一，微软正式发布新版 Copilot“超级应用”",
+        "url": "https://www.ithome.com/1/007/230.htm",
+        "hot": "",
+        "time": "2026-09-25 20:37:23"
+      },
+      {
+        "platform": "IT之家",
+        "title": "长安汽车：深化与宁德时代合作，钠新换电技术项目立项",
+        "url": "https://www.ithome.com/1/007/229.htm",
+        "hot": "",
+        "time": "2026-09-25 20:24:18"
+      },
+      {
+        "platform": "IT之家",
+        "title": "英国最大 AI 超算面临供电问题：原定明年上线，或拖到 2030 年代中期",
+        "url": "https://www.ithome.com/1/007/228.htm",
+        "hot": "",
+        "time": "2026-09-25 20:19:29"
+      },
+      {
+        "platform": "IT之家",
+        "title": "“交个朋友”就所售万向轮溜溜凳木板发霉等致歉：全面下架，启动退赔处理流程",
+        "url": "https://www.ithome.com/1/007/225.htm",
+        "hot": "",
+        "time": "2026-09-25 20:05:11"
+      },
+      {
+        "platform": "IT之家",
+        "title": "2026 中秋节电影票房破亿：时隔七年重映漫威《复仇者联盟 4》加码臻享版登顶",
+        "url": "https://www.ithome.com/1/007/212.htm",
+        "hot": "",
+        "time": "2026-09-25 19:47:31"
+      },
+      {
+        "platform": "IT之家",
+        "title": "第 48 届世界技能大赛在沪举办，新增 3 项人工智能相关赛项创历届之最",
+        "url": "https://www.ithome.com/1/007/206.htm",
+        "hot": "",
+        "time": "2026-09-25 19:31:56"
+      },
+      {
+        "platform": "IT之家",
+        "title": "陈立武：英特尔会维持在台积电前十大客户之列，我很敬佩张忠谋",
+        "url": "https://www.ithome.com/1/007/205.htm",
+        "hot": "",
+        "time": "2026-09-25 19:21:20"
+      },
+      {
+        "platform": "IT之家",
+        "title": "Reddit 版主大规模复制、传播盗版 Switch 游戏，被判赔偿任天堂 450 万美元",
+        "url": "https://www.ithome.com/1/007/203.htm",
+        "hot": "",
+        "time": "2026-09-25 18:59:30"
+      },
+      {
+        "platform": "IT之家",
+        "title": "Shift Up CEO 金亨泰：《剑星》曾濒临绝境，一度只发得起三个月工资",
+        "url": "https://www.ithome.com/1/007/202.htm",
+        "hot": "",
+        "time": "2026-09-25 18:43:13"
+      },
+      {
+        "platform": "IT之家",
+        "title": "奕境 X9 上市 24 小时大定 9157 台，满配华为乾崑全栈智能",
+        "url": "https://www.ithome.com/1/007/185.htm",
+        "hot": "",
+        "time": "2026-09-25 18:05:01"
+      },
+      {
+        "platform": "IT之家",
+        "title": "比亚迪大汉上市定档 10 月 13 日：纯电车型续航破千，预售价 24.99 万-29.99 万元",
+        "url": "https://www.ithome.com/1/007/183.htm",
+        "hot": "",
+        "time": "2026-09-25 18:03:24"
+      },
+      {
+        "platform": "IT之家",
+        "title": "纽约市议员提议立法奖励危险 AI 举报人，奖金来自收取的罚款",
+        "url": "https://www.ithome.com/1/007/170.htm",
+        "hot": "",
+        "time": "2026-09-25 17:53:14"
+      },
+      {
+        "platform": "IT之家",
+        "title": "LG 电子被印度追缴约 15.4 亿卢比关税",
+        "url": "https://www.ithome.com/1/007/169.htm",
+        "hot": "",
+        "time": "2026-09-25 17:45:31"
+      }
+    ],
+    "36kr": [
+      {
+        "platform": "36Kr快讯",
+        "title": "IMF：2026年全球AI投资规模或突破2万亿美元，成为增长重要驱动力",
+        "url": "https://www.36kr.com/newsflashes/3998607176274049",
+        "hot": "",
+        "time": "10小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "交通运输部：9月24日全社会跨区域人员流动量22850.9万人次",
+        "url": "https://www.36kr.com/newsflashes/3998606708920448",
+        "hot": "",
+        "time": "10小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "日本监管机构正加强对人工智能数据中心融资的审查力度",
+        "url": "https://www.36kr.com/newsflashes/3998605168529284",
+        "hot": "",
+        "time": "10小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "2026年中秋档票房突破1亿元",
+        "url": "https://www.36kr.com/newsflashes/3998593904595075",
+        "hot": "",
+        "time": "10小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "亚马逊推出工具帮助商家管理沃尔玛、Shopify等平台库",
+        "url": "https://www.36kr.com/newsflashes/3998593465749640",
+        "hot": "",
+        "time": "11小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "马斯克计划在年底前将Colossus 2的英伟达芯片数量增加一倍",
+        "url": "https://www.36kr.com/newsflashes/3998521879810183",
+        "hot": "",
+        "time": "11小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "恒指收跌1.01%，恒生科技指数跌1.13%",
+        "url": "https://www.36kr.com/newsflashes/3998547448500357",
+        "hot": "",
+        "time": "11小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "通航满一周，平陆运河全线运行平稳有序",
+        "url": "https://www.36kr.com/newsflashes/3998486613168265",
+        "hot": "",
+        "time": "12小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "中信证券：高阶智驾加速渗透，产业链持续受益",
+        "url": "https://www.36kr.com/newsflashes/3998474433253504",
+        "hot": "",
+        "time": "12小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "国盛、湘财证券被立案后罚单出炉：暂停新开户3个月，多名责任人被追责",
+        "url": "https://www.36kr.com/newsflashes/3998470352506760",
+        "hot": "",
+        "time": "12小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "欧洲央行三大高层职位将陆续空缺，人事接班竞争料加剧",
+        "url": "https://www.36kr.com/newsflashes/3998467504148617",
+        "hot": "",
+        "time": "13小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "报告：今夏热浪预计致德国损失约250亿欧元",
+        "url": "https://www.36kr.com/newsflashes/3998465842483080",
+        "hot": "",
+        "time": "13小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "Nanexa与诺和诺德就长效注射剂达成11.65亿欧元全球许可和合作协议",
+        "url": "https://www.36kr.com/newsflashes/3998408154435462",
+        "hot": "",
+        "time": "13小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "印度允许规模4630亿美元的财富类基金出海投资",
+        "url": "https://www.36kr.com/newsflashes/3998404978724745",
+        "hot": "",
+        "time": "13小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "日本10年期国债收益率一度升至3.115%",
+        "url": "https://www.36kr.com/newsflashes/3998381187288966",
+        "hot": "",
+        "time": "14小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "特斯拉Semi电动卡车开启量产交付",
+        "url": "https://www.36kr.com/newsflashes/3998407736856449",
+        "hot": "",
+        "time": "14小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "海外机构调研股出炉，融资客加仓多只个股",
+        "url": "https://www.36kr.com/newsflashes/3998381724438400",
+        "hot": "",
+        "time": "14小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "影石正布局AI眼镜，或采用“分体电池”设计",
+        "url": "https://www.36kr.com/newsflashes/3998333280227202",
+        "hot": "",
+        "time": "14小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "受AI相关产品等拉动，泰国出口创四年最大增幅",
+        "url": "https://www.36kr.com/newsflashes/3998333856337800",
+        "hot": "",
+        "time": "14小时前"
+      },
+      {
+        "platform": "36Kr快讯",
+        "title": "华泰证券：部分商金浮息债提供了更厚的收益补偿，更适合能够承受一定流动性约束、以持有至到期为主的配置型账户",
+        "url": "https://www.36kr.com/newsflashes/3998333027471241",
+        "hot": "",
+        "time": "15小时前"
+      }
+    ],
+    "36kr-renqi": [
+      {
+        "platform": "36Kr热榜",
+        "title": "刚刚，DeepSeek Harness桌面预览版上线！",
+        "url": "https://36kr.com/p/3998199345500040",
+        "hot": "AI前线  |  155点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "ChatGPT要卖500美元的Pro Max套餐了！",
+        "url": "https://36kr.com/p/3998280592396421",
+        "hot": "新智元  |  124点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "大厂AI赛马下，腾讯“龙虾”退场",
+        "url": "https://36kr.com/p/3997508606972040",
+        "hot": "科技狐  |  25点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "一件T恤卖2块，河北人把义乌打懵了",
+        "url": "https://36kr.com/p/3998444556570500",
+        "hot": "金错刀  |  63点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "月饼，还是炒着最好吃",
+        "url": "https://36kr.com/p/3998083291140230",
+        "hot": "冯仑风马牛  |  58点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "难吃的飞机餐，终于要洗心革面了？",
+        "url": "https://36kr.com/p/3998104073965445",
+        "hot": "新周刊  |  51点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "阿莫迪偷师姚顺雨，奥特曼偷师梁文锋",
+        "url": "https://36kr.com/p/3998565950330503",
+        "hot": "字母AI  |  89点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "OpenAI闯大祸！GPT竟黑进医保系统，黄仁勋：管不住就关掉",
+        "url": "https://36kr.com/p/3998452251545473",
+        "hot": "量子位  |  30点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "每人持股约2%，却要50.1%投票权：Anthropic创始人的IPO算盘",
+        "url": "https://36kr.com/p/3998243846459524",
+        "hot": "机器之心  |  68点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "Codex和Claude Code都跑偏了，前OpenAI研究员称Jev出现前AI世界是个悲剧",
+        "url": "https://36kr.com/p/3998248835551367",
+        "hot": "极客邦科技InfoQ  |  64点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "跌落神坛的微型电动车：当低价不再是万能灵药",
+        "url": "https://36kr.com/p/3998423118155911",
+        "hot": "DoNews  |  14点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "月饼第一股，有多赚钱？",
+        "url": "https://36kr.com/p/3998224539520897",
+        "hot": "融资中国  |  29点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "中秋月饼卖不动了？“液体月饼”已经冲上奶茶店销量Top1！",
+        "url": "https://36kr.com/p/3998151984533385",
+        "hot": "咖门",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "被中国资本收购后，麦当劳的“卫生神话”破灭了？",
+        "url": "https://36kr.com/p/3998126701205379",
+        "hot": "锌消费研究中心",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "1.4 万亿美元的预付款谁来收货？",
+        "url": "https://36kr.com/p/3998202026446978",
+        "hot": "王智远  |  24点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "平均翻倍！卖不动钻石，却越涨越猛",
+        "url": "https://36kr.com/p/3998623185703048",
+        "hot": "格隆汇",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "代言翻车，谁来背锅",
+        "url": "https://36kr.com/p/3998283601039240",
+        "hot": "娱乐硬糖",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "花上千块买冰箱贴，这届年轻人为何爱上博物馆文创？",
+        "url": "https://36kr.com/p/3998306499465090",
+        "hot": "金融八卦女  |  19点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "消费分层加剧，Costco依旧\"稳坐钓鱼台\"？",
+        "url": "https://36kr.com/p/3998209298206600",
+        "hot": "海豚投研  |  19点赞",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "从TVB到华谊兄弟，黎瑞刚拼出“东方好莱坞”？",
+        "url": "https://36kr.com/p/3998306537639815",
+        "hot": "金融八卦女",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "中国公司全球化周报｜Temu欧洲4国零售登顶、8国第二 / 京洽会报名持续进行中",
+        "url": "https://36kr.com/p/3998243157430408",
+        "hot": "36氪出海",
+        "time": ""
+      },
+      {
+        "platform": "36Kr热榜",
+        "title": "“9・24”行情两周年：A股市值暴增45万亿，1430只个股翻倍",
+        "url": "https://36kr.com/p/3998500989865865",
+        "hot": "时代财经",
+        "time": ""
+      }
+    ],
+    "xueqiu-hotstock": [
+      {
+        "platform": "雪球热门股票",
+        "title": "SK海力士",
+        "url": "https://xueqiu.com/s/SKHY",
+        "hot": "2.78% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "英伟达",
+        "url": "https://xueqiu.com/s/NVDA",
+        "hot": "0.22% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "闪迪",
+        "url": "https://xueqiu.com/s/SNDK",
+        "hot": "1.38% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "美光科技",
+        "url": "https://xueqiu.com/s/MU",
+        "hot": "0.16% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "Moderna",
+        "url": "https://xueqiu.com/s/MRNA",
+        "hot": "2.08% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "微软",
+        "url": "https://xueqiu.com/s/MSFT",
+        "hot": "3.66% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "英特尔",
+        "url": "https://xueqiu.com/s/INTC",
+        "hot": "-3.45% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "Meta",
+        "url": "https://xueqiu.com/s/META",
+        "hot": "-3.33% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "Bloom Energy",
+        "url": "https://xueqiu.com/s/BE",
+        "hot": "8.27% NYSE",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "特斯拉",
+        "url": "https://xueqiu.com/s/TSLA",
+        "hot": "-1.54% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "Lumentum控股",
+        "url": "https://xueqiu.com/s/LITE",
+        "hot": "1.36% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "苹果",
+        "url": "https://xueqiu.com/s/AAPL",
+        "hot": "1.53% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "SpaceX",
+        "url": "https://xueqiu.com/s/SPCX",
+        "hot": "0.43% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "超威半导体",
+        "url": "https://xueqiu.com/s/AMD",
+        "hot": "0.21% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "阿里巴巴",
+        "url": "https://xueqiu.com/s/BABA",
+        "hot": "-0.8% NYSE",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "戴尔科技",
+        "url": "https://xueqiu.com/s/DELL",
+        "hot": "5.01% NYSE",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "纳斯达克100指数ETF",
+        "url": "https://xueqiu.com/s/QQQ",
+        "hot": "0.46% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "拼多多",
+        "url": "https://xueqiu.com/s/PDD",
+        "hot": "-0.81% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "腾讯控股",
+        "url": "https://xueqiu.com/s/00700",
+        "hot": "-0.41% HK",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "甲骨文",
+        "url": "https://xueqiu.com/s/ORCL",
+        "hot": "-1.75% NYSE",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "半导体板块指数ETF-iShares",
+        "url": "https://xueqiu.com/s/SOXX",
+        "hot": "1.17% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "Nebius Group",
+        "url": "https://xueqiu.com/s/NBIS",
+        "hot": "-2.53% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "AXT",
+        "url": "https://xueqiu.com/s/AXTI",
+        "hot": "4.01% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "高通",
+        "url": "https://xueqiu.com/s/QCOM",
+        "hot": "3.97% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "迈威尔科技",
+        "url": "https://xueqiu.com/s/MRVL",
+        "hot": "1.15% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "谷歌A",
+        "url": "https://xueqiu.com/s/GOOGL",
+        "hot": "0.46% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "宁德时代",
+        "url": "https://xueqiu.com/s/SZ300750",
+        "hot": "-2.49% SZ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "胜宏科技",
+        "url": "https://xueqiu.com/s/SZ300476",
+        "hot": "-4.75% SZ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "Summit Therapeutics",
+        "url": "https://xueqiu.com/s/SMMT",
+        "hot": "-4.7% NASDAQ",
+        "time": ""
+      },
+      {
+        "platform": "雪球热门股票",
+        "title": "Circle",
+        "url": "https://xueqiu.com/s/CRCL",
+        "hot": "-4.3% NYSE",
+        "time": ""
+      }
+    ],
+    "kuaishou": [
+      {
+        "platform": "快手",
+        "title": "习近平圆满结束对美国的国事访问",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E4%B9%A0%E8%BF%91%E5%B9%B3%E5%9C%86%E6%BB%A1%E7%BB%93%E6%9D%9F%E5%AF%B9%E7%BE%8E%E5%9B%BD%E7%9A%84%E5%9B%BD%E4%BA%8B%E8%AE%BF%E9%97%AE",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "中美元首会谈",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E4%B8%AD%E7%BE%8E%E5%85%83%E9%A6%96%E4%BC%9A%E8%B0%88",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "国庆花篮又绽放",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%9B%BD%E5%BA%86%E8%8A%B1%E7%AF%AE%E5%8F%88%E7%BB%BD%E6%94%BE",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "大熊猫平平福双即将赴美",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%A4%A7%E7%86%8A%E7%8C%AB%E5%B9%B3%E5%B9%B3%E7%A6%8F%E5%8F%8C%E5%8D%B3%E5%B0%86%E8%B5%B4%E7%BE%8E",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "陈妤颉亚运百米夺金",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E9%99%88%E5%A6%A4%E9%A2%89%E4%BA%9A%E8%BF%90%E7%99%BE%E7%B1%B3%E5%A4%BA%E9%87%91",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "王楚钦孙颖莎晋级混双决赛",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E7%8E%8B%E6%A5%9A%E9%92%A6%E5%AD%99%E9%A2%96%E8%8E%8E%E6%99%8B%E7%BA%A7%E6%B7%B7%E5%8F%8C%E5%86%B3%E8%B5%9B",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "特朗普会中文的外孙女出席宴会",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E7%89%B9%E6%9C%97%E6%99%AE%E4%BC%9A%E4%B8%AD%E6%96%87%E7%9A%84%E5%A4%96%E5%AD%99%E5%A5%B3%E5%87%BA%E5%B8%AD%E5%AE%B4%E4%BC%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "豆包遭谐音梗套路自骂",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E8%B1%86%E5%8C%85%E9%81%AD%E8%B0%90%E9%9F%B3%E6%A2%97%E5%A5%97%E8%B7%AF%E8%87%AA%E9%AA%82",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "中秋消费新风向你读懂了吗",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E4%B8%AD%E7%A7%8B%E6%B6%88%E8%B4%B9%E6%96%B0%E9%A3%8E%E5%90%91%E4%BD%A0%E8%AF%BB%E6%87%82%E4%BA%86%E5%90%97",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "央视中秋晚会",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%A4%AE%E8%A7%86%E4%B8%AD%E7%A7%8B%E6%99%9A%E4%BC%9A",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "野生棕熊千万不要投喂",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E9%87%8E%E7%94%9F%E6%A3%95%E7%86%8A%E5%8D%83%E4%B8%87%E4%B8%8D%E8%A6%81%E6%8A%95%E5%96%82",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "亚运男子百米中国队无缘奖牌",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E4%BA%9A%E8%BF%90%E7%94%B7%E5%AD%90%E7%99%BE%E7%B1%B3%E4%B8%AD%E5%9B%BD%E9%98%9F%E6%97%A0%E7%BC%98%E5%A5%96%E7%89%8C",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "中秋前夕深圳多路段飘红",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E4%B8%AD%E7%A7%8B%E5%89%8D%E5%A4%95%E6%B7%B1%E5%9C%B3%E5%A4%9A%E8%B7%AF%E6%AE%B5%E9%A3%98%E7%BA%A2",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "大月饼里话团圆",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%A4%A7%E6%9C%88%E9%A5%BC%E9%87%8C%E8%AF%9D%E5%9B%A2%E5%9C%86",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "刘云梅任河源市委副书记",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%88%98%E4%BA%91%E6%A2%85%E4%BB%BB%E6%B2%B3%E6%BA%90%E5%B8%82%E5%A7%94%E5%89%AF%E4%B9%A6%E8%AE%B0",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "安徽连续6天有雨",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%AE%89%E5%BE%BD%E8%BF%9E%E7%BB%AD6%E5%A4%A9%E6%9C%89%E9%9B%A8",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "老江湖梁家辉坚持过肩摔",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E8%80%81%E6%B1%9F%E6%B9%96%E6%A2%81%E5%AE%B6%E8%BE%89%E5%9D%9A%E6%8C%81%E8%BF%87%E8%82%A9%E6%91%94",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "国庆中秋消防安全不放假",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%9B%BD%E5%BA%86%E4%B8%AD%E7%A7%8B%E6%B6%88%E9%98%B2%E5%AE%89%E5%85%A8%E4%B8%8D%E6%94%BE%E5%81%87",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "古天乐电影侦战片场硬核哄娃",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%8F%A4%E5%A4%A9%E4%B9%90%E7%94%B5%E5%BD%B1%E4%BE%A6%E6%88%98%E7%89%87%E5%9C%BA%E7%A1%AC%E6%A0%B8%E5%93%84%E5%A8%83",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "张本智和放话日本乒乓已超中国",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%BC%A0%E6%9C%AC%E6%99%BA%E5%92%8C%E6%94%BE%E8%AF%9D%E6%97%A5%E6%9C%AC%E4%B9%92%E4%B9%93%E5%B7%B2%E8%B6%85%E4%B8%AD%E5%9B%BD",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "游本昌哈尔滨溜达影像",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E6%B8%B8%E6%9C%AC%E6%98%8C%E5%93%88%E5%B0%94%E6%BB%A8%E6%BA%9C%E8%BE%BE%E5%BD%B1%E5%83%8F",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "女子买到广西加密狗",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%A5%B3%E5%AD%90%E4%B9%B0%E5%88%B0%E5%B9%BF%E8%A5%BF%E5%8A%A0%E5%AF%86%E7%8B%97",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "海口查获违禁塑料制品",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E6%B5%B7%E5%8F%A3%E6%9F%A5%E8%8E%B7%E8%BF%9D%E7%A6%81%E5%A1%91%E6%96%99%E5%88%B6%E5%93%81",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "灯火里的中国唱出国泰民安",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E7%81%AF%E7%81%AB%E9%87%8C%E7%9A%84%E4%B8%AD%E5%9B%BD%E5%94%B1%E5%87%BA%E5%9B%BD%E6%B3%B0%E6%B0%91%E5%AE%89",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "中秋请自己吃一只帝王蟹",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E4%B8%AD%E7%A7%8B%E8%AF%B7%E8%87%AA%E5%B7%B1%E5%90%83%E4%B8%80%E5%8F%AA%E5%B8%9D%E7%8E%8B%E8%9F%B9",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "哈萨克斯坦军演事故12死",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%93%88%E8%90%A8%E5%85%8B%E6%96%AF%E5%9D%A6%E5%86%9B%E6%BC%94%E4%BA%8B%E6%95%8512%E6%AD%BB",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "在三角洲过中秋节",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%9C%A8%E4%B8%89%E8%A7%92%E6%B4%B2%E8%BF%87%E4%B8%AD%E7%A7%8B%E8%8A%82",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "当我意识到月饼只是一个形状",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%BD%93%E6%88%91%E6%84%8F%E8%AF%86%E5%88%B0%E6%9C%88%E9%A5%BC%E5%8F%AA%E6%98%AF%E4%B8%80%E4%B8%AA%E5%BD%A2%E7%8A%B6",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "快手",
+        "title": "吴艳妮在质疑声中向前冲",
+        "url": "https://www.kuaishou.com/search/video?searchKey=%E5%90%B4%E8%89%B3%E5%A6%AE%E5%9C%A8%E8%B4%A8%E7%96%91%E5%A3%B0%E4%B8%AD%E5%90%91%E5%89%8D%E5%86%B2",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "tencent": [
+      {
+        "platform": "腾讯新闻",
+        "title": "视频丨习近平和彭丽媛同美国总统特朗普夫妇茶叙",
+        "url": "https://view.inews.qq.com/a/20260926A00LBL00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "中国海警局：正告菲方立即停止挑衅滋事",
+        "url": "https://view.inews.qq.com/a/20260925A07AFH00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "山西省公安厅厅长调整",
+        "url": "https://view.inews.qq.com/a/20260925A09ZYQ00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "俄总统新闻秘书：俄美乌三方会晤或近期举行",
+        "url": "https://view.inews.qq.com/a/20260925A08TOQ00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "李在明：乌克兰违背共识，我深感遗憾",
+        "url": "https://view.inews.qq.com/a/20260925A080UT00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "破尘封24年赛会纪录！亚运会女子百米：17岁陈妤颉11秒06夺金",
+        "url": "https://view.inews.qq.com/a/20260925A09TCK00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "央行例会，出现新提法",
+        "url": "https://view.inews.qq.com/a/20260925A071EE00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "霍尔木兹海峡有望重开压低油价！市场或暂时抛开收益率梦魇",
+        "url": "https://view.inews.qq.com/a/20260925A09T0Y00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "中秋白酒消费变淡了？酒商大单减少，多家酒企不卖礼盒卖小酒",
+        "url": "https://view.inews.qq.com/a/20260925A081SN00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "消息称特斯拉Optimus机器人产能已提升10倍，大规模生产仍面临挑战",
+        "url": "https://view.inews.qq.com/a/20260925A09ZXQ00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "OpenAI闯大祸，GPT竟黑进医保系统，黄仁勋：管不住就关掉",
+        "url": "https://view.inews.qq.com/a/20260925A09W2C00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "聊天、编程、智能体三合一，微软正式发布新版Copilot“超级应用”",
+        "url": "https://view.inews.qq.com/a/20260925A09QC200",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "澳总理突然放话“不想当棋子”，在焦虑什么？",
+        "url": "https://view.inews.qq.com/a/20260925A09J2R00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "好一个双标！德工业界：保护主义要不得，但中国得“防”",
+        "url": "https://view.inews.qq.com/a/20260925A08VTQ00",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "腾讯新闻",
+        "title": "外媒：芬兰和瑞典首次联合拦截俄罗斯军机",
+        "url": "https://view.inews.qq.com/a/20260925A09U8Y00",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "kaopu": [],
+    "cankaoxiaoxi": [
+      {
+        "platform": "参考消息",
+        "title": "外媒：芬兰和瑞典首次联合拦截俄罗斯军机",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/3ed0b347b7e64eec80a5b5179b2a1ce0.html",
+        "hot": "",
+        "time": "21:21"
+      },
+      {
+        "platform": "参考消息",
+        "title": "股市剧烈波动损害“韩国品牌”",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/e87024676cf940ea9c4cc6ed8669b184.html",
+        "hot": "",
+        "time": "20:07"
+      },
+      {
+        "platform": "参考消息",
+        "title": "外媒：沙土巴三国总参谋长将召开紧急会议",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/426a7a7074554a8ca04b1d4d3224110d.html",
+        "hot": "",
+        "time": "20:07"
+      },
+      {
+        "platform": "参考消息",
+        "title": "法媒：人民币债券在全球愈发受欢迎",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/bcbcd283968f49c89aa5c0cdb3efbb0f.html",
+        "hot": "",
+        "time": "17:45"
+      },
+      {
+        "platform": "参考消息",
+        "title": "中国铁路迎来“双节”运输高峰",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/01fb76d7850e490ea4cce18f982ed2bd.html",
+        "hot": "",
+        "time": "17:45"
+      },
+      {
+        "platform": "参考消息",
+        "title": "黎巴嫩总理告诉伊朗总统：黎方拒绝外部干涉",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/5325d2c17206495db2d914cb0dee13db.html",
+        "hot": "",
+        "time": "16:51"
+      },
+      {
+        "platform": "参考消息",
+        "title": "英国央行暂停出售债券",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/af4d5398db1e482cb0f84e87077d7d6b.html",
+        "hot": "",
+        "time": "16:36"
+      },
+      {
+        "platform": "参考消息",
+        "title": "台“猎豹”战车实弹射击尴尬哑火",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/db5fef8225b745c8bc1d82bf823de106.html",
+        "hot": "",
+        "time": "16:22"
+      },
+      {
+        "platform": "参考消息",
+        "title": "外媒：内塔尼亚胡联合国演讲，多国代表退场",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/d30eba871b324c4bb4556a64ae037ff5.html",
+        "hot": "",
+        "time": "16:20"
+      },
+      {
+        "platform": "参考消息",
+        "title": "外媒：哈萨克斯坦里海军演事故，12名军人身亡",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/888589e70dc34ddea6ba836b3326d5b4.html",
+        "hot": "",
+        "time": "16:20"
+      },
+      {
+        "platform": "参考消息",
+        "title": "深化产业新连结符合两岸长远利益",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/05382ce9f7a34ad88f764db492eebdf2.html",
+        "hot": "",
+        "time": "16:20"
+      },
+      {
+        "platform": "参考消息",
+        "title": "宁波舟山港：“通达全球700多个港口，搭建起中国与世界联通的桥梁”",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/1054e6219bf04140b3436bc6f1736b19.html",
+        "hot": "",
+        "time": "16:19"
+      },
+      {
+        "platform": "参考消息",
+        "title": "西班牙首相呼吁管控对华经贸分歧",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/f96a37cf303f44a9a15c67b09b7f3a71.html",
+        "hot": "",
+        "time": "16:06"
+      },
+      {
+        "platform": "参考消息",
+        "title": "义乌：“五个发展关键词，确实能够改变一座城市的命运”",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/f3a1f3b5890f412f8079ed8f5b6cf6fb.html",
+        "hot": "",
+        "time": "16:05"
+      },
+      {
+        "platform": "参考消息",
+        "title": "梅林：“五条基本发展原则，成就新型农村现代化模式”",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/32bf9133c1e849c3845f3bd0038bca56.html",
+        "hot": "",
+        "time": "16:05"
+      },
+      {
+        "platform": "参考消息",
+        "title": "中国将为全球数字贸易贡献更大力量",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/fe1d8475bdff4425a04097e6aa90e4c5.html",
+        "hot": "",
+        "time": "16:04"
+      },
+      {
+        "platform": "参考消息",
+        "title": "卢旺达最大银行加入人民币结算网络",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/25/f7302708ef2c4c73818a17bee2e3b76f.html",
+        "hot": "",
+        "time": "16:04"
+      },
+      {
+        "platform": "参考消息",
+        "title": "英军成立首个“卫星保护中队”",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/24/96f3246d2da44e598e7883e82d63c6e3.html",
+        "hot": "",
+        "time": "20:44"
+      },
+      {
+        "platform": "参考消息",
+        "title": "土耳其将向伊拉克移交一座在伊军事基地",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/24/275c9452237746678fec41dbed0e3982.html",
+        "hot": "",
+        "time": "19:54"
+      },
+      {
+        "platform": "参考消息",
+        "title": "美媒：中国文化出口从成品转向平台",
+        "url": "https://ckxxapp.ckxx.net/pages/2026/09/24/5513ca9333b34617b8c7d72db37891d1.html",
+        "hot": "",
+        "time": "17:51"
+      }
+    ],
+    "hupu": [
+      {
+        "platform": "虎扑",
+        "title": "给你一个亿，但你需要完成下面一件事，怎么选？",
+        "url": "https://bbs.hupu.com/642569846.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "这两天听说中国体育没落了，是真的吗",
+        "url": "https://bbs.hupu.com/642593782.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "中国体育在亚洲层面已经属于落后了",
+        "url": "https://bbs.hupu.com/642584820.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "今晚这趟洗脚，感觉自己赚到了……",
+        "url": "https://bbs.hupu.com/642589251.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "到目前为止，你旅游过的城市，体验感最好和最差的城市是哪俩座？",
+        "url": "https://bbs.hupu.com/642573096.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "我是轩子，我来怼人了。虎扑里没有一个看直播的真粉",
+        "url": "https://bbs.hupu.com/642597389.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "感觉我国在亚洲的强项都在变弱 但这金牌数为啥差距越来越大 疯狂收割吗",
+        "url": "https://bbs.hupu.com/642592358.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "美团现在点外卖基本废了",
+        "url": "https://bbs.hupu.com/642594074.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "内娱女星内衣代言合集",
+        "url": "https://bbs.hupu.com/642584760.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "当众把球鞋扔出场！易建联生涯最失态的名场面 ！",
+        "url": "https://bbs.hupu.com/642573926.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "和高个球友如何打球",
+        "url": "https://bbs.hupu.com/642567262.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "给你一千万，但是一辈子只能使用一个品牌的电子产品你会选择？",
+        "url": "https://bbs.hupu.com/642587650.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "贾国龙：悬着的心彻底死了，毁灭吧",
+        "url": "https://bbs.hupu.com/642559231.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "单挑能力是真正超巨的试金石？三大持球高手车轮单挑，结局如何？",
+        "url": "https://bbs.hupu.com/642560230.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "真实案例。深圳一中介小哥讲述手中的一套房这几年是如何被钝刀割肉的",
+        "url": "https://bbs.hupu.com/642558724.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "天塌了",
+        "url": "https://bbs.hupu.com/642586130.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "这么多吹林葳的",
+        "url": "https://bbs.hupu.com/642558669.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "浙大不合并，最少还有3个211",
+        "url": "https://bbs.hupu.com/642556344.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "2026年高考满分作文，爷爷的那件衬衫是奖励，而我的衬衫价格是9磅15便士！",
+        "url": "https://bbs.hupu.com/642594660.html",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "虎扑",
+        "title": "这一波只能站城管了，这地方确实不能摆摊！",
+        "url": "https://bbs.hupu.com/642586176.html",
+        "hot": "",
+        "time": ""
+      }
+    ],
+    "tieba": [
+      {
+        "platform": "百度贴吧",
+        "title": "面王争霸赛,谁是你心目中的面王",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365746&amp;topic_name=%E9%9D%A2%E7%8E%8B%E4%BA%89%E9%9C%B8%E8%B5%9B%2C%E8%B0%81%E6%98%AF%E4%BD%A0%E5%BF%83%E7%9B%AE%E4%B8%AD%E7%9A%84%E9%9D%A2%E7%8E%8B",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "第一批已到账!签到5天白嫖50",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365575&amp;topic_name=%E7%AC%AC%E4%B8%80%E6%89%B9%E5%B7%B2%E5%88%B0%E8%B4%A6%21%E7%AD%BE%E5%88%B05%E5%A4%A9%E7%99%BD%E5%AB%9650",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "亚运会中国金牌数断层领先",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365725&amp;topic_name=%E4%BA%9A%E8%BF%90%E4%BC%9A%E4%B8%AD%E5%9B%BD%E9%87%91%E7%89%8C%E6%95%B0%E6%96%AD%E5%B1%82%E9%A2%86%E5%85%88",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "布森三枪破10刷新亚运纪录",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365797&amp;topic_name=%E5%B8%83%E6%A3%AE%E4%B8%89%E6%9E%AA%E7%A0%B410%E5%88%B7%E6%96%B0%E4%BA%9A%E8%BF%90%E7%BA%AA%E5%BD%95",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "完美世界停更,帝关战留到年底",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365794&amp;topic_name=%E5%AE%8C%E7%BE%8E%E4%B8%96%E7%95%8C%E5%81%9C%E6%9B%B4%2C%E5%B8%9D%E5%85%B3%E6%88%98%E7%95%99%E5%88%B0%E5%B9%B4%E5%BA%95",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "CN瓦一号种子天禄遭G2零封",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365726&amp;topic_name=CN%E7%93%A6%E4%B8%80%E5%8F%B7%E7%A7%8D%E5%AD%90%E5%A4%A9%E7%A6%84%E9%81%ADG2%E9%9B%B6%E5%B0%81",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "六连冠!国乒女团横扫日本夺金",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365665&amp;topic_name=%E5%85%AD%E8%BF%9E%E5%86%A0%21%E5%9B%BD%E4%B9%92%E5%A5%B3%E5%9B%A2%E6%A8%AA%E6%89%AB%E6%97%A5%E6%9C%AC%E5%A4%BA%E9%87%91",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "各省宝藏泡面,泡面也有限定款",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365745&amp;topic_name=%E5%90%84%E7%9C%81%E5%AE%9D%E8%97%8F%E6%B3%A1%E9%9D%A2%2C%E6%B3%A1%E9%9D%A2%E4%B9%9F%E6%9C%89%E9%99%90%E5%AE%9A%E6%AC%BE",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "国乒男团憾负日本无缘金牌",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365636&amp;topic_name=%E5%9B%BD%E4%B9%92%E7%94%B7%E5%9B%A2%E6%86%BE%E8%B4%9F%E6%97%A5%E6%9C%AC%E6%97%A0%E7%BC%98%E9%87%91%E7%89%8C",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "吧友手搓AI娘网站,梗图全收录",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365534&amp;topic_name=%E5%90%A7%E5%8F%8B%E6%89%8B%E6%90%93AI%E5%A8%98%E7%BD%91%E7%AB%99%2C%E6%A2%97%E5%9B%BE%E5%85%A8%E6%94%B6%E5%BD%95",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "Xun不听指挥,丹妮气破防",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365564&amp;topic_name=Xun%E4%B8%8D%E5%90%AC%E6%8C%87%E6%8C%A5%2C%E4%B8%B9%E5%A6%AE%E6%B0%94%E7%A0%B4%E9%98%B2",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "配送50骑手赚2.7,平台抽太狠",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365574&amp;topic_name=%E9%85%8D%E9%80%8150%E9%AA%91%E6%89%8B%E8%B5%9A2.7%2C%E5%B9%B3%E5%8F%B0%E6%8A%BD%E5%A4%AA%E7%8B%A0",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "DeepSeek将参加联合国会议",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365570&amp;topic_name=DeepSeek%E5%B0%86%E5%8F%82%E5%8A%A0%E8%81%94%E5%90%88%E5%9B%BD%E4%BC%9A%E8%AE%AE",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "管泽元48分更新电台后秒删",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365492&amp;topic_name=%E7%AE%A1%E6%B3%BD%E5%85%8348%E5%88%86%E6%9B%B4%E6%96%B0%E7%94%B5%E5%8F%B0%E5%90%8E%E7%A7%92%E5%88%A0",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "东京医大改分阻拦女生入学",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365518&amp;topic_name=%E4%B8%9C%E4%BA%AC%E5%8C%BB%E5%A4%A7%E6%94%B9%E5%88%86%E9%98%BB%E6%8B%A6%E5%A5%B3%E7%94%9F%E5%85%A5%E5%AD%A6",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "微软申请游戏内插播广告专利",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365502&amp;topic_name=%E5%BE%AE%E8%BD%AF%E7%94%B3%E8%AF%B7%E6%B8%B8%E6%88%8F%E5%86%85%E6%8F%92%E6%92%AD%E5%B9%BF%E5%91%8A%E4%B8%93%E5%88%A9",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "博主怒斥开屏广告被封禁",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365432&amp;topic_name=%E5%8D%9A%E4%B8%BB%E6%80%92%E6%96%A5%E5%BC%80%E5%B1%8F%E5%B9%BF%E5%91%8A%E8%A2%AB%E5%B0%81%E7%A6%81",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "吧友评无职转生:鲁迪铁好人",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365428&amp;topic_name=%E5%90%A7%E5%8F%8B%E8%AF%84%E6%97%A0%E8%81%8C%E8%BD%AC%E7%94%9F%3A%E9%B2%81%E8%BF%AA%E9%93%81%E5%A5%BD%E4%BA%BA",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "骑行圈鸟哥22天撬走准新娘",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365441&amp;topic_name=%E9%AA%91%E8%A1%8C%E5%9C%88%E9%B8%9F%E5%93%A522%E5%A4%A9%E6%92%AC%E8%B5%B0%E5%87%86%E6%96%B0%E5%A8%98",
+        "hot": "",
+        "time": ""
+      },
+      {
+        "platform": "百度贴吧",
+        "title": "渣男文鼻祖斥巨资求娶女友",
+        "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28365440&amp;topic_name=%E6%B8%A3%E7%94%B7%E6%96%87%E9%BC%BB%E7%A5%96%E6%96%A5%E5%B7%A8%E8%B5%84%E6%B1%82%E5%A8%B6%E5%A5%B3%E5%8F%8B",
+        "hot": "",
+        "time": ""
+      }
+    ]
+  }
+}
